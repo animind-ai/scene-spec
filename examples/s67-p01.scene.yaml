@@ -1,5 +1,5 @@
 # §6.7 例1(1) 高阶等差数列：用 scene-spec 改写的完整一支。
-# 旁白与 highSchool/lessons/sec6-7/p01/build.py 一致；画面对应 p01/scenes.py。
+# 旁白与 highSchool/lessons/sec6-7/p01/audio 里实际合成的 37 句一致（比 build.py 多了累加法一段）；画面对应 p01/scenes.py。
 # 品牌元素（培玉 logo、讲师头像与署名）不进开源版本，由培玉的私有主题在渲染时叠加。
 spec: "0.1"
 
@@ -66,6 +66,7 @@ objects:
     tex: '121'
     role: HL
     over: card#blank
+    align: {y: card#ask}
   table:
     widget: diff_table
     in: stage
@@ -78,28 +79,15 @@ objects:
     widget: chips
     in: footer
     items: ["↓ 往下做差", "→ 在等差层补全", "↑ 逐层加回"]
-  f_c:
+  telescoping:
     type: math
-    tex: 'c_n = n + 2'
-    role: C
+    tex: 'b_2 = b_1 + c_1 \\ b_3 = b_2 + c_2 \\ \vdots \\ b_n = b_{n-1} + c_{n-1}'
     in: side
-  f_b:
+  sum_b:
     type: math
-    tex: 'b_n = \tfrac{1}{2}(n+1)(n+2)'
-    role: B
-    below: f_c
-    gap: sm
-  f_a:
-    type: math
-    tex: 'A_n = \tfrac{1}{6}n(n+1)(n+2) + 1'
-    role: A
-    below: f_b
-    gap: sm
-  verify:
-    type: math
-    tex: 'A_8 = \tfrac{8 \cdot 9 \cdot 10}{6} + 1 = 121'
+    tex: 'b_n = b_1 + c_1 + c_2 + \cdots + c_{n-1}'
     role: HL
-    below: f_a
+    below: telescoping
     gap: md
   recap:
     widget: summary
@@ -107,7 +95,7 @@ objects:
     rows:
       - {tag: 信号, role: A, text: 给了前几项，又说某一层差数列等差或为常数}
       - {tag: 求某一项, role: B, text: 往下做差，在等差那层补全，再往上逐层加回}
-      - {tag: 求通项, role: HL, text: 从等差那层开始，一层一层累加}
+      - {tag: 求通项, role: HL, text: 用累加法，从等差那层开始一层一层往上加}
   question:
     widget: think_box
     below: recap
@@ -164,6 +152,7 @@ beats:
       - {id: s3, pace: normal, text: 等差数列我们最熟，知道了公差，就能一直往后写。}
       - {id: s4, pace: normal, text: "所以思路是三步：{@p1}往下做差，找到等差的那一层；{@p2}在那一层往后补；{@p3}再一层一层加回来。"}
     do:
+      - {at: s1, act: clear, target: card}
       - {at: s2@k, act: mark, target: "card#key"}
       - {at: s4, act: show, target: plan}
       - {at: s4@p1, act: focus, target: "plan[0]"}
@@ -199,6 +188,7 @@ beats:
       - {at: s1@c, act: extend, target: table, args: {row: C, index: "3:6"}, dur: fit}
       - {at: s2, act: focus, target: "plan[2]"}
       - {at: s2@tri, act: triangle, target: table, args: {row: B, index: 4}}
+      - {after: prev, act: extend, target: table, args: {row: B, index: 4}}
       - {at: s3@b5, act: extend, target: table, args: {row: B, index: 5}}
       - {at: s3@b6, act: extend, target: table, args: {row: B, index: 6}}
       - {at: s4@a5, act: extend, target: table, args: {row: A, index: 5}}
@@ -210,22 +200,30 @@ beats:
     shows: landing
     say:
       - {id: s1, pace: ask, text: 可如果题目问的是第一百项呢？一项一项补就太慢了，我们得要通项。}
-      - {id: s2, pace: normal, text: "思路不变，只是把补数换成累加。二阶差数列首项是三，公差是一，{@c}所以 c n 等于 n 加二。"}
-      - {id: s3, pace: normal, text: "一阶差数列，就是首项三，再加上前面所有的 c。累加整理，{@b}b n 等于二分之一，乘 n 加一，乘 n 加二。"}
-      - {id: s4, pace: normal, text: "原数列也一样，首项二，加上前面所有的 b，{@a}得到 A n 等于六分之一乘 n，乘 n 加一，再乘 n 加二，最后加一。"}
-      - {id: s5, pace: slow, text: "代 n 等于八检验一下：{@v}八乘九乘十，除以六，一百二十，加一，一百二十一。对上了。"}
+      - {id: s2, pace: normal, text: "其实刚才往上加的时候，已经藏着一个方法，叫累加法。{@row}先只看一阶差数列这一层。"}
+      - {id: s3, pace: normal, text: "从首项三出发，每往后走一步，就加上下面的一个 c：{@k1}加三得六，{@k2}加四得十，{@k3}加五得十五，{@k4}加六得二十一。"}
+      - {id: s4, pace: normal, text: "所以 {@b5}b 五，就等于首项三，加上 c 一到 c 四，这四个数的和。"}
+      - {id: s5, pace: normal, text: "换成字母也一样：{@eq}b 二等于 b 一加 c 一，b 三等于 b 二加 c 二，一直写到 b n 等于前一项，加上 c 的第 n 减一项。"}
+      - {id: s6, pace: normal, text: "把这些式子左右两边全部加起来。{@cancel}中间的 b，左边出现一次，右边也出现一次，一对一对消掉。"}
+      - {id: s7, pace: slow, text: "只剩下：{@sum}b n 等于 b 一，加上 c 一一直加到 c 的第 n 减一项。这就是累加法。"}
     do:
-      - {at: s2@c, act: transform, from: "table.C[0:6]", to: f_c, match: auto}
-      - {at: s3@b, act: transform, from: "table.B[0:7]", to: f_b, match: auto}
-      - {at: s4@a, act: transform, from: "table.A[0:8]", to: f_a, match: auto}
-      - {at: s5@v, act: show, target: verify}
+      - {at: s1, act: unfocus, target: plan}
+      - {at: s2@row, act: focus, target: "table.B[0:7]"}
+      - {at: s3@k1, act: mark, target: "table.C[0]"}
+      - {at: s3@k2, act: mark, target: "table.C[1]"}
+      - {at: s3@k3, act: mark, target: "table.C[2]"}
+      - {at: s3@k4, act: mark, target: "table.C[3]"}
+      - {at: s4@b5, act: circle, target: "table.B[4]"}
+      - {at: s5@eq, act: show, target: telescoping, style: write}
+      - {at: s6@cancel, act: underline, target: telescoping}
+      - {at: s7@sum, act: transform, from: telescoping, to: sum_b}
       - {after: prev, act: hold, dur: 1.5}
 
   - id: Close
     say:
       - {id: s1, pace: normal, text: 最后收一下，这套方法到底什么时候用、怎么用。}
       - {id: s2, pace: normal, text: "{@sig}信号是：题目给了前几项，又告诉你某一层差数列是等差的，或者是常数。看到它，就把这张差分表画出来。"}
-      - {id: s3, pace: normal, text: "{@one}只求某一项，就往下做差，在等差那层补全，再往上逐层加回。{@all}要求通项，就从等差那层开始，一层一层累加。"}
+      - {id: s3, pace: normal, text: "{@one}只求某一项，就往下做差，在等差那层补全，再往上逐层加回。{@all}要求通项，就用累加法，从等差那层开始一层一层往上加；碰到不是等差的和，试试把每一项拆成两项相减。"}
       - {id: s4, pace: normal, text: 顺带记一个名字：像本题这样，要做三次差才变成常数的数列，叫三阶等差数列。}
       - {id: s5, pace: ask, text: "{@q}最后留个问题给你：本题再往下做一次差，第三层全是一，是常数；而 A n 恰好是 n 的三次式。这是巧合吗？"}
       - {id: s6, pace: slow, text: 想通了，你就多了一种解法：直接设 A n 是三次式，用前四项待定系数。}

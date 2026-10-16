@@ -10,7 +10,7 @@ def test_full_example_passes_without_warnings():
     report = check_file(EXAMPLE)
     assert report.issues == []
     assert report.stats["beats"] == 9
-    assert report.stats["sentences"] == 35  # 与 p01/build.py 的旁白句数一致
+    assert report.stats["sentences"] == 37  # 与 p01/audio 实际合成的句数一致
     assert report.stats["absolute_coords"] == 0
     assert report.stats["unregistered_widgets"] == 0
 

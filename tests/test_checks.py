@@ -67,12 +67,12 @@ def test_item_index_out_of_range(example):
 
 
 def test_layout_reference_must_exist(example):
-    example["objects"]["f_b"]["below"] = "f_x"
+    example["objects"]["sum_b"]["below"] = "f_x"
     assert codes(example) == ["SS310"]
 
 
 def test_layout_self_reference(example):
-    example["objects"]["f_b"]["below"] = "f_b"
+    example["objects"]["sum_b"]["below"] = "sum_b"
     assert "SS341" in codes(example)
 
 
@@ -145,8 +145,8 @@ def test_diff_table_index_out_of_range(example):
 
 
 def test_transform_needs_from_and_to(example):
-    del beat(example, "GeneralTerm")["do"][0]["to"]
-    assert codes(example) == ["SS331"]
+    del beat(example, "GeneralTerm")["do"][9]["to"]
+    assert codes(example) == ["SS331", "SS381"]  # sum_b 随之变成未引用的对象
 
 
 def test_target_required_for_show(example):
@@ -155,7 +155,7 @@ def test_target_required_for_show(example):
 
 
 def test_hold_needs_dur(example):
-    del beat(example, "GeneralTerm")["do"][4]["dur"]
+    del beat(example, "GeneralTerm")["do"][10]["dur"]
     assert codes(example) == ["SS331"]
 
 

@@ -18,7 +18,7 @@ from .textmarks import parse_object_text, parse_say_text
 
 BUILTIN_ACTS = {
     "show", "hide", "transform", "move", "focus", "unfocus", "mark", "unmark",
-    "underline", "circle", "cross", "set", "camera", "hold",
+    "underline", "circle", "cross", "clear", "set", "camera", "hold",
 }
 NEEDS_TARGET = BUILTIN_ACTS - {"transform", "camera", "hold"}
 KNOWN_THEMES = {"paper", "chalk", "jade", "xuan", "blueprint", "riso"}

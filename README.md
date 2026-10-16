@@ -21,7 +21,7 @@ uv run scene-spec check examples/s67-p01.scene.yaml
 
 ```
 examples/s67-p01.scene.yaml: 通过（0 个错误，0 个警告）
-  统计：beats=9，sentences=35，actions=52，custom_beats=0，absolute_coords=0，unregistered_widgets=0
+  统计：beats=9，sentences=37，actions=58，custom_beats=0，absolute_coords=0，unregistered_widgets=0
 ```
 
 - 退出码：`0` 通过（可以有警告），`1` 有错误，`2` 用法错误。
