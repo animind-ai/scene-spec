@@ -117,6 +117,84 @@ def _validate_lines(ctx: WidgetContext, report: Report, path: str) -> None:
                 seen[span.id] = n
 
 
+def _answers(value: object) -> str | None:
+    if not isinstance(value, list) or not all(v is None or (isinstance(v, str) and v) for v in value):
+        return "应为列表，每项是答案文字或 null（这一行没有答案）"
+    return None
+
+
+def _expose_card(definition: dict, data: dict) -> Exposed:
+    exposed = _expose_lines(definition, data)
+    answers = definition.get("answers")
+    if isinstance(answers, list):
+        exposed.parts["answer"] = len(answers)
+    return exposed
+
+
+def _validate_card(ctx: WidgetContext, report: Report, path: str) -> None:
+    _validate_lines(ctx, report, path)
+    answers, lines = ctx.definition.get("answers"), ctx.definition.get("lines")
+    if isinstance(answers, list) and isinstance(lines, list) and len(answers) != len(lines):
+        report.error("SS212", f"{path}.answers", f"answers 有 {len(answers)} 项，lines 有 {len(lines)} 行；没有答案的行写 null")
+
+
+# ---------- 对齐的等式组 ----------
+
+def _eq_rows(value: object) -> str | None:
+    if not isinstance(value, list) or not value:
+        return "应为非空列表"
+    for row in value:
+        if isinstance(row, str) and row:
+            continue
+        if isinstance(row, dict) and isinstance(row.get("tex"), str) and set(row) <= {"tex", "role"}:
+            if "role" in row and row["role"] not in ROLES:
+                return f"role 应为 {'/'.join(sorted(ROLES))} 之一"
+            continue
+        return "每行是 LaTeX 字符串（用 & 标出对齐点），或 {tex, role}"
+    return None
+
+
+# ---------- 数列格子 ----------
+
+def _list_of_literals(value: object) -> str | None:
+    if not isinstance(value, list) or not value or not all(isinstance(v, (int, float, str)) and not isinstance(v, bool) for v in value):
+        return "应为非空列表，每项是数或 LaTeX 字符串"
+    return None
+
+
+def _nonneg_int(value: object) -> str | None:
+    ok = isinstance(value, int) and not isinstance(value, bool) and value >= 0
+    return None if ok else "应为非负整数"
+
+
+def _bool(value: object) -> str | None:
+    return None if isinstance(value, bool) else "应为 true / false"
+
+
+def _expose_cells(definition: dict, data: dict) -> Exposed:
+    values = definition.get("values")
+    n = len(values) if isinstance(values, list) else 0
+    return Exposed(parts={"value": n}, items=n)
+
+
+def _validate_cells(ctx: WidgetContext, report: Report, path: str) -> None:
+    values, labels = ctx.definition.get("values"), ctx.definition.get("labels")
+    if isinstance(values, list) and isinstance(labels, list) and len(values) != len(labels):
+        report.error("SS250", f"{path}.labels", f"labels 有 {len(labels)} 项，values 有 {len(values)} 项")
+    known = ctx.definition.get("known")
+    if isinstance(known, int) and isinstance(values, list) and known > len(values):
+        report.error("SS250", f"{path}.known", f"known={known} 超过了 values 的个数 {len(values)}")
+
+
+def _cells_fill(args: dict, ctx: WidgetContext, report: Report, path: str) -> None:
+    rng = selectors.parse_slice(args.get("index"))
+    n = ctx.exposed.parts.get("value", 0)
+    if rng is None:
+        report.error("SS233", f"{path}.args.index", "index 应为非负整数或 \"i:j\"")
+    elif rng[1] > n:
+        report.error("SS234", f"{path}.args.index", f"只有 {n} 格，下标越界")
+
+
 # ---------- 步骤胶囊、总结卡 ----------
 
 def _expose_items(key: str) -> Callable[[dict, dict], Exposed]:
@@ -243,9 +321,22 @@ def _area_cut(args: dict, ctx: WidgetContext, report: Report, path: str) -> None
 REGISTRY: dict[str, Widget] = {
     "problem_card": Widget(
         "problem_card",
-        params={"lines": (True, _str_list)},
-        expose=_expose_lines,
-        validate=_validate_lines,
+        params={"lines": (True, _str_list), "answers": (False, _answers)},
+        expose=_expose_card,
+        validate=_validate_card,
+    ),
+    "equations": Widget(
+        "equations",
+        params={"rows": (True, _eq_rows)},
+        expose=_expose_items("rows"),
+    ),
+    "seq_cells": Widget(
+        "seq_cells",
+        params={"values": (True, _list_of_literals), "labels": (True, _list_of_literals),
+                "known": (False, _nonneg_int), "dots": (False, _bool)},
+        expose=_expose_cells,
+        actions={"fill": _cells_fill},
+        validate=_validate_cells,
     ),
     "think_box": Widget(
         "think_box",

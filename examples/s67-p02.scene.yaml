@@ -1,0 +1,430 @@
+# §6.7 例1(2) d-等差比数列：用 scene-spec 改写的第二支。
+# 旁白与 highSchool/lessons/sec6-7/p02/build.py 一致（37 句），画面对应 p02/scenes.py。
+# 这一支用到了第一支没有的东西：题卡回填答案（answers）、对齐的等式组（equations）、数列格子（seq_cells），
+# 以及只显示对象里的某几项（show card.answer[2]、show recap[0]）。
+spec: "0.1"
+
+meta:
+  id: s67-p02
+  title: d-等差比数列
+  line: worked
+  units: [S6]
+  grade: 高二
+  author: Boxi Yu
+  license: CC-BY-4.0
+  sources:
+    - kind: problem
+      cite: §6.7 例1(2)（2025·昆明模拟）
+      note: 题面引用；讲解与旁白为原创
+
+pedagogy:
+  insight: d-等差比数列把等比（d=0）和等差（d=k²）装进同一个式子；对任意 n 成立的式子，写两遍消掉常数，结构就露出来
+  misconception: 算几项猜出规律就够了，不用证明
+  status: method
+  landing: Prove
+
+style:
+  theme: paper
+  canvas: "16:9"
+  voice:
+    persona: teacher-hs
+    speed: 1.25
+  subtitles: soft
+
+objects:
+  # ---- 开场 ----
+  title:
+    type: text
+    text: d-等差比数列
+    role: A
+    level: title
+    in: stage
+  def_formula:
+    type: math
+    tex: 'a_{n+1}^2-a_na_{n+2}=d'
+    role: HL
+    level: display
+    below: title
+    gap: lg
+  q_geo:
+    type: text
+    text: 等比？
+    role: B
+    level: title
+    below: def_formula
+    gap: lg
+  q_ari:
+    type: text
+    text: 等差？
+    role: B
+    level: title
+    right_of: q_geo
+    gap: xl
+
+  # ---- 题卡 ----
+  card:
+    widget: problem_card
+    pin: top
+    lines:
+      - '[例1(2)]{.bold} 对于数列 $\{a_n\}$，若存在正整数 $m$，使得对任意的 $n\ge m$，都有'
+      - '[$a_{n+1}^2-a_na_{n+2}=d$]{#rule .HL}（$d$ 为常数），则称 $\{a_n\}$ 从第 $m$ 项起为[“$d$-等差比数列”]{#name .A}．'
+      - '① 已知 [$a_n=2^n$]{#an .B}，判断 $\{a_n\}$ 是否为“$d$-等差比数列”，若是，求出 $d$ 的值；'
+      - '② 若 $\{b_n\}$ 从第 1 项起为“1-等差比数列”，[$b_1=1$，$b_2=2$]{#binit .B}，求 $\{b_n\}$ 的通项公式；'
+      - '③ 在②的条件下，$\{b_n\}$ 的前 $n$ 项和为 $S_n$，若对任意的 $n\in\mathbf{N}^*$ 都有 [$S_n\ge\lambda b_n$]{#ineq .C}，求实数 $\lambda$ 的取值范围．'
+    answers: [null, null, '$d=0$', '$b_n=n$', '$\lambda\le 1$']
+  plan:
+    widget: chips
+    in: footer
+    items: ["① 判断，求 d", "② 求通项", "③ 求 λ 的范围"]
+
+  # ---- 翻译 ----
+  tr_eq:
+    type: math
+    tex: 'a_{n+1}^2-a_na_{n+2}=d'
+    role: HL
+    in: stage
+  tr_zero:
+    type: math
+    tex: 'a_{n+1}^2=a_na_{n+2}'
+    role: B
+    over: tr_eq
+  tr_name:
+    type: text
+    text: 等比中项
+    role: HL
+    below: tr_zero
+    gap: md
+  tr_ex:
+    type: text
+    text: '例如 $2,4,8$：$4^2=2\times 8$'
+    role: DIM
+    below: tr_name
+    gap: sm
+  tr_d0:
+    type: text
+    text: '$d=0$ $\Longrightarrow$ [就是等比数列]{.B}'
+    below: tr_zero
+    gap: lg
+  tr_d1:
+    type: text
+    text: '$d\ne 0$ $\Longrightarrow$ 和等比差一个常数 $d$'
+    below: tr_d0
+    gap: sm
+
+  # ---- 第一问 ----
+  p1:
+    widget: equations
+    in: stage
+    rows:
+      - {tex: 'a_n &= 2^n', role: B}
+      - 'a_{n+1}^2 &= (2^{n+1})^2 = 2^{2n+2}'
+      - 'a_na_{n+2} &= 2^n\cdot 2^{n+2} = 2^{2n+2}'
+      - {tex: 'a_{n+1}^2-a_na_{n+2} &= 0', role: HL}
+  p1_verdict:
+    type: text
+    text: '是“$0$-等差比数列”，$d=0$'
+    role: HL
+    below: p1
+    gap: md
+  p1_note:
+    type: text
+    text: '$2^n$ 本来就是等比数列 $\checkmark$'
+    role: B
+    below: p1_verdict
+    gap: sm
+
+  # ---- 第二问：先猜 ----
+  g_rule:
+    type: math
+    tex: 'b_{n+1}^2-b_nb_{n+2}=1'
+    role: HL
+    in: stage
+  g_seq:
+    widget: seq_cells
+    below: g_rule
+    gap: md
+    values: [1, 2, 3, 4]
+    labels: ['b_1', 'b_2', 'b_3', 'b_4']
+    known: 2
+    dots: true
+  g_n1:
+    type: text
+    text: '$n=1$：$2^2-1\cdot b_3=1$ $\Rightarrow$ [$b_3=3$]{.HL}'
+    below: g_seq
+    gap: md
+  g_n2:
+    type: text
+    text: '$n=2$：$3^2-2\cdot b_4=1$ $\Rightarrow$ [$b_4=4$]{.HL}'
+    below: g_n1
+    gap: sm
+  g_guess:
+    type: text
+    text: '猜：$b_n=n$ ？'
+    role: HL
+    right_of: g_seq
+    gap: lg
+  g_warn:
+    type: text
+    text: '猜 $\ne$ 证'
+    role: NO
+    below: g_guess
+    gap: sm
+
+  # ---- 第二问：再证 ----
+  pv_chain:
+    widget: equations
+    in: stage
+    rows:
+      - {tex: 'b_{n+1}^2-b_nb_{n+2} &= 1 \qquad (n)', role: B}
+      - {tex: 'b_{n+2}^2-b_{n+1}b_{n+3} &= 1 \qquad (n+1)', role: C}
+      - 'b_{n+1}^2-b_nb_{n+2} &= b_{n+2}^2-b_{n+1}b_{n+3}'
+      - 'b_{n+1}^2+b_{n+1}b_{n+3} &= b_nb_{n+2}+b_{n+2}^2'
+      - 'b_{n+1}(b_{n+1}+b_{n+3}) &= b_{n+2}(b_n+b_{n+2})'
+  pv_div:
+    type: text
+    text: '两边同除以 $b_{n+1}b_{n+2}$'
+    role: DIM
+    below: pv_chain
+    gap: sm
+  pv_ratio:
+    type: math
+    tex: '\frac{b_{n+1}+b_{n+3}}{b_{n+2}}=\frac{b_n+b_{n+2}}{b_{n+1}}'
+    in: stage
+  pv_const:
+    type: text
+    text: '和 $n$ 无关：$\dfrac{b_n+b_{n+2}}{b_{n+1}}$ 是常数'
+    role: HL
+    below: pv_ratio
+    gap: md
+  pv_value:
+    type: math
+    tex: '\frac{b_n+b_{n+2}}{b_{n+1}}=\frac{b_1+b_3}{b_2}=\frac{1+3}{2}=2'
+    in: stage
+  pv_mid:
+    type: text
+    text: '$b_n+b_{n+2}=2b_{n+1}$ [等差中项]{.HL}'
+    below: pv_value
+    gap: md
+  pv_result:
+    type: text
+    text: '$\{b_n\}$ 等差，首项 $1$，公差 $1$ $\Rightarrow$ [$b_n=n$]{.HL}'
+    below: pv_mid
+    gap: sm
+
+  # ---- 第三问 ----
+  pt_sum:
+    type: math
+    tex: 'b_n=n\ \Rightarrow\ S_n=\frac{n(n+1)}{2}'
+    in: stage
+  pt_ineq:
+    type: math
+    tex: '\frac{n(n+1)}{2}\ge\lambda n'
+    role: C
+    below: pt_sum
+    gap: md
+  pt_sign:
+    type: text
+    text: '$n>0$，两边除以 $n$，不等号方向不变'
+    role: DIM
+    below: pt_ineq
+    gap: sm
+  pt_bound:
+    type: text
+    text: '$\Rightarrow$ [$\lambda\le\dfrac{n+1}{2}$]{.C}，对任意 $n\in\mathbf{N}^*$ 成立'
+    right_of: pt_ineq
+    gap: md
+  pt_vals:
+    widget: seq_cells
+    below: pt_sign
+    gap: md
+    values: ['1', '\tfrac32', '2', '\tfrac52']
+    labels: ['n=1', 'n=2', 'n=3', 'n=4']
+    dots: true
+  pt_answer:
+    type: text
+    text: '最小值 $1$ $\Rightarrow$ [$\lambda\le 1$]{.HL}'
+    right_of: pt_vals
+    gap: lg
+
+  # ---- 收尾 ----
+  recap:
+    widget: summary
+    in: stage
+    rows:
+      - {tag: 先翻译, role: HL, text: '$d=0$：$a_{n+1}^2=a_na_{n+2}$，就是等比数列'}
+      - {tag: 写两遍, role: B, text: '对任意 $n$ 成立的式子，写出 $n$ 与 $n+1$ 两式，消去常数，结构就出来了'}
+      - {tag: 求通项, role: A, text: 先按定义算几项猜答案，再用“写两遍”证明}
+      - {tag: 恒成立, role: C, text: '分离参数 $\Rightarrow$ 取最值；除之前先看符号'}
+  question:
+    widget: think_box
+    below: recap
+    gap: md
+    lines:
+      - '[想一想]{.bold} 若 $\{a_n\}$ 是公差为 $k$ 的等差数列，$a_{n+1}^2-a_na_{n+2}=\,?$'
+      - '$=k^2$，也是常数：等比（$d=0$）、等差（$d=k^2$）都是它的特例'
+
+beats:
+  - id: Intro
+    say:
+      - {id: s1, pace: normal, text: "这一题，题目又造了一个新名词，{@name}叫 d 等差比数列。"}
+      - {id: s2, pace: normal, text: "名字看着唬人，但做完你会发现，{@form}它其实是把等比和等差，装进了同一个式子里。"}
+    do:
+      - {at: s1@name, act: show, target: title, style: write}
+      - {at: s2@form, act: show, target: def_formula, style: write}
+      - {after: prev, act: show, target: q_geo}
+      - {with: prev, act: show, target: q_ari}
+
+  - id: Problem
+    say:
+      - {id: s1, pace: normal, text: "先读题。对一个数列，如果从某一项起，后面每一个 n 都满足：{@rule}a n 加一的平方，减去 a n 乘 a n 加二，等于同一个常数 d，"}
+      - {id: s2, pace: normal, text: "{@name}就说它从第 m 项起，是 d 等差比数列。"}
+      - {id: s3, pace: normal, text: "第一问，{@p1}a n 等于二的 n 次方，判断它是不是，是的话求 d。"}
+      - {id: s4, pace: normal, text: "第二问，{@p2}数列 b n 从第一项起就是等差比数列，而且 d 等于一；b 一等于一，b 二等于二，求通项公式。"}
+      - {id: s5, pace: normal, text: "第三问，{@p3}在第二问的条件下，S n 大于等于拉姆达乘 b n 对任意 n 都成立，求拉姆达的取值范围。"}
+    do:
+      - {at: s1, act: hide, target: title}
+      - {with: prev, act: hide, target: def_formula}
+      - {with: prev, act: hide, target: q_geo}
+      - {with: prev, act: hide, target: q_ari}
+      - {after: prev, act: show, target: card}
+      - {at: s1@rule, act: underline, target: "card#rule"}
+      - {at: s2@name, act: underline, target: "card#name"}
+      - {at: s3@p1, act: underline, target: "card#an"}
+      - {at: s4@p2, act: underline, target: "card#binit"}
+      - {at: s5@p3, act: underline, target: "card#ineq"}
+
+  - id: Translate
+    say:
+      - {id: s1, pace: ask, text: 先别急着做。这个定义式，你看着眼熟吗？}
+      - {id: s2, pace: slow, text: "如果 d 等于零，{@zero}它就是：a n 加一的平方，等于 a n 乘 a n 加二。{@mean}这正是等比中项！"}
+      - {id: s3, pace: normal, text: "所以，零等差比数列，就是我们熟悉的等比数列；{@ne}d 不等于零，就是和等比差了一个常数。{@go}带着这个理解，去做三问。"}
+    do:
+      - {at: s1, act: clear, target: card}
+      - {after: prev, act: transform, from: "card#rule", to: tr_eq}
+      - {at: s2@zero, act: hide, target: tr_eq}
+      - {with: prev, act: show, target: tr_zero}
+      - {at: s2@mean, act: show, target: tr_name}
+      - {with: prev, act: show, target: tr_ex}
+      - {at: s3, act: hide, target: tr_name}
+      - {with: prev, act: hide, target: tr_ex}
+      - {after: prev, act: show, target: tr_d0}
+      - {at: s3@ne, act: show, target: tr_d1}
+      - {at: s3@go, act: show, target: plan}
+
+  - id: PartOne
+    say:
+      - {id: s1, pace: normal, text: "第一问。{@go}照章办事，把二的 n 次方代进定义式。"}
+      - {id: s2, pace: brisk, text: "{@r1}a n 加一的平方，是二的二 n 加二次方；{@r2}a n 乘 a n 加二，也是二的二 n 加二次方。"}
+      - {id: s3, pace: slow, text: "{@zero}一减，等于零。{@d}所以它是零等差比数列，d 等于零。"}
+      - {id: s4, pace: normal, text: "{@geo}这也和刚才对上了：二的 n 次方，本来就是等比数列。"}
+    do:
+      - {at: s1, act: hide, target: tr_zero}
+      - {with: prev, act: hide, target: tr_d0}
+      - {with: prev, act: hide, target: tr_d1}
+      - {after: prev, act: focus, target: "plan[0]"}
+      - {with: prev, act: focus, target: "card[2]"}
+      - {at: s1@go, act: show, target: "p1[0]"}
+      - {at: s2@r1, act: show, target: "p1[1]"}
+      - {at: s2@r2, act: show, target: "p1[2]"}
+      - {at: s3@zero, act: show, target: "p1[3]"}
+      - {at: s3@d, act: show, target: p1_verdict}
+      - {at: s4@geo, act: show, target: p1_note}
+      - {after: prev, act: show, target: "card.answer[2]"}
+
+  - id: Guess
+    shows: misconception
+    say:
+      - {id: s1, pace: normal, text: "第二问，要通项。{@look}先别急着推公式，按定义算几项，找找感觉。"}
+      - {id: s2, pace: normal, text: "{@n1}n 取一：b 二的平方，减 b 一乘 b 三，等于一。也就是四减 b 三等于一，{@b3}b 三等于三。"}
+      - {id: s3, pace: brisk, text: "{@n2}n 取二：九减二倍的 b 四等于一，{@b4}b 四等于四。"}
+      - {id: s4, pace: ask, text: "{@guess}一、二、三、四，看起来 b n 就等于 n。{@warn}但猜出来的不算数，得证明。"}
+    do:
+      - {at: s1, act: hide, target: p1}
+      - {with: prev, act: hide, target: p1_verdict}
+      - {with: prev, act: hide, target: p1_note}
+      - {after: prev, act: focus, target: "plan[1]"}
+      - {with: prev, act: focus, target: "card[3]"}
+      - {at: s1@look, act: show, target: g_rule}
+      - {after: prev, act: show, target: g_seq}
+      - {at: s2@n1, act: show, target: g_n1}
+      - {at: s2@b3, act: fill, target: g_seq, args: {index: 2}}
+      - {at: s3@n2, act: show, target: g_n2}
+      - {at: s3@b4, act: fill, target: g_seq, args: {index: 3}}
+      - {at: s4@guess, act: show, target: g_guess}
+      - {at: s4@warn, act: show, target: g_warn}
+
+  - id: Prove
+    shows: landing
+    say:
+      - {id: s1, pace: normal, text: "定义式对每一个 n 都成立。{@w1}那就写两遍：n 一次，{@w2}n 加一再一次。{@eq}两个都等于一，所以它们相等。"}
+      - {id: s2, pace: normal, text: "{@move}移项，{@fac}左右两边各提一个公因式，{@div}再同时除以 b n 加一乘 b n 加二。"}
+      - {id: s3, pace: slow, text: "得到：{@ratio}b n 加 b n 加二，再除以 b n 加一，{@const}这个比值和 n 无关，是个常数。"}
+      - {id: s4, pace: brisk, text: "常数是多少？{@val}代 n 等于一：一加三，除以二，等于二。"}
+      - {id: s5, pace: slow, text: "{@mid}于是 b n 加 b n 加二，等于二倍的 b n 加一。这是等差中项！{@res}所以 b n 是等差数列，首项一，公差一，b n 等于 n。和刚才猜的一样。"}
+    do:
+      - {at: s1, act: hide, target: g_rule}
+      - {with: prev, act: hide, target: g_seq}
+      - {with: prev, act: hide, target: g_n1}
+      - {with: prev, act: hide, target: g_n2}
+      - {with: prev, act: hide, target: g_guess}
+      - {with: prev, act: hide, target: g_warn}
+      - {at: s1@w1, act: show, target: "pv_chain[0]"}
+      - {at: s1@w2, act: show, target: "pv_chain[1]"}
+      - {at: s1@eq, act: show, target: "pv_chain[2]"}
+      - {at: s2@move, act: show, target: "pv_chain[3]"}
+      - {at: s2@fac, act: show, target: "pv_chain[4]"}
+      - {at: s2@div, act: show, target: pv_div}
+      - {at: s3@ratio, act: hide, target: pv_chain}
+      - {with: prev, act: hide, target: pv_div}
+      - {after: prev, act: show, target: pv_ratio}
+      - {at: s3@const, act: show, target: pv_const}
+      - {at: s4@val, act: hide, target: pv_ratio}
+      - {with: prev, act: hide, target: pv_const}
+      - {after: prev, act: show, target: pv_value}
+      - {at: s5@mid, act: show, target: pv_mid}
+      - {at: s5@res, act: show, target: pv_result}
+      - {after: prev, act: show, target: "card.answer[3]"}
+
+  - id: PartThree
+    say:
+      - {id: s1, pace: normal, text: "第三问。{@sum}b n 等于 n，前 n 项和就是二分之一乘 n 乘 n 加一。"}
+      - {id: s2, pace: normal, text: "{@ineq}不等式变成：二分之一乘 n 乘 n 加一，大于等于拉姆达乘 n。{@sign}n 是正数，两边除以 n，不等号方向不变。"}
+      - {id: s3, pace: normal, text: "{@bound}得到拉姆达小于等于二分之 n 加一，而且要对每一个 n 都成立。"}
+      - {id: s4, pace: slow, text: "{@min}所以拉姆达要小于等于它的最小值。{@one}n 等于一时最小，是一。{@ans}所以拉姆达小于等于一。"}
+    do:
+      - {at: s1, act: hide, target: pv_value}
+      - {with: prev, act: hide, target: pv_mid}
+      - {with: prev, act: hide, target: pv_result}
+      - {after: prev, act: focus, target: "plan[2]"}
+      - {with: prev, act: focus, target: "card[4]"}
+      - {at: s1@sum, act: show, target: pt_sum}
+      - {at: s2@ineq, act: show, target: pt_ineq}
+      - {at: s2@sign, act: show, target: pt_sign}
+      - {at: s3@bound, act: show, target: pt_bound}
+      - {at: s4@min, act: show, target: pt_vals}
+      - {at: s4@one, act: circle, target: "pt_vals[0]"}
+      - {at: s4@ans, act: show, target: pt_answer}
+      - {after: prev, act: show, target: "card.answer[4]"}
+
+  - id: Close
+    say:
+      - {id: s1, pace: normal, text: "收一下。{@r0}这题的新定义，先翻译：d 等于零，就是等比。"}
+      - {id: s2, pace: normal, text: "{@r1}遇到对任意 n 都成立的式子，一个常用动作是：写两遍，n 一次，n 加一一次，让常数消掉，结构就露出来了。"}
+      - {id: s3, pace: normal, text: "{@r2}求通项，可以先算几项猜答案，再用这个动作去证明。{@r3}恒成立求参数，就分离参数、取最值；除之前，先看符号。"}
+      - {id: s4, pace: ask, text: "{@q}最后想一想：为什么叫等差比？如果 a n 是公差为 k 的等差数列，算一算，a n 加一的平方减 a n 乘 a n 加二，等于多少？"}
+      - {id: s5, pace: slow, text: "{@a}答案是 k 的平方，也是常数。所以等比数列和等差数列，都是 d 等差比数列的特例，名字里既有等差、又有比。"}
+    do:
+      - {at: s1, act: hide, target: pt_sum}
+      - {with: prev, act: hide, target: pt_ineq}
+      - {with: prev, act: hide, target: pt_sign}
+      - {with: prev, act: hide, target: pt_bound}
+      - {with: prev, act: hide, target: pt_vals}
+      - {with: prev, act: hide, target: pt_answer}
+      - {with: prev, act: hide, target: plan}
+      - {with: prev, act: unfocus, target: card}
+      - {at: s1@r0, act: show, target: "recap[0]"}
+      - {at: s2@r1, act: show, target: "recap[1]"}
+      - {at: s3@r2, act: show, target: "recap[2]"}
+      - {at: s3@r3, act: show, target: "recap[3]"}
+      - {at: s4@q, act: show, target: "question[0]"}
+      - {at: s5@a, act: show, target: "question[1]"}

@@ -40,6 +40,7 @@ objects:
     type: text
     text: 高阶等差数列
     role: A
+    level: display
     in: stage
   subtitle:
     type: text

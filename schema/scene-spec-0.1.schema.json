@@ -4,143 +4,328 @@
   "title": "scene-spec 0.1",
   "description": "一支数学讲解视频的场景描述：讲什么、画什么、什么时候动。",
   "type": "object",
-  "required": ["spec", "meta", "beats"],
+  "required": [
+    "spec",
+    "meta",
+    "beats"
+  ],
   "additionalProperties": false,
   "properties": {
-    "spec": { "const": "0.1" },
-    "meta": { "$ref": "#/$defs/meta" },
-    "pedagogy": { "$ref": "#/$defs/pedagogy" },
-    "style": { "$ref": "#/$defs/style" },
+    "spec": {
+      "const": "0.1"
+    },
+    "meta": {
+      "$ref": "#/$defs/meta"
+    },
+    "pedagogy": {
+      "$ref": "#/$defs/pedagogy"
+    },
+    "style": {
+      "$ref": "#/$defs/style"
+    },
     "data": {
       "type": "object",
-      "propertyNames": { "$ref": "#/$defs/name" },
-      "additionalProperties": { "$ref": "#/$defs/literal" }
+      "propertyNames": {
+        "$ref": "#/$defs/name"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/literal"
+      }
     },
     "objects": {
       "type": "object",
-      "propertyNames": { "$ref": "#/$defs/objectId" },
-      "additionalProperties": { "$ref": "#/$defs/objectDef" }
+      "propertyNames": {
+        "$ref": "#/$defs/objectId"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/objectDef"
+      }
     },
     "beats": {
       "type": "array",
       "minItems": 1,
-      "items": { "$ref": "#/$defs/beat" }
+      "items": {
+        "$ref": "#/$defs/beat"
+      }
     }
   },
   "$defs": {
-    "name": { "type": "string", "pattern": "^[A-Za-z_][A-Za-z0-9_]*$" },
-    "objectId": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" },
-    "beatId": { "type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_]*$" },
+    "name": {
+      "type": "string",
+      "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+    },
+    "objectId": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*$"
+    },
+    "beatId": {
+      "type": "string",
+      "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+    },
     "selector": {
       "type": "string",
       "description": "对象或对象的一部分：obj、obj#span、obj.part[i]、obj[i]、obj[i:j]",
       "pattern": "^[a-z][a-z0-9_]*(#[A-Za-z_][A-Za-z0-9_]*|\\.[A-Za-z_][A-Za-z0-9_]*(\\[[0-9]+(:[0-9]+)?\\])?|\\[[0-9]+(:[0-9]+)?\\])?$"
     },
-    "role": { "enum": ["FG", "A", "B", "C", "HL", "NO", "DIM"] },
+    "role": {
+      "enum": [
+        "FG",
+        "A",
+        "B",
+        "C",
+        "HL",
+        "NO",
+        "DIM"
+      ]
+    },
     "literal": {
       "description": "字面量：数、字符串、布尔、null，或它们组成的列表 / 映射。不支持表达式。",
       "anyOf": [
-        { "type": ["number", "string", "boolean", "null"] },
-        { "type": "array", "items": { "$ref": "#/$defs/literal" } },
+        {
+          "type": [
+            "number",
+            "string",
+            "boolean",
+            "null"
+          ]
+        },
+        {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/literal"
+          }
+        },
         {
           "type": "object",
-          "propertyNames": { "$ref": "#/$defs/name" },
-          "additionalProperties": { "$ref": "#/$defs/literal" }
+          "propertyNames": {
+            "$ref": "#/$defs/name"
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/literal"
+          }
         }
       ]
     },
-
     "meta": {
       "type": "object",
-      "required": ["id", "title", "line", "author", "license"],
+      "required": [
+        "id",
+        "title",
+        "line",
+        "author",
+        "license"
+      ],
       "additionalProperties": false,
       "properties": {
-        "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
-        "title": { "type": "string", "minLength": 1 },
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9-]*$"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
         "line": {
           "description": "产品线：insight 洞察短视频 | worked 例题讲解 | contest 竞赛拔高",
-          "enum": ["insight", "worked", "contest"]
+          "enum": [
+            "insight",
+            "worked",
+            "contest"
+          ]
         },
         "units": {
           "type": "array",
-          "items": { "type": "string", "pattern": "^[PMHJSX][0-9]{1,2}b?$" },
+          "items": {
+            "type": "string",
+            "pattern": "^[PMHJSX][0-9]{1,2}b?$"
+          },
           "uniqueItems": true
         },
-        "episode": { "type": ["integer", "null"], "minimum": 1 },
-        "grade": { "type": "string" },
-        "author": { "type": "string", "minLength": 1 },
-        "license": { "enum": ["CC-BY-4.0", "CC-BY-SA-4.0", "MIT"] },
+        "episode": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1
+        },
+        "grade": {
+          "type": "string"
+        },
+        "author": {
+          "type": "string",
+          "minLength": 1
+        },
+        "license": {
+          "enum": [
+            "CC-BY-4.0",
+            "CC-BY-SA-4.0",
+            "MIT"
+          ]
+        },
         "sources": {
           "type": "array",
           "items": {
             "type": "object",
-            "required": ["kind", "cite"],
+            "required": [
+              "kind",
+              "cite"
+            ],
             "additionalProperties": false,
             "properties": {
-              "kind": { "enum": ["problem", "figure", "text", "data", "other"] },
-              "cite": { "type": "string", "minLength": 1 },
-              "note": { "type": "string" }
+              "kind": {
+                "enum": [
+                  "problem",
+                  "figure",
+                  "text",
+                  "data",
+                  "other"
+                ]
+              },
+              "cite": {
+                "type": "string",
+                "minLength": 1
+              },
+              "note": {
+                "type": "string"
+              }
             }
           }
         }
       }
     },
-
     "pedagogy": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "insight": { "type": "string", "minLength": 1 },
-        "misconception": { "type": "string", "minLength": 1 },
-        "non_example": { "type": "string", "minLength": 1 },
+        "insight": {
+          "type": "string",
+          "minLength": 1
+        },
+        "misconception": {
+          "type": "string",
+          "minLength": 1
+        },
+        "non_example": {
+          "type": "string",
+          "minLength": 1
+        },
         "status": {
           "description": "proof 证明 | demo 演示 | motivation 动机 | method 方法",
-          "enum": ["proof", "demo", "motivation", "method"]
+          "enum": [
+            "proof",
+            "demo",
+            "motivation",
+            "method"
+          ]
         },
-        "landing": { "$ref": "#/$defs/beatId" },
-        "checks": { "type": "array", "items": { "type": "string" }, "uniqueItems": true }
+        "landing": {
+          "$ref": "#/$defs/beatId"
+        },
+        "checks": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        }
       }
     },
-
     "style": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "theme": { "type": "string", "pattern": "^[a-z][a-z0-9_-]*$" },
-        "canvas": { "enum": ["16:9", "9:16", "4:3"] },
+        "theme": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_-]*$"
+        },
+        "canvas": {
+          "enum": [
+            "16:9",
+            "9:16",
+            "4:3"
+          ]
+        },
         "voice": {
           "type": "object",
           "additionalProperties": false,
           "properties": {
-            "persona": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
-            "speed": { "type": "number", "minimum": 0.5, "maximum": 2 }
+            "persona": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9-]*$"
+            },
+            "speed": {
+              "type": "number",
+              "minimum": 0.5,
+              "maximum": 2
+            }
           }
         },
-        "segmented": { "type": "boolean" },
-        "subtitles": { "enum": ["soft", "none"] },
-        "min_font": { "type": "integer", "minimum": 12, "maximum": 96 }
+        "segmented": {
+          "type": "boolean"
+        },
+        "subtitles": {
+          "enum": [
+            "soft",
+            "none"
+          ]
+        },
+        "min_font": {
+          "type": "integer",
+          "minimum": 12,
+          "maximum": 96
+        }
       }
     },
-
     "layout": {
       "description": "布局约束：只写关系，不写坐标（at 是受限的逃生口）。",
       "type": "object",
       "properties": {
-        "in": { "enum": ["top", "stage", "footer", "side"] },
-        "below": { "$ref": "#/$defs/selector" },
-        "above": { "$ref": "#/$defs/selector" },
-        "left_of": { "$ref": "#/$defs/selector" },
-        "right_of": { "$ref": "#/$defs/selector" },
-        "within": { "$ref": "#/$defs/selector" },
-        "over": { "$ref": "#/$defs/selector" },
-        "gap": { "enum": ["xs", "sm", "md", "lg", "xl"] },
+        "in": {
+          "enum": [
+            "top",
+            "stage",
+            "footer",
+            "side"
+          ]
+        },
+        "below": {
+          "$ref": "#/$defs/selector"
+        },
+        "above": {
+          "$ref": "#/$defs/selector"
+        },
+        "left_of": {
+          "$ref": "#/$defs/selector"
+        },
+        "right_of": {
+          "$ref": "#/$defs/selector"
+        },
+        "within": {
+          "$ref": "#/$defs/selector"
+        },
+        "over": {
+          "$ref": "#/$defs/selector"
+        },
+        "gap": {
+          "enum": [
+            "xs",
+            "sm",
+            "md",
+            "lg",
+            "xl"
+          ]
+        },
         "align": {
           "type": "object",
           "additionalProperties": false,
           "minProperties": 1,
           "properties": {
-            "x": { "$ref": "#/$defs/selector" },
-            "y": { "$ref": "#/$defs/selector" }
+            "x": {
+              "$ref": "#/$defs/selector"
+            },
+            "y": {
+              "$ref": "#/$defs/selector"
+            }
           }
         },
         "size": {
@@ -148,91 +333,226 @@
           "additionalProperties": false,
           "minProperties": 1,
           "properties": {
-            "max_width": { "type": "number", "exclusiveMinimum": 0, "maximum": 1 },
-            "max_height": { "type": "number", "exclusiveMinimum": 0, "maximum": 1 }
+            "max_width": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "maximum": 1
+            },
+            "max_height": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "maximum": 1
+            }
           }
         },
-        "pin": { "enum": ["top"] },
+        "pin": {
+          "enum": [
+            "top"
+          ]
+        },
         "at": {
           "description": "绝对坐标逃生口：insight 线禁止，其余警告。",
           "type": "array",
-          "items": { "type": "number" },
+          "items": {
+            "type": "number"
+          },
           "minItems": 2,
           "maxItems": 2
         }
       }
     },
-
     "objectDef": {
       "oneOf": [
-        { "$ref": "#/$defs/basicObject" },
-        { "$ref": "#/$defs/widgetObject" }
+        {
+          "$ref": "#/$defs/basicObject"
+        },
+        {
+          "$ref": "#/$defs/widgetObject"
+        }
       ]
     },
     "basicObject": {
       "type": "object",
-      "required": ["type"],
-      "allOf": [{ "$ref": "#/$defs/layout" }],
+      "required": [
+        "type"
+      ],
+      "allOf": [
+        {
+          "$ref": "#/$defs/layout"
+        }
+      ],
       "properties": {
-        "type": { "enum": ["text", "math", "shape", "axes", "numberline", "grid", "group"] },
-        "role": { "$ref": "#/$defs/role" },
-        "text": { "type": "string", "minLength": 1 },
-        "tex": { "type": "string", "minLength": 1 },
-        "shape": { "enum": ["circle", "square", "rectangle", "polygon", "line", "arrow", "dot"] },
-        "side": { "type": ["string", "number"] },
-        "children": { "type": "array", "items": { "$ref": "#/$defs/objectId" }, "minItems": 1 }
+        "type": {
+          "enum": [
+            "text",
+            "math",
+            "shape",
+            "axes",
+            "numberline",
+            "grid",
+            "group"
+          ]
+        },
+        "role": {
+          "$ref": "#/$defs/role"
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1
+        },
+        "tex": {
+          "type": "string",
+          "minLength": 1
+        },
+        "shape": {
+          "enum": [
+            "circle",
+            "square",
+            "rectangle",
+            "polygon",
+            "line",
+            "arrow",
+            "dot"
+          ]
+        },
+        "side": {
+          "type": [
+            "string",
+            "number"
+          ]
+        },
+        "children": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/objectId"
+          },
+          "minItems": 1
+        },
+        "level": {
+          "description": "字号层级（语义，不是数字）：display 大标题 / title 标题 / body 正文 / caption 注释",
+          "enum": [
+            "display",
+            "title",
+            "body",
+            "caption"
+          ]
+        }
       },
       "unevaluatedProperties": false
     },
     "widgetObject": {
       "type": "object",
-      "required": ["widget"],
-      "not": { "required": ["type"] },
-      "allOf": [{ "$ref": "#/$defs/layout" }],
+      "required": [
+        "widget"
+      ],
+      "not": {
+        "required": [
+          "type"
+        ]
+      },
+      "allOf": [
+        {
+          "$ref": "#/$defs/layout"
+        }
+      ],
       "properties": {
         "widget": {
           "description": "组件名，可带版本：diff_table 或 diff_table@1",
           "type": "string",
           "pattern": "^[a-z][a-z0-9_]*(@[0-9]+)?$"
         },
-        "role": { "$ref": "#/$defs/role" }
+        "role": {
+          "$ref": "#/$defs/role"
+        }
       },
-      "additionalProperties": { "$ref": "#/$defs/literal" }
-    },
-
-    "beat": {
-      "type": "object",
-      "required": ["id"],
-      "additionalProperties": false,
-      "properties": {
-        "id": { "$ref": "#/$defs/beatId" },
-        "say": { "type": "array", "items": { "$ref": "#/$defs/sentence" } },
-        "do": { "type": "array", "items": { "$ref": "#/$defs/action" } },
-        "pause": { "$ref": "#/$defs/pause" },
-        "shows": {
-          "anyOf": [
-            { "$ref": "#/$defs/showKind" },
-            { "type": "array", "items": { "$ref": "#/$defs/showKind" }, "minItems": 1, "uniqueItems": true }
-          ]
-        },
-        "custom": { "$ref": "#/$defs/custom" }
+      "additionalProperties": {
+        "$ref": "#/$defs/literal"
       }
     },
-    "showKind": { "enum": ["misconception", "non_example", "landing"] },
-    "sentence": {
+    "beat": {
       "type": "object",
-      "required": ["pace", "text"],
+      "required": [
+        "id"
+      ],
       "additionalProperties": false,
       "properties": {
-        "id": { "$ref": "#/$defs/name" },
-        "pace": { "enum": ["normal", "brisk", "slow", "ask"] },
-        "text": { "type": "string", "minLength": 1 }
+        "id": {
+          "$ref": "#/$defs/beatId"
+        },
+        "say": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/sentence"
+          }
+        },
+        "do": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/action"
+          }
+        },
+        "pause": {
+          "$ref": "#/$defs/pause"
+        },
+        "shows": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/showKind"
+            },
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/showKind"
+              },
+              "minItems": 1,
+              "uniqueItems": true
+            }
+          ]
+        },
+        "custom": {
+          "$ref": "#/$defs/custom"
+        }
+      }
+    },
+    "showKind": {
+      "enum": [
+        "misconception",
+        "non_example",
+        "landing"
+      ]
+    },
+    "sentence": {
+      "type": "object",
+      "required": [
+        "pace",
+        "text"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/name"
+        },
+        "pace": {
+          "enum": [
+            "normal",
+            "brisk",
+            "slow",
+            "ask"
+          ]
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1
+        }
       }
     },
     "timeRef": {
       "description": "句子 id 或下标，可接 @书签 和 +秒数：s1、s1@d0、0、s1+0.5",
       "anyOf": [
-        { "type": "integer", "minimum": 0 },
+        {
+          "type": "integer",
+          "minimum": 0
+        },
         {
           "type": "string",
           "pattern": "^([A-Za-z_][A-Za-z0-9_]*|[0-9]+)(@[A-Za-z_][A-Za-z0-9_]*)?(\\+[0-9]+(\\.[0-9]+)?)?$"
@@ -241,60 +561,150 @@
     },
     "action": {
       "type": "object",
-      "required": ["act"],
+      "required": [
+        "act"
+      ],
       "additionalProperties": false,
       "oneOf": [
-        { "required": ["at"] },
-        { "required": ["after"] },
-        { "required": ["with"] }
+        {
+          "required": [
+            "at"
+          ]
+        },
+        {
+          "required": [
+            "after"
+          ]
+        },
+        {
+          "required": [
+            "with"
+          ]
+        }
       ],
       "properties": {
-        "at": { "$ref": "#/$defs/timeRef" },
-        "after": { "const": "prev" },
-        "with": { "const": "prev" },
-        "act": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" },
-        "target": { "$ref": "#/$defs/selector" },
-        "from": { "$ref": "#/$defs/selector" },
-        "to": { "$ref": "#/$defs/selector" },
-        "match": { "enum": ["tex", "shape", "auto"] },
-        "style": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" },
+        "at": {
+          "$ref": "#/$defs/timeRef"
+        },
+        "after": {
+          "const": "prev"
+        },
+        "with": {
+          "const": "prev"
+        },
+        "act": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*$"
+        },
+        "target": {
+          "$ref": "#/$defs/selector"
+        },
+        "from": {
+          "$ref": "#/$defs/selector"
+        },
+        "to": {
+          "$ref": "#/$defs/selector"
+        },
+        "match": {
+          "enum": [
+            "tex",
+            "shape",
+            "auto"
+          ]
+        },
+        "style": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*$"
+        },
         "args": {
           "type": "object",
-          "propertyNames": { "$ref": "#/$defs/name" },
-          "additionalProperties": { "$ref": "#/$defs/literal" }
+          "propertyNames": {
+            "$ref": "#/$defs/name"
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/literal"
+          }
         },
         "dur": {
           "anyOf": [
-            { "type": "number", "exclusiveMinimum": 0 },
-            { "const": "fit" }
+            {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            {
+              "const": "fit"
+            }
           ]
         }
       }
     },
     "pause": {
       "type": "object",
-      "required": ["type"],
+      "required": [
+        "type"
+      ],
       "additionalProperties": false,
       "properties": {
-        "type": { "enum": ["predict", "think", "segment"] },
-        "prompt": { "type": "string", "minLength": 1 },
-        "hold": { "type": "number", "minimum": 0 },
-        "app_item": { "type": "string" }
+        "type": {
+          "enum": [
+            "predict",
+            "think",
+            "segment"
+          ]
+        },
+        "prompt": {
+          "type": "string",
+          "minLength": 1
+        },
+        "hold": {
+          "type": "number",
+          "minimum": 0
+        },
+        "app_item": {
+          "type": "string"
+        }
       },
-      "if": { "properties": { "type": { "enum": ["predict", "think"] } } },
-      "then": { "required": ["prompt"] }
+      "if": {
+        "properties": {
+          "type": {
+            "enum": [
+              "predict",
+              "think"
+            ]
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "prompt"
+        ]
+      }
     },
     "custom": {
       "type": "object",
-      "required": ["backend", "ref"],
+      "required": [
+        "backend",
+        "ref"
+      ],
       "additionalProperties": false,
       "properties": {
-        "backend": { "enum": ["manim"] },
-        "ref": { "type": "string", "pattern": "^[A-Za-z_][A-Za-z0-9_.]*:[A-Za-z_][A-Za-z0-9_]*$" },
+        "backend": {
+          "enum": [
+            "manim"
+          ]
+        },
+        "ref": {
+          "type": "string",
+          "pattern": "^[A-Za-z_][A-Za-z0-9_.]*:[A-Za-z_][A-Za-z0-9_]*$"
+        },
         "args": {
           "type": "object",
-          "propertyNames": { "$ref": "#/$defs/name" },
-          "additionalProperties": { "$ref": "#/$defs/literal" }
+          "propertyNames": {
+            "$ref": "#/$defs/name"
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/literal"
+          }
         }
       }
     }
