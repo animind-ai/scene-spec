@@ -1,0 +1,215 @@
+# 洞察系列 #9 分数除法为什么"颠倒相乘"（六年级）。
+# 钩子先让观众预测"6÷2/3 比 6 大还是小"，戳破"除法一定让数变小"；中段在一条数轴上反复做同一个动作——
+# 把每个 1 重新等分、几份一跳地数"里面有几个除数"：先 2/3（变大），再 3/2（比 1 大的除数，变小），
+# 最后 4/5 跳不完整（非例：剩下的两份要按"一跳"读成 1/2，不能按单位 1 读成 2/5）。
+# 结尾把"颠倒相乘"和"通分后分子相除"并排比较。小学集默认分段播放。
+spec: "0.1"
+
+meta:
+  id: ep09
+  title: 分数除法为什么"颠倒相乘"
+  line: insight
+  units: [P6]
+  episode: 9
+  grade: 六年级
+  author: Boxi Yu
+  license: CC-BY-4.0
+
+pedagogy:
+  insight: 除以 p/q 就是数"里面有几个 p/q"：每个 1 分成 q 份（乘 q），p 份一跳（除以 p），合起来就是乘 q/p
+  misconception: 除法一定让数变小
+  non_example: 6÷4/5 跳七次还剩两份，不够一跳；剩下的要按"一跳"来读（两份是半跳），答案是 7½，不能按单位 1 读成 7又2/5
+  status: demo
+  landing: Landing
+
+style:
+  theme: paper
+  canvas: "16:9"
+  voice:
+    persona: friend-ps
+    speed: 1.0
+  segmented: true
+  subtitles: soft
+
+objects:
+  ask:
+    type: text
+    text: '[$6\div\frac{2}{3}$]{#q .A} 比 $6$ 大，还是比 $6$ 小？'
+    level: title
+    in: top
+  myth:
+    type: text
+    text: 除法一定让数变小？
+    role: NO
+    below: ask
+    gap: sm
+  practice:
+    type: text
+    text: '练一练：[$6\div\frac{3}{4}=\ ?$]{#q .A}'
+    level: title
+    below: myth
+    gap: sm
+  line:
+    widget: number_line
+    range: [0, 6]
+    parts: 1
+    measures: ["2/3", "3/2", "4/5"]
+    fractions: true
+    role: A
+    in: stage
+  eq1:
+    type: text
+    text: '[$6\div\frac{2}{3}$]{#lhs} [$=6\times 3$]{#x3 .B} [$\div 2$]{#d2 .C} [$=9$]{#ans .HL}'
+    level: title
+    in: footer
+  law:
+    type: text
+    text: '[$6\div\frac{2}{3}$]{#div} [$=$]{#e} [$6\times\frac{3}{2}$]{#flip .HL}'
+    level: title
+    in: footer
+    right_of: eq1
+    gap: xl
+  eq2:
+    type: text
+    text: '[$6\div\frac{3}{2}$]{#lhs} [$=6\times 2$]{#x2 .B} [$\div 3$]{#d3 .C} [$=4$]{#ans .HL}'
+    level: title
+    in: footer
+  eq3:
+    type: text
+    text: '[$6\div\frac{4}{5}$]{#lhs} [$=7\frac{2}{5}$]{#bad .NO} [$=7\frac{1}{2}$]{#ans .HL}'
+    level: title
+    in: footer
+  two:
+    widget: summary
+    in: top
+    rows:
+      - {tag: 颠倒相乘, role: A, text: '$6\div\frac{4}{5}=6\times\frac{5}{4}=\frac{30}{4}=7\frac{1}{2}$'}
+      - {tag: 通分后分子相除, role: B, text: '$6\div\frac{4}{5}=\frac{30}{5}\div\frac{4}{5}=30\div 4=7\frac{1}{2}$'}
+
+beats:
+  - id: Hook
+    shows: misconception
+    pause: {type: predict, prompt: 6÷2/3 比 6 大还是小？先猜一猜。, hold: 0.5}
+    say:
+      - {id: s1, pace: normal, text: "{@q}六除以三分之二，比六大，还是比六小？"}
+      - {id: s2, pace: normal, text: "很多人觉得，{@m}除法让数变小。"}
+      - {id: s3, pace: ask, text: "先猜一猜，{@n}三，二，一。"}
+    do:
+      - {at: s1@q, act: show, target: ask}
+      - {at: s2@m, act: show, target: myth}
+      - {at: s3@n, act: focus, target: "ask#q"}
+
+  - id: Thirds
+    say:
+      - {id: s1, pace: normal, text: "{@l}除法就是问，{@q}六里面有几个三分之二？"}
+      - {id: s2, pace: normal, text: "{@cut}把每个一分成三份，{@two}两份就是三分之二。"}
+    do:
+      - {at: s1, act: unfocus, target: ask}
+      - {at: s1@l, act: show, target: line}
+      - {at: s1@q, act: highlight, target: line, args: {to: 6}}
+      - {at: s2@cut, act: subdivide, target: line, args: {parts: 3}, dur: 1.2}
+      - {at: s2@two, act: highlight, target: line, args: {to: "2/3"}}
+
+  - id: Count
+    say:
+      - {id: s1, pace: brisk, text: "{@c}一、二、三、四、五、六、七、八、九。"}
+      - {id: s2, pace: slow, text: "{@nine}九个！比六还大。"}
+      - {id: s3, pace: normal, text: "{@x}一共十八份，{@d}两份一跳。"}
+    do:
+      # 算式的各段先藏好（整个算式这时还看不见），s3 开头再整体亮出来，跟着旁白一段段出现
+      - {at: s1, act: hide, target: "eq1#x3"}
+      - {with: prev, act: hide, target: "eq1#d2"}
+      - {with: prev, act: hide, target: "eq1#ans"}
+      - {at: s1@c, act: jump, target: line, args: {length: "2/3"}, dur: fit}
+      - {at: s2@nine, act: mark, target: "line.count[8]"}
+      - {with: prev, act: cross, target: myth}
+      - {at: s3@x, act: set, target: eq1, args: {opacity: 1}}
+      - {with: prev, act: show, target: "eq1#x3"}
+      - {at: s3@d, act: show, target: "eq1#d2"}
+      - {after: prev, act: show, target: "eq1#ans"}
+
+  - id: Landing
+    shows: landing
+    say:
+      - {id: s1, pace: normal, text: "{@u}分成三份，乘三；{@j}两份一跳，除以二。"}
+      - {id: s2, pace: slow, text: "{@f}合起来，除以三分之二，就是乘二分之三。"}
+    do:
+      - {at: s1, act: hide, target: "law#flip"}
+      - {at: s1@u, act: focus, target: "line.unit[0]"}
+      - {with: prev, act: mark, target: "eq1#x3"}
+      - {at: s1@j, act: focus, target: "line.jump[0]"}
+      - {with: prev, act: mark, target: "eq1#d2"}
+      - {at: s2@f, act: transform, from: "eq1#x3", to: "law#flip"}
+      - {with: prev, act: unfocus, target: line}
+      - {with: prev, act: set, target: law, args: {opacity: 1}}
+      - {with: prev, act: transform, from: "eq1#d2", to: "law#flip"}
+      - {after: prev, act: underline, target: "law#flip"}
+
+  - id: Halves
+    say:
+      - {id: s1, pace: normal, text: "{@q}六除以二分之三呢？"}
+      - {id: s2, pace: normal, text: "{@cut}每个一分成两份，{@len}三份一跳。"}
+      - {id: s3, pace: brisk, text: "{@c}一、二、三、四。"}
+      - {id: s4, pace: normal, text: "{@four}四个，变小了。"}
+    do:
+      - {at: s1, act: hide, target: ask}
+      - {with: prev, act: hide, target: myth}
+      - {with: prev, act: hide, target: eq1}
+      - {with: prev, act: hide, target: law}
+      - {with: prev, act: erase, target: line}
+      - {at: s1@q, act: hide, target: "eq2#x2"}
+      - {with: prev, act: hide, target: "eq2#d3"}
+      - {with: prev, act: hide, target: "eq2#ans"}
+      - {after: prev, act: set, target: eq2, args: {opacity: 1}}
+      - {at: s2@cut, act: subdivide, target: line, args: {parts: 2}, dur: 1.2}
+      - {at: s2@len, act: highlight, target: line, args: {to: "3/2"}}
+      - {at: s3@c, act: jump, target: line, args: {length: "3/2"}, dur: fit}
+      - {at: s4@four, act: mark, target: "line.count[3]"}
+      - {after: prev, act: show, target: "eq2#x2"}
+      - {after: prev, act: show, target: "eq2#d3"}
+      - {after: prev, act: show, target: "eq2#ans"}
+
+  - id: Leftover
+    shows: non_example
+    say:
+      - {id: s1, pace: normal, text: "{@q}六除以五分之四呢？{@cut}分成五份，{@len}四份一跳。"}
+      - {id: s2, pace: brisk, text: "{@c}一、二、三、四、五、六、七。"}
+      - {id: s3, pace: ask, text: "{@r}还剩两份，{@bad}是七又五分之二吗？"}
+      - {id: s4, pace: slow, text: "{@no}不对，两份只是半跳，{@ans}答案是七又二分之一。"}
+    do:
+      - {at: s1, act: hide, target: eq2}
+      - {with: prev, act: erase, target: line}
+      - {at: s1@q, act: hide, target: "eq3#bad"}
+      - {with: prev, act: hide, target: "eq3#ans"}
+      - {after: prev, act: set, target: eq3, args: {opacity: 1}}
+      - {at: s1@cut, act: subdivide, target: line, args: {parts: 5}, dur: 1.2}
+      - {at: s1@len, act: highlight, target: line, args: {to: "4/5"}}
+      - {at: s2@c, act: jump, target: line, args: {length: "4/5"}, dur: fit}
+      - {at: s3@r, act: remainder, target: line, dur: 1.2}
+      - {at: s3@bad, act: show, target: "eq3#bad"}
+      - {at: s4@no, act: cross, target: "eq3#bad"}
+      - {at: s4@ans, act: show, target: "eq3#ans"}
+      - {with: prev, act: mark, target: "line.rest[0]"}
+
+  - id: Compare
+    say:
+      - {id: s1, pace: normal, text: "{@a}颠倒相乘，六乘四分之五；"}
+      - {id: s2, pace: normal, text: "{@b}或者先通分，六是五分之三十，{@d}三十除以四。"}
+    do:
+      - {at: s1, act: hide, target: eq3}
+      - {with: prev, act: unmark, target: "line.rest[0]"}
+      - {at: s1@a, act: show, target: "two[0]"}
+      - {at: s2@b, act: show, target: "two[1]"}
+      - {at: s2@d, act: highlight, target: line, args: {to: 6}}
+      - {with: prev, act: focus, target: "two[1]"}
+
+  - id: Close
+    say:
+      - {id: s1, pace: normal, text: "这只是演示，换别的分数也一样。"}
+      - {id: s2, pace: normal, text: "{@m}除法不一定让数变小。{@q}练一练，六除以四分之三等于几？"}
+    do:
+      - {at: s1, act: unfocus, target: two}
+      - {at: s2@m, act: hide, target: two}
+      - {after: prev, act: show, target: myth}
+      - {after: prev, act: cross, target: myth}
+      - {at: s2@q, act: show, target: practice}

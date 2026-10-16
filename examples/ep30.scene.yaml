@@ -1,0 +1,257 @@
+# 洞察系列 #30 导数：把曲线放大，看它越来越像直线。
+# 钩子说出迷思（切线就是只碰一个点的直线），割线的第二个点滑向 P（h → 0），割线逼近切线；
+# 中段预测暂停；镜头把 P 附近放大到 60 倍，弯曲越来越不明显；非例 y=|x| 在原点怎么放大都还是尖角；
+# 最后落到 f'(x₀) = 割线斜率在 h → 0 时的极限。画面只用 graph 组件 + 镜头（camera）。
+spec: "0.1"
+
+meta:
+  id: ep30
+  title: 导数：把曲线放大，看它越来越像直线
+  line: insight
+  units: [S7]
+  episode: 30
+  grade: 高二
+  author: Boxi Yu
+  license: CC-BY-4.0
+
+pedagogy:
+  insight: 切线是割线在 h → 0 时逼近的那条直线；把可导曲线在切点附近不断放大，弯曲越来越不明显，曲线越来越贴近这条切线
+  misconception: 切线就是只碰一个点的直线；任何曲线放大都会变直
+  non_example: y=|x| 在原点是尖角：放大多少倍都还是同样的尖角，右侧割线斜率总是 1、左侧总是 −1，逼近的不是同一条直线，所以没有切线、没有导数
+  status: demo
+  landing: Landing
+
+style:
+  theme: paper
+  canvas: "16:9"
+  voice:
+    persona: teacher-hs
+    speed: 1.0
+  segmented: false
+  subtitles: soft
+
+objects:
+  g:
+    widget: graph
+    x: [-2.0, 5.0]
+    y: [-0.7, 4.8]
+    readout_at: [3.05, 2.2]
+    plots:
+      - {f: "x^2", label: "y=x^2"}
+    points:
+      - {x: 1, label: P}
+    secants:
+      - {point: 0, h: 1, label: Q, readout: true, readout_text: 右侧割线斜率}
+      - {point: 0, h: -1, label: "Q'", role: C, label_dir: ul, readout: true, readout_text: 左侧割线斜率}
+    tangents:
+      - {point: 0, role: HL}
+    lines:
+      - {x: 1}
+    in: stage
+  ab:
+    widget: graph
+    x: [-2.2, 2.2]
+    y: [-0.7, 2.4]
+    readout_at: [0.3, 2.35]
+    plots:
+      - {f: "abs(x)", label: "y=|x|"}
+    points:
+      - {x: 0, label: O, label_dir: d}
+    secants:
+      - {point: 0, h: 1.6, label: Q, readout: true, readout_text: 右侧割线斜率}
+      - {point: 0, h: -1.6, label: "Q'", role: C, label_dir: ul, readout: true, readout_text: 左侧割线斜率}
+    in: stage
+  wrong:
+    type: text
+    text: 切线 = 只碰一个点的直线？
+    role: NO
+    in: side
+  ksec:
+    type: math
+    tex: 'k=\frac{f(1+h)-f(1)}{h}'
+    role: B
+    in: side
+  ask:
+    type: text
+    text: Q 滑向 P，斜率靠近几？
+    role: HL
+    below: ksec
+    gap: lg
+  calc:
+    type: math
+    tex: '=\frac{(1+h)^2-1}{h}=2+h'
+    below: ksec
+    gap: md
+  cap10:
+    type: text
+    text: 放大 10 倍：弯曲已经不太明显
+    role: FG
+    in: footer
+  cap60:
+    type: text
+    text: 放大 60 倍：曲线和切线几乎贴在一起
+    role: FG
+    in: footer
+  wrong2:
+    type: text
+    text: 任何曲线放大都会变直？
+    role: NO
+    in: side
+  capabs:
+    type: text
+    text: 放大 60 倍：还是一样的尖角
+    role: NO
+    in: footer
+  deriv:
+    type: math
+    tex: "f'(x_0)=\\lim_{h\\to 0}\\frac{f(x_0+h)-f(x_0)}{h}"
+    role: HL
+    in: footer
+  practice:
+    widget: think_box
+    lines: ["[练一练]{.HL}", "$y=x^3$ 在 $x=1$ 处", "切线斜率是多少？"]
+    below: wrong
+    gap: xl
+
+beats:
+  - id: Hook
+    shows: misconception
+    say:
+      - {id: s1, pace: normal, text: "{@curve}这是抛物线 y 等于 x 的平方，{@p}上面一点 P。"}
+      - {id: s2, pace: ask, text: "过 P 点的切线是哪一条？很多人会说：{@w}只碰曲线一个点的直线。"}
+      - {id: s3, pace: normal, text: "{@v}可这条竖线也只碰一个点，却显然不是切线。"}
+      - {id: s4, pace: slow, text: "{@x}所以这不能当定义。切线到底是什么？"}
+    do:
+      - {at: s1, act: show, target: g.axes}
+      - {at: s1@curve, act: draw, target: g, args: {plot: 0}}
+      - {with: prev, act: show, target: g.plot_label}
+      - {at: s1@p, act: show, target: "g.point[0]"}
+      - {at: s2@w, act: show, target: wrong}
+      - {at: s3@v, act: show, target: "g.line[0]"}
+      - {at: s4@x, act: cross, target: wrong}
+
+  - id: Secant
+    say:
+      - {id: s1, pace: normal, text: "{@go}先问：在 P 点附近，曲线有多陡？"}
+      - {id: s2, pace: normal, text: "{@q}在曲线上再取一点 Q，连成割线。"}
+      - {id: s3, pace: normal, text: "{@k}割线斜率，是 y 的变化量除以 x 的变化量。"}
+      - {id: s4, pace: normal, text: "两点横坐标相差 h，现在 h 等于一，{@r}斜率是三。"}
+    do:
+      - {at: s1@go, act: hide, target: "g.line[0]"}
+      - {with: prev, act: hide, target: wrong}
+      - {at: s2@q, act: show, target: "g.qpoint[0]"}
+      - {with: prev, act: show, target: "g.secant[0]"}
+      - {at: s3@k, act: show, target: ksec}
+      - {at: s4@r, act: show, target: "g.slope[0]"}
+
+  - id: Predict
+    pause: {type: predict, prompt: 让 Q 沿着曲线滑向 P，割线会怎么转？斜率会靠近几？, hold: 2}
+    say:
+      - {id: s1, pace: ask, text: "{@ask}如果让 Q 沿着曲线，一点一点滑向 P，"}
+      - {id: s2, pace: ask, text: "割线会怎么转？斜率会靠近几？先想三秒。"}
+    do:
+      - {at: s1@ask, act: show, target: ask}
+
+  - id: Approach
+    say:
+      - {id: s1, pace: normal, text: "{@a1}h 从一缩到零点五，{@a2}再缩到零点一，"}
+      - {id: s2, pace: normal, text: "{@a3}再到零点零一。斜率从三，到二点五，到二点一，越来越接近二。"}
+      - {id: s3, pace: normal, text: "{@left}从左边取点，h 是负的。{@l2}斜率从一往上走，也越来越接近二。"}
+      - {id: s4, pace: slow, text: "{@t}两边的割线逼近同一条直线，这就是 P 点的切线，斜率是二。"}
+    do:
+      - {at: s1, act: hide, target: ask}
+      - {at: s1@a1, act: approach, target: g, args: {secant: 0, h: 0.5}, dur: fit}
+      - {at: s1@a2, act: approach, target: g, args: {secant: 0, h: 0.1}, dur: fit}
+      - {at: s2@a3, act: approach, target: g, args: {secant: 0, h: 0.01}, dur: 2.0}
+      - {at: s3@left, act: show, target: "g.qpoint[1]"}
+      - {with: prev, act: show, target: "g.secant[1]"}
+      - {with: prev, act: show, target: "g.slope[1]"}
+      - {at: s3@l2, act: approach, target: g, args: {secant: 1, h: -0.01}, dur: fit}
+      - {at: s4@t, act: show, target: "g.tangent[0]"}
+
+  - id: Zoom
+    say:
+      - {id: s1, pace: normal, text: "{@clean}换个角度。{@z}把 P 点附近放大十倍，"}
+      - {id: s2, pace: normal, text: "弯曲已经不太明显。{@z2}再放大到六十倍。"}
+      - {id: s3, pace: slow, text: "{@tan}叠上切线：曲线和切线几乎贴在一起。"}
+      - {id: s4, pace: normal, text: "放得越大，弯曲越不明显，越来越像那条切线。"}
+      - {id: s5, pace: normal, text: "{@back}这是演示，不是证明：曲线始终是曲线，只是越来越接近直线。"}
+    do:
+      - {at: s1@clean, act: hide, target: g.secant}
+      - {with: prev, act: hide, target: g.qpoint}
+      - {with: prev, act: hide, target: g.slope}
+      - {with: prev, act: hide, target: g.tangent}
+      - {with: prev, act: hide, target: ksec}
+      - {at: s1@z, act: camera, target: "g.dot[0]", args: {zoom: 10}, dur: 2.5}
+      - {with: prev, act: show, target: cap10}
+      - {at: s2@z2, act: camera, target: "g.dot[0]", args: {zoom: 60}, dur: fit}
+      - {with: prev, act: hide, target: cap10}
+      - {with: prev, act: show, target: cap60}
+      - {at: s3@tan, act: show, target: "g.tangent[0]"}
+      - {at: s5@back, act: camera, args: {reset: true}, dur: 2.5}
+      - {with: prev, act: hide, target: cap60}
+
+  - id: NonExample
+    shows: non_example
+    say:
+      - {id: s1, pace: ask, text: "{@w2}那么，任何曲线放大，都会越来越直吗？"}
+      - {id: s2, pace: normal, text: "{@abs}看 y 等于 x 的绝对值，{@o}在原点 O 处。"}
+      - {id: s3, pace: normal, text: "{@zoom}同样放大六十倍：{@still}还是一模一样的尖角。"}
+      - {id: s4, pace: normal, text: "{@back}再看割线：{@r}右侧割线的斜率总是一，{@l}左侧的总是负一。"}
+      - {id: s5, pace: slow, text: "两边逼近的不是同一条直线，{@x}所以原点处没有切线。"}
+    do:
+      - {at: s1, act: hide, target: g}
+      - {at: s1@w2, act: show, target: wrong2}
+      - {at: s2@abs, act: show, target: ab.axes}
+      - {with: prev, act: draw, target: ab, args: {plot: 0}}
+      - {with: prev, act: show, target: ab.plot_label}
+      - {at: s2@o, act: show, target: "ab.point[0]"}
+      - {at: s3@zoom, act: camera, target: "ab.dot[0]", args: {zoom: 60}, dur: 3.0}
+      - {with: prev, act: hide, target: wrong2}
+      - {with: prev, act: show, target: capabs}
+      - {at: s4@back, act: camera, args: {reset: true}, dur: 1.6}
+      - {with: prev, act: hide, target: capabs}
+      - {at: s4@r, act: show, target: "ab.qpoint[0]"}
+      - {with: prev, act: show, target: "ab.secant[0]"}
+      - {with: prev, act: show, target: "ab.slope[0]"}
+      - {after: prev, act: approach, target: ab, args: {secant: 0, h: 0.3}, dur: 1.4}
+      - {at: s4@l, act: show, target: "ab.qpoint[1]"}
+      - {with: prev, act: show, target: "ab.secant[1]"}
+      - {with: prev, act: show, target: "ab.slope[1]"}
+      - {after: prev, act: approach, target: ab, args: {secant: 1, h: -0.3}, dur: 1.4}
+      - {at: s5@x, act: show, target: wrong2}
+      - {after: prev, act: cross, target: wrong2}
+
+  - id: Landing
+    shows: landing
+    say:
+      - {id: s1, pace: normal, text: "{@back}回到抛物线，{@k}把割线斜率写出来，"}
+      - {id: s2, pace: normal, text: "{@calc}化简得二加 h。"}
+      - {id: s3, pace: slow, text: "{@lim}h 趋近于零，二加 h 的极限是二，这就是 P 点的切线斜率。"}
+      - {id: s4, pace: slow, text: "{@gen}一般地，割线斜率在 h 趋近于零时的极限，叫做导数。"}
+    do:
+      - {at: s1@back, act: hide, target: ab}
+      - {with: prev, act: hide, target: wrong2}
+      - {after: prev, act: show, target: g}
+      - {at: s1@k, act: show, target: ksec}
+      - {with: prev, act: show, target: "g.qpoint[0]"}
+      - {with: prev, act: show, target: "g.secant[0]"}
+      - {with: prev, act: show, target: "g.slope[0]"}
+      - {after: prev, act: approach, target: g, args: {secant: 0, h: 1}, dur: 1.5}
+      - {at: s2@calc, act: show, target: calc}
+      - {at: s3@lim, act: approach, target: g, args: {secant: 0, h: 0.001}, dur: 2.5}
+      - {with: prev, act: mark, target: calc}
+      - {at: s4@gen, act: show, target: deriv}
+      - {after: prev, act: underline, target: deriv}
+
+  - id: Close
+    say:
+      - {id: s1, pace: normal, text: "回到开头：{@w}切线不是只碰一个点的直线，而是割线逼近的那条直线。"}
+      - {id: s2, pace: normal, text: "{@g}能求导的地方，越放大越像直线；尖角处，放大还是尖角。"}
+      - {id: s3, pace: ask, text: "练一练，{@q}y 等于 x 的三次方，在 x 等于一处，切线斜率是多少？"}
+    do:
+      - {at: s1, act: hide, target: ksec}
+      - {with: prev, act: hide, target: calc}
+      - {at: s1@w, act: show, target: wrong}
+      - {after: prev, act: cross, target: wrong}
+      - {at: s3@q, act: show, target: practice}

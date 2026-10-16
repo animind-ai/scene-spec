@@ -440,6 +440,364 @@ REGISTRY: dict[str, Widget] = {
 }
 
 
+# ---------- 数轴（分数除法：里面有几个）----------
+# 自成一节，登记在下面一行；跳几次、剩多少按 fractions.Fraction 精确算，和 kit 的 mx/numberline.py 一致。
+
+NUMBER_LINE_POINTS = 4  # mark_point 最多点几个（erase 后重新计数）
+
+
+def _nl_frac(value: object):
+    """整数或 "p/q" 字符串 → Fraction；小数、布尔和写错的返回 None。"""
+    from fractions import Fraction
+
+    if isinstance(value, bool) or isinstance(value, float):
+        return None
+    if isinstance(value, int):
+        return Fraction(value)
+    if isinstance(value, str):
+        try:
+            return Fraction(value.replace(" ", ""))
+        except (ValueError, ZeroDivisionError):
+            return None
+    return None
+
+
+def _nl_range(value: object) -> str | None:
+    ok = (isinstance(value, list) and len(value) == 2 and all(isinstance(v, int) and not isinstance(v, bool) for v in value)
+          and value[1] > value[0])
+    return None if ok else "应为两个整数 [起点, 终点]，终点更大"
+
+
+def _nl_measures(value: object) -> str | None:
+    if not isinstance(value, list) or not value:
+        return "应为非空列表：要拿来量的长度（整数或 \"2/3\" 这样的分数字符串）"
+    for v in value:
+        f = _nl_frac(v)
+        if f is None or f <= 0:
+            return f"{v!r} 不是正的整数或分数字符串（不要写小数）"
+    return None
+
+
+def _nl_bounds(definition: dict) -> tuple[int, int] | None:
+    r = definition.get("range")
+    return (r[0], r[1]) if _nl_range(r) is None else None
+
+
+def _nl_max_jumps(definition: dict) -> int:
+    import math
+
+    bounds = _nl_bounds(definition)
+    measures = definition.get("measures")
+    if bounds is None or _nl_measures(measures) is not None:
+        return 0
+    return max(math.floor((bounds[1] - bounds[0]) / _nl_frac(m)) for m in measures)
+
+
+def _expose_number_line(definition: dict, data: dict) -> Exposed:
+    bounds = _nl_bounds(definition)
+    n = bounds[1] - bounds[0] if bounds else 0
+    slots = _nl_max_jumps(definition)
+    # tick / label：整数刻度和数字；unit：每个单位一格；frac：第一格的分数标注；span：高亮段；
+    # jump / count：跳跃弧和计数（按 measures 里最多的整跳数预留）；rest：剩余段；point：点
+    return Exposed(parts={"tick": n + 1, "label": n + 1, "unit": n, "frac": 1, "span": 1,
+                          "jump": slots, "count": slots, "rest": 1, "point": NUMBER_LINE_POINTS})
+
+
+def _nl_value(args: dict, key: str, report: Report, path: str, ctx: WidgetContext, required: bool = True):
+    if key not in args:
+        if required:
+            report.error("SS281", f"{path}.args", f"缺少参数 {key}")
+        return None
+    f = _nl_frac(args[key])
+    if f is None:
+        report.error("SS281", f"{path}.args.{key}", "应为整数或分数字符串（例如 \"2/3\"），不要写小数")
+        return None
+    bounds = _nl_bounds(ctx.definition)
+    if bounds and not bounds[0] <= f <= bounds[1]:
+        report.error("SS282", f"{path}.args.{key}", f"{args[key]} 不在数轴 {list(bounds)} 上")
+    return f
+
+
+def _nl_jump(args: dict, ctx: WidgetContext, report: Report, path: str) -> None:
+    import math
+
+    length = _nl_frac(args.get("length"))
+    if length is None or length <= 0:
+        report.error("SS283", f"{path}.args.length", "jump 需要 length：正的整数或分数字符串，例如 \"2/3\"")
+        return
+    measures = [_nl_frac(m) for m in ctx.definition.get("measures") or []]
+    if length not in measures:
+        report.error("SS284", f"{path}.args.length",
+                     f"{args['length']} 不在 measures 里；把它加进 {ctx.obj_id}.measures，跳跃弧的引用才能按它预留")
+    count = args.get("count")
+    bounds = _nl_bounds(ctx.definition)
+    if count is not None:
+        if not isinstance(count, int) or isinstance(count, bool) or count <= 0:
+            report.error("SS283", f"{path}.args.count", "count 应为正整数（不写就跳到放不下为止）")
+        elif bounds and count > math.floor((bounds[1] - bounds[0]) / length):
+            report.error("SS285", f"{path}.args.count", f"长度 {args['length']} 在 {list(bounds)} 上最多跳 "
+                         f"{math.floor((bounds[1] - bounds[0]) / length)} 次")
+    for key in sorted(set(args) - {"length", "count"}):
+        report.error("SS281", f"{path}.args.{key}", f"jump 没有参数 {key}（可用：length、count）")
+
+
+def _nl_subdivide(args: dict, ctx: WidgetContext, report: Report, path: str) -> None:
+    problem = _positive_int(args.get("parts"))
+    if problem:
+        report.error("SS286", f"{path}.args.parts", f"subdivide 需要 parts（每个单位分成几份）：{problem}")
+
+
+def _nl_highlight(args: dict, ctx: WidgetContext, report: Report, path: str) -> None:
+    a = _nl_value(args, "from", report, path, ctx, required=False)
+    b = _nl_value(args, "to", report, path, ctx)
+    if a is not None and b is not None and b <= a:
+        report.error("SS282", f"{path}.args", "highlight 的 to 要大于 from")
+
+
+def _nl_mark_point(args: dict, ctx: WidgetContext, report: Report, path: str) -> None:
+    _nl_value(args, "at", report, path, ctx)
+    if "label" in args and _str(args["label"]):
+        report.error("SS281", f"{path}.args.label", "label 应为非空的 LaTeX 字符串")
+
+
+def _nl_no_args(args: dict, ctx: WidgetContext, report: Report, path: str) -> None:
+    for key in sorted(args):
+        report.error("SS281", f"{path}.args.{key}", f"这个动作不带参数（多了 {key}）")
+
+
+REGISTRY["number_line"] = Widget(
+    "number_line",
+    params={
+        "range": (True, _nl_range),
+        "parts": (False, _positive_int),
+        "measures": (False, _nl_measures),
+        "fractions": (False, _bool),
+    },
+    expose=_expose_number_line,
+    actions={"jump": _nl_jump, "remainder": _nl_no_args, "subdivide": _nl_subdivide, "highlight": _nl_highlight,
+             "mark_point": _nl_mark_point, "erase": _nl_no_args},
+)
+
+# ---------- 函数图像（graph）：坐标轴、曲线、点、割线、切线 ----------
+# 函数写成白名单表达式字符串（见 expr.py），这里检查语法、点是否在定义域里、切线处左右导数是否相等。
+
+from . import expr as _expr  # noqa: E402
+
+GRAPH_LABEL_DIRS = ("u", "d", "l", "r", "ul", "ur", "dl", "dr")
+
+
+def _num(value: object) -> bool:
+    return isinstance(value, (int, float)) and not isinstance(value, bool)
+
+
+def _graph_range(value: object) -> str | None:
+    if not (isinstance(value, list) and len(value) == 2 and all(_num(v) for v in value) and value[0] < value[1]):
+        return "应为 [最小值, 最大值]，两个数且前小后大"
+    return None
+
+
+def _graph_positive(value: object) -> str | None:
+    return None if _num(value) and value > 0 else "应为正数"
+
+
+def _graph_ticks(value: object) -> str | None:
+    return None if value is False or (_num(value) and value > 0) else "应为刻度间隔（正数），或 false 不画刻度"
+
+
+def _graph_axis_labels(value: object) -> str | None:
+    ok = value is False or (isinstance(value, list) and len(value) == 2 and all(isinstance(v, str) and v for v in value))
+    return None if ok else "应为两个 LaTeX 字符串 [横轴名, 纵轴名]，或 false"
+
+
+def _graph_entries(fields: dict[str, Callable[[object], bool]], required: tuple[str, ...], what: str) -> ParamCheck:
+    def check(value: object) -> str | None:
+        if not isinstance(value, list):
+            return f"应为列表，每项是{what}"
+        for n, entry in enumerate(value):
+            if not isinstance(entry, dict):
+                return f"第 {n} 项应为 {{{', '.join(fields)}}}"
+            extra = set(entry) - set(fields)
+            if extra:
+                return f"第 {n} 项有不认识的字段 {sorted(extra)}（可用：{', '.join(fields)}）"
+            for key in required:
+                if key not in entry:
+                    return f"第 {n} 项缺少 {key}"
+            for key, ok in fields.items():
+                if key in entry and not ok(entry[key]):
+                    return f"第 {n} 项的 {key} 不对"
+        return None
+
+    return check
+
+
+def _is_role(v: object) -> bool:
+    return v in ROLES
+
+
+def _is_text(v: object) -> bool:
+    return isinstance(v, str) and bool(v)
+
+
+def _is_index(v: object) -> bool:
+    return isinstance(v, int) and not isinstance(v, bool) and v >= 0
+
+
+def _is_expr(v: object) -> bool:
+    try:
+        _expr.parse(v)  # type: ignore[arg-type]
+    except _expr.ExprError:
+        return False
+    return True
+
+
+_graph_plots = _graph_entries(
+    {"f": _is_expr, "role": _is_role, "label": _is_text, "domain": lambda v: _graph_range(v) is None},
+    ("f",), "一条曲线 {f: \"x^2\", role?, label?, domain?}")
+_graph_points = _graph_entries(
+    {"x": _num, "plot": _is_index, "label": _is_text, "role": _is_role, "label_dir": lambda v: v in GRAPH_LABEL_DIRS},
+    ("x",), "曲线上的一个点 {x, plot?, label?, role?, label_dir?}")
+_graph_secants = _graph_entries(
+    {"point": _is_index, "h": lambda v: _num(v) and v != 0, "label": _is_text, "role": _is_role,
+     "label_dir": lambda v: v in GRAPH_LABEL_DIRS, "readout": lambda v: isinstance(v, bool), "readout_text": _is_text},
+    ("point", "h"), "一条割线 {point, h（≠0）, label?, role?, readout?}")
+_graph_tangents = _graph_entries({"point": _is_index, "role": _is_role}, ("point",), "一条切线 {point, role?}")
+_graph_lines = _graph_entries(
+    {"x": _num, "through": lambda v: isinstance(v, list) and len(v) == 2 and all(_num(c) for c in v),
+     "slope": _num, "role": _is_role},
+    (), "一条直线 {x}（竖线）或 {through: [x, y], slope}")
+
+
+def _graph_list(definition: dict, key: str) -> list:
+    value = definition.get(key)
+    return [v for v in value if isinstance(v, dict)] if isinstance(value, list) else []
+
+
+def _expose_graph(definition: dict, data: dict) -> Exposed:
+    n = {k: len(_graph_list(definition, k)) for k in ("plots", "points", "secants", "tangents", "lines")}
+    readouts = sum(1 for s in _graph_list(definition, "secants") if s.get("readout"))
+    parts = {
+        "axes": 1, "plot": n["plots"], "plot_label": n["plots"], "point": n["points"], "dot": n["points"],
+        "secant": n["secants"], "qpoint": n["secants"], "slope": readouts, "tangent": n["tangents"], "line": n["lines"],
+    }
+    return Exposed(parts=parts, items=sum(parts.values()) - n["points"])  # dot 和 point 是同一个点
+
+
+def _graph_fn(definition: dict, k: object):
+    plots = _graph_list(definition, "plots")
+    if not _is_index(k) or k >= len(plots) or not _is_expr(plots[k].get("f")):
+        return None
+    return _expr.parse(plots[k]["f"])
+
+
+def _graph_point_xy(definition: dict, i: int):
+    """第 i 个点的 (语法树, x)；点或曲线不合法时返回 None（参数检查已经报过）。"""
+    points = _graph_list(definition, "points")
+    if i >= len(points) or not _num(points[i].get("x")):
+        return None
+    tree = _graph_fn(definition, points[i].get("plot", 0))
+    return None if tree is None else (tree, float(points[i]["x"]))
+
+
+def _validate_graph(ctx: WidgetContext, report: Report, path: str) -> None:
+    import math
+
+    d = ctx.definition
+    plots, points = _graph_list(d, "plots"), _graph_list(d, "points")
+    xr = d.get("x") if _graph_range(d.get("x")) is None else None
+    for n, p in enumerate(points):
+        k = p.get("plot", 0)
+        if _is_index(k) and k >= len(plots):
+            report.error("SS291", f"{path}.points[{n}].plot", f"只有 {len(plots)} 条曲线，没有第 {k} 条（从 0 数）")
+            continue
+        xy = _graph_point_xy(d, n)
+        if xy is None:
+            continue
+        tree, x = xy
+        if xr and not xr[0] <= x <= xr[1]:
+            report.error("SS292", f"{path}.points[{n}].x", f"x={x:g} 不在横轴范围 {xr} 里")
+        if not math.isfinite(_expr.evaluate(tree, x)):
+            report.error("SS292", f"{path}.points[{n}].x", f"{plots[k]['f']} 在 x={x:g} 处没有定义")
+    for key in ("secants", "tangents"):
+        for n, s in enumerate(_graph_list(d, key)):
+            i = s.get("point")
+            if _is_index(i) and i >= len(points):
+                report.error("SS291", f"{path}.{key}[{n}].point", f"只有 {len(points)} 个点，没有第 {i} 个（从 0 数）")
+                continue
+            xy = _graph_point_xy(d, i) if _is_index(i) else None
+            if xy is None:
+                continue
+            tree, x = xy
+            if key == "secants" and _num(s.get("h")):
+                _graph_check_h(tree, x, s["h"], report, f"{path}.secants[{n}].h")
+            if key == "tangents":
+                e = 1e-6 * max(1.0, abs(x))
+                y = _expr.evaluate(tree, x)
+                right = (_expr.evaluate(tree, x + e) - y) / e
+                left = (y - _expr.evaluate(tree, x - e)) / e
+                if not (math.isfinite(left) and math.isfinite(right)) or abs(left - right) > 1e-3 * max(1.0, abs(left)):
+                    report.error("SS293", f"{path}.tangents[{n}]",
+                                 f"曲线在 x={x:g} 处左右导数不相等（约 {left:.3g} 和 {right:.3g}），没有切线；"
+                                 "非例请用两条割线（h 一正一负）来演示")
+    for n, ln in enumerate(_graph_list(d, "lines")):
+        if ("x" in ln) == ("through" in ln or "slope" in ln) or ("through" in ln) != ("slope" in ln):
+            report.error("SS294", f"{path}.lines[{n}]", "直线写 {x: c}（竖线），或 {through: [x, y], slope: k}")
+
+
+def _graph_check_h(tree, x: float, h: float, report: Report, path: str) -> None:
+    import math
+
+    if not math.isfinite(_expr.evaluate(tree, x + h)):
+        report.error("SS295", path, f"割线的第二个点 x={x + h:g} 不在曲线的定义域里")
+
+
+def _graph_draw(args: dict, ctx: WidgetContext, report: Report, path: str) -> None:
+    k = args.get("plot", 0)
+    n = len(_graph_list(ctx.definition, "plots"))
+    if not _is_index(k) or k >= n:
+        report.error("SS296", f"{path}.args.plot", f"draw 的 plot 应为 0 到 {n - 1} 的整数")
+
+
+def _graph_approach(args: dict, ctx: WidgetContext, report: Report, path: str) -> None:
+    secants = _graph_list(ctx.definition, "secants")
+    i = args.get("secant", 0)
+    if not _is_index(i) or i >= len(secants):
+        report.error("SS296", f"{path}.args.secant", f"approach 的 secant 应为 0 到 {len(secants) - 1} 的整数")
+        return
+    h = args.get("h")
+    if not _num(h) or h == 0:
+        report.error("SS296", f"{path}.args.h", "approach 需要 h：第二个点的目标偏移量，非零的数（h → 0 只能逼近，不能等于 0）")
+        return
+    point = secants[i].get("point")
+    xy = _graph_point_xy(ctx.definition, point) if _is_index(point) else None
+    if xy is not None:
+        if (h > 0) != (secants[i].get("h", h) > 0):
+            report.warning("SS297", f"{path}.args.h", "h 换了符号：第二个点会穿过第一个点，割线会先乱转一下")
+        _graph_check_h(xy[0], xy[1], h, report, f"{path}.args.h")
+
+
+REGISTRY["graph"] = Widget(
+    "graph",
+    params={
+        "x": (True, _graph_range),
+        "y": (True, _graph_range),
+        "plots": (True, _graph_plots),
+        "points": (False, _graph_points),
+        "secants": (False, _graph_secants),
+        "tangents": (False, _graph_tangents),
+        "lines": (False, _graph_lines),
+        "unit": (False, _graph_positive),
+        "ticks": (False, _graph_ticks),
+        "tick_labels": (False, _bool),
+        "axis_labels": (False, _graph_axis_labels),
+        "readout_at": (False, lambda v: None if isinstance(v, list) and len(v) == 2 and all(_num(c) for c in v)
+                       else "应为 [x, y]：第一个斜率读数左上角的数学坐标"),
+    },
+    expose=_expose_graph,
+    actions={"draw": _graph_draw, "approach": _graph_approach},
+    validate=_validate_graph,
+)
+
+
 def lookup(name: str) -> Widget | None:
     """按名字找组件，忽略 @版本。"""
     return REGISTRY.get(name.split("@", 1)[0])
