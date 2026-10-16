@@ -27,7 +27,7 @@ style:
   canvas: "16:9"
   voice:
     persona: teacher-hs
-    speed: 1.25
+    speed: 1.0
   subtitles: soft
 
 data:
