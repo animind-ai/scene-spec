@@ -287,9 +287,35 @@ pin: top                        # 钉住：之后每一帧都在（题卡）
 | `underline` / `circle` / `cross` | 划线、圈出、打叉（打叉用于排除、错误） |
 | `clear` | 去掉目标对象上的划线、圈、叉和 mark |
 | `set` | 改角色、透明度等属性 |
-| `camera` | 放大、平移（导数放大、局部特写） |
+| `camera` | 放大、平移（导数放大、局部特写），参数见下 |
 | `hold` | 停住 N 秒（"aha"处留白） |
 | 原语动作 | 由 `primitives` 提供，例如 `derive`、`extend`（差分表）、`cut`、`slide`（面积模型）、`flip`（数轴） |
+
+**镜头 `camera`**：整幅画面一起放大、平移，对象本身不动（布局、引用的坐标都不变）。
+
+```yaml
+    - at: s2@z
+      act: camera
+      target: graph.point     # 对准谁
+      args: {zoom: 60}        # 放大到原样的 60 倍（绝对倍数，不累乘）
+      dur: 3
+    - at: s3
+      act: camera
+      target: table
+      args: {fit: true, margin: 0.3}   # 让 table 刚好填满画面，四周留 0.3
+    - at: s4
+      act: camera
+      args: {reset: true}     # 回到原样
+```
+
+| 参数 | 含义 |
+|---|---|
+| `zoom: 3` | 放大倍数，> 0；1 是原样。有 `target` 时对准它的中心，没有时绕当前中心缩放 |
+| `fit: true` | 自动算倍数，让 `target` 填满画面；需要 `target`，不能和 `zoom` 同时写 |
+| `margin: 0.3` | 只和 `fit: true` 一起用，四周留白（画面单位，默认 0.5） |
+| `reset: true` | 复位到原样；不再写 `target`、`zoom`、`fit`、`margin` |
+
+三者（`zoom`、`fit: true`、`reset: true`）必须有一个。放大倍数按对数插值，从 1 倍推到 100 倍看起来是匀速的；默认时长 1.5 秒。钉住的对象（`pin`）和 `top` / `footer` 区的对象不跟镜头走，题卡和底部胶囊在放大时原地不动；对准它们会得到警告。参数错误报 `SS334`。
 
 ### 7.3 停顿、分段和互动点
 

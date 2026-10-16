@@ -24,6 +24,8 @@ NEEDS_TARGET = BUILTIN_ACTS - {"transform", "camera", "hold"}
 KNOWN_THEMES = {"paper", "chalk", "jade", "xuan", "blueprint", "riso"}
 LAYOUT_REFS = ("below", "above", "left_of", "right_of", "within", "over")
 DEMO_WORDS = ("演示", "不是证明", "不算证明", "并非证明")
+CAMERA_ARGS = {"zoom", "fit", "margin", "reset"}
+CAMERA_EXEMPT_REGIONS = ("top", "footer")  # 这些区域和钉住的对象不跟镜头走
 
 REQUIRED_PEDAGOGY = {
     "insight": ("insight", "misconception", "non_example", "status", "landing"),
@@ -274,6 +276,8 @@ class _Checker:
                     self.r.error("SS331", f"{path}.target", "hold 不需要 target")
             if "match" in action and act != "transform":
                 self.r.error("SS331", f"{path}.match", "只有 transform 用 match")
+            if act == "camera":
+                self.check_camera(action, target, path)
             return
 
         # 组件提供的动作
@@ -293,6 +297,43 @@ class _Checker:
             return
         ctx = widgets.WidgetContext(target.obj, definition, self.data, self.exposed[target.obj])
         widget.actions[act](action.get("args", {}), ctx, self.r, path)
+
+    def check_camera(self, action: dict, target: selectors.Selector | None, path: str) -> None:
+        """camera 的参数：{zoom: 倍数} / {fit: true, margin?} 对准 target；{reset: true} 复位。"""
+        args = action.get("args", {})
+        apath = f"{path}.args"
+        for key in sorted(set(args) - CAMERA_ARGS):
+            self.r.error("SS334", f"{apath}.{key}", f"camera 没有参数 {key}（可用：fit、margin、reset、zoom）")
+        zoom, fit, margin, reset = (args.get(k) for k in ("zoom", "fit", "margin", "reset"))
+
+        def number(v) -> bool:
+            return isinstance(v, (int, float)) and not isinstance(v, bool)
+
+        if reset is not None:
+            if reset is not True:
+                self.r.error("SS334", f"{apath}.reset", "reset 只能写 true")
+            others = [k for k in ("zoom", "fit", "margin") if k in args] + (["target"] if "target" in action else [])
+            if others:
+                self.r.error("SS334", path, f"camera 复位（reset）时不能再写 {'、'.join(others)}")
+            return
+        if zoom is not None and (not number(zoom) or zoom <= 0):
+            self.r.error("SS334", f"{apath}.zoom", f"zoom 应为大于 0 的数（放大倍数，1 = 原样），收到 {zoom!r}")
+        if fit is not None and not isinstance(fit, bool):
+            self.r.error("SS334", f"{apath}.fit", f"fit 应为 true / false，收到 {fit!r}")
+        if margin is not None and (not number(margin) or margin < 0):
+            self.r.error("SS334", f"{apath}.margin", f"margin 应为不小于 0 的数，收到 {margin!r}")
+        if fit is True and zoom is not None:
+            self.r.error("SS334", path, "fit 和 zoom 只能二选一：fit 自动算倍数，zoom 指定倍数")
+        if fit is True and "target" not in action:
+            self.r.error("SS334", path, "fit 需要 target：镜头要填满哪个对象")
+        if margin is not None and fit is not True:
+            self.r.error("SS334", f"{apath}.margin", "margin 只和 fit: true 一起用")
+        if zoom is None and fit is not True:
+            self.r.error("SS334", path, "camera 需要 zoom、fit: true 或 reset: true 之一")
+        if target is not None and target.obj in self.objects:
+            definition = self.objects[target.obj]
+            if definition.get("pin") or definition.get("in") in CAMERA_EXEMPT_REGIONS:
+                self.r.warning("SS334", f"{path}.target", f"{target.obj} 钉住或在 top / footer 区，不跟镜头走，对准它没有意义")
 
     # ---------- 教学信息 ----------
 
