@@ -1,0 +1,170 @@
+# 洞察系列 #21 勾股定理：拼一拼就看见。
+# 第一支洞察短视频：钩子说出迷思（a+b=c），中段预测暂停，钝角非例，最后把图里的每一块变成公式里的对应项。
+# 画面只用一个面积模型（area_model）：边长 a+b 的大正方形里四个全等直角三角形，两种摆法之间只做平移。
+spec: "0.1"
+
+meta:
+  id: ep21
+  title: 勾股定理：拼一拼就看见
+  line: insight
+  units: [J11]
+  episode: 21
+  grade: 八年级
+  author: Boxi Yu
+  license: CC-BY-4.0
+
+pedagogy:
+  insight: 同一个大正方形里，四个直角三角形换个摆法，空白处从 c² 变成 a²+b²，所以 a²+b²=c²
+  misconception: a+b=c
+  non_example: 把直角撑成钝角，四个三角形戳出大正方形、互相压住，拼不起来；这时 c² 比 a²+b² 大
+  status: proof
+  landing: Landing
+
+style:
+  theme: paper
+  canvas: "16:9"
+  voice:
+    persona: peer-ms
+    speed: 1.0
+  segmented: false
+  subtitles: soft
+
+objects:
+  one:
+    widget: area_model
+    kind: right_triangles
+    count: 1
+    legs: [2, 3]
+    role: A
+    in: stage
+  pyth:
+    widget: area_model
+    kind: right_triangles
+    count: 4
+    legs: [2, 3]
+    layout: four_around_c
+    pieces: hidden
+    role: A
+    in: stage
+  wrong:
+    type: math
+    tex: 'a+b=c'
+    role: NO
+    level: display
+    in: side
+  ask:
+    type: text
+    text: 空白会变成什么？
+    role: HL
+    below: wrong
+    gap: xl
+  law:
+    type: text
+    text: '[$a^2$]{#a2 .B} [$+$]{#plus} [$b^2$]{#b2 .C} [$=$]{#eq} [$c^2$]{#c2 .HL}'
+    level: display
+    below: wrong
+    gap: xl
+
+beats:
+  - id: Hook
+    shows: misconception
+    say:
+      - {id: s1, pace: normal, text: "{@tri}一个直角三角形，两条直角边是 a 和 b，斜边是 c。"}
+      - {id: s2, pace: ask, text: "很多人会猜：{@w}斜边等于 a 加 b？"}
+      - {id: s3, pace: normal, text: "{@x}不对。{@c}走斜边是直路，走两条直角边是绕远路，直路更短。"}
+      - {id: s4, pace: slow, text: "那它们是什么关系？{@area}不比长度，比面积。"}
+    do:
+      - {at: s1@tri, act: show, target: one}
+      - {at: s2@w, act: show, target: wrong}
+      - {at: s3@x, act: cross, target: wrong}
+      - {at: s3@c, act: mark, target: "one.side[2]"}
+
+  - id: Setup
+    say:
+      - {id: s1, pace: normal, text: "画一个{@sq}边长 a 加 b 的大正方形。"}
+      - {id: s2, pace: brisk, text: "放进四个一模一样的直角三角形，{@t0}一个、{@t1}两个、{@t2}三个、{@t3}四个。"}
+      - {id: s3, pace: normal, text: "{@h}中间空出了一块，四条边都是斜边 c。"}
+      - {id: s4, pace: normal, text: "{@ang}每条边上，两个锐角凑成九十度，剩下的角也是九十度。"}
+      - {id: s5, pace: slow, text: "所以它是正方形，{@c2}面积是 c 方。"}
+    do:
+      - {at: s1, act: hide, target: one}
+      - {at: s1@sq, act: show, target: pyth}
+      - {at: s2@t0, act: show, target: "pyth[0]"}
+      - {at: s2@t1, act: show, target: "pyth[1]"}
+      - {at: s2@t2, act: show, target: "pyth[2]"}
+      - {at: s2@t3, act: show, target: "pyth[3]"}
+      - {at: s3@h, act: show, target: "pyth.hole[0]"}
+      - {at: s4@ang, act: focus, target: "pyth.hole[0]"}
+      - {at: s5@c2, act: unfocus, target: pyth}
+      - {with: prev, act: mark, target: "pyth.area[0]"}
+
+  - id: Predict
+    pause: {type: predict, prompt: 大正方形不动，四个三角形两两拼成长方形，空白处会变成什么？面积变了吗？, hold: 1}
+    say:
+      - {id: s1, pace: ask, text: "大正方形不动，把四个三角形{@pair}两两拼成长方形。"}
+      - {id: s2, pace: ask, text: "猜一猜：{@q}空白会变成什么？面积变不变？"}
+      - {id: s3, pace: slow, text: "先想三秒。{@n}三，二，一。"}
+    do:
+      - {at: s1@pair, act: clear, target: pyth}
+      - {at: s2@q, act: show, target: ask}
+      - {at: s3@n, act: focus, target: ask}
+
+  - id: Rearrange
+    say:
+      - {id: s1, pace: normal, text: "{@go}看好了：三角形只平移，不转动，也不变形。"}
+      - {id: s2, pace: normal, text: "空白变成了{@a2}边长 a 的正方形，{@b2}和边长 b 的正方形，"}
+      - {id: s3, pace: normal, text: 面积是 a 方加 b 方。}
+      - {id: s4, pace: slow, text: "大正方形和三角形都没变，{@same}空白的面积也不会变。"}
+    do:
+      - {at: s1, act: hide, target: ask}
+      - {at: s1@go, act: slide, target: pyth, args: {layout: two_rectangles}, dur: fit}
+      - {at: s2@a2, act: show, target: "pyth.hole[1]"}
+      - {at: s2@b2, act: show, target: "pyth.hole[2]"}
+      - {at: s4@same, act: focus, target: "pyth.hole[1:3]"}
+
+  - id: NonExample
+    shows: non_example
+    say:
+      - {id: s1, pace: ask, text: "换成钝角行不行？{@bend}把直角撑开试试。"}
+      - {id: s2, pace: normal, text: 三角形戳出了大正方形，还互相压住，拼不起来。}
+      - {id: s3, pace: normal, text: 这时斜边更长，c 方比 a 方加 b 方大。}
+      - {id: s4, pace: slow, text: "{@back}只有直角，才能严丝合缝。"}
+    do:
+      - {at: s1, act: unfocus, target: pyth}
+      - {at: s1@bend, act: bend, target: pyth, args: {angle: 110}, dur: 1.6}
+      - {at: s4@back, act: bend, target: pyth, args: {angle: 90}, dur: 1.2}
+      - {after: prev, act: show, target: "pyth.hole[1:3]"}
+
+  - id: Landing
+    shows: landing
+    say:
+      - {id: s1, pace: normal, text: "把图翻译成公式：{@a}这块是 a 方，{@p}加上{@b}这块 b 方，"}
+      - {id: s2, pace: normal, text: "{@back}再把三角形挪回原位，空白又变回了中间这一块，{@c}c 方。"}
+      - {id: s3, pace: slow, text: "{@law}a 方加 b 方等于 c 方，这就是勾股定理。"}
+    do:
+      # 公式先整体亮出来、各项先藏好，再让图里的每一块依次变成公式里的对应项
+      - {at: s1, act: hide, target: "law#a2"}
+      - {with: prev, act: hide, target: "law#plus"}
+      - {with: prev, act: hide, target: "law#b2"}
+      - {with: prev, act: hide, target: "law#eq"}
+      - {with: prev, act: hide, target: "law#c2"}
+      - {after: prev, act: set, target: law, args: {opacity: 1}}
+      - {at: s1@a, act: transform, from: "pyth.area[1]", to: "law#a2"}
+      - {at: s1@p, act: show, target: "law#plus"}
+      - {at: s1@b, act: transform, from: "pyth.area[2]", to: "law#b2"}
+      - {at: s2@back, act: slide, target: pyth, args: {layout: four_around_c}, dur: fit}
+      - {at: s2@c, act: show, target: "pyth.hole[0]"}
+      - {with: prev, act: show, target: "law#eq"}
+      - {with: prev, act: transform, from: "pyth.area[0]", to: "law#c2"}
+      - {at: s3@law, act: underline, target: law}
+
+  - id: Close
+    say:
+      - {id: s1, pace: normal, text: "回到开头：{@w}斜边不是 a 加 b。长度不能直接加，{@area}面积可以。"}
+      - {id: s2, pace: normal, text: "记住这幅图：{@sw}同样四块换个摆法，c 方就变成了 a 方加 b 方。"}
+      - {id: s3, pace: ask, text: "练一练：{@q}直角边是三和四，斜边是多少？"}
+    do:
+      - {at: s1@w, act: mark, target: wrong}
+      - {at: s1@area, act: mark, target: law}
+      - {at: s2@sw, act: slide, target: pyth, args: {layout: two_rectangles}, dur: fit}
+      - {at: s3@q, act: show, target: "pyth.hole[1:3]"}

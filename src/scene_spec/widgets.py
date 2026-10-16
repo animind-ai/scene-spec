@@ -308,9 +308,70 @@ def _diff_triangle(args: dict, ctx: WidgetContext, report: Report, path: str) ->
 
 # ---------- 面积模型 ----------
 
+AREA_LAYOUTS = ("four_around_c", "two_rectangles")
+
+
+def _legs(value: object) -> str | None:
+    ok = (isinstance(value, list) and len(value) == 2
+          and all(isinstance(v, (int, float, str)) and not isinstance(v, bool) for v in value))
+    if not ok:
+        return "应为两个元素的列表：两条直角边的长度（right_triangles 要求正数，用来画图）"
+    return None
+
+
+def _angle(value: object) -> str | None:
+    ok = isinstance(value, (int, float)) and not isinstance(value, bool) and 0 < value < 180
+    return None if ok else "应为 0 到 180 之间的角度（度）"
+
+
+def _area_count(definition: dict) -> int | None:
+    count = definition.get("count")
+    if count is None and definition.get("kind") == "right_triangles":
+        return 4
+    return count if isinstance(count, int) and not isinstance(count, bool) else None
+
+
+def _expose_area(definition: dict, data: dict) -> Exposed:
+    count = _area_count(definition)
+    exposed = Exposed(items=count)
+    if definition.get("kind") == "right_triangles" and count is not None:
+        # tri：每个三角形；hole / area：空白区域 [c², a², b²] 及其名字（只有四个三角形的拼图才有）；side：边长标注 [a, b, c]
+        holes = 3 if count == 4 else 0
+        exposed.parts = {"tri": count, "hole": holes, "area": holes, "side": 3}
+    return exposed
+
+
+def _validate_area(ctx: WidgetContext, report: Report, path: str) -> None:
+    d = ctx.definition
+    if d.get("kind") != "right_triangles":
+        return
+    legs = d.get("legs")
+    if legs is None:
+        report.error("SS243", path, "right_triangles 需要 legs：两条直角边的长度，例如 [2, 3]")
+    elif isinstance(legs, list) and not all(isinstance(v, (int, float)) and not isinstance(v, bool) and v > 0 for v in legs):
+        report.error("SS243", f"{path}.legs", "right_triangles 的 legs 要写成正数（按比例画图），例如 [2, 3]")
+    count = _area_count(d)
+    if count not in (1, 4):
+        report.error("SS243", f"{path}.count", "right_triangles 只支持 count: 1（单个三角形）或 4（拼大正方形）")
+
+
 def _area_slide(args: dict, ctx: WidgetContext, report: Report, path: str) -> None:
-    if not isinstance(args.get("layout"), str):
+    layout = args.get("layout")
+    if not isinstance(layout, str):
         report.error("SS241", f"{path}.args.layout", "slide 需要 layout（目标摆法的名字）")
+    elif ctx.definition.get("kind") == "right_triangles":
+        if layout not in AREA_LAYOUTS:
+            report.error("SS241", f"{path}.args.layout", f"right_triangles 的摆法只有 {' / '.join(AREA_LAYOUTS)}")
+        if _area_count(ctx.definition) != 4:
+            report.error("SS244", path, "只有四个三角形的拼图才能 slide")
+
+
+def _area_bend(args: dict, ctx: WidgetContext, report: Report, path: str) -> None:
+    problem = _angle(args.get("angle"))
+    if problem:
+        report.error("SS245", f"{path}.args.angle", f"bend 需要 angle：{problem}")
+    if ctx.definition.get("kind") != "right_triangles" or _area_count(ctx.definition) != 4:
+        report.error("SS244", path, "bend 只用于四个三角形的拼图（kind: right_triangles）")
 
 
 def _area_cut(args: dict, ctx: WidgetContext, report: Report, path: str) -> None:
@@ -366,11 +427,15 @@ REGISTRY: dict[str, Widget] = {
         params={
             "kind": (True, _enum("square", "rectangle", "right_triangles", "strip")),
             "side": (False, _number_or_str),
-            "legs": (False, lambda v: None if isinstance(v, list) and len(v) == 2 else "应为两个元素的列表"),
+            "legs": (False, _legs),
             "count": (False, _positive_int),
+            "layout": (False, _enum(*AREA_LAYOUTS)),
+            "angle": (False, _angle),
+            "pieces": (False, _enum("shown", "hidden")),
         },
-        expose=lambda d, data: Exposed(items=d.get("count") if isinstance(d.get("count"), int) else None),
-        actions={"slide": _area_slide, "cut": _area_cut},
+        expose=_expose_area,
+        actions={"slide": _area_slide, "bend": _area_bend, "cut": _area_cut},
+        validate=_validate_area,
     ),
 }
 
