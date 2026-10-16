@@ -1,0 +1,245 @@
+# §6.7 例1(1) 高阶等差数列：用 scene-spec 改写的完整一支。
+# 旁白与 highSchool/lessons/sec6-7/p01/build.py 一致；画面对应 p01/scenes.py。
+# 品牌元素（培玉 logo、讲师头像与署名）不进开源版本，由培玉的私有主题在渲染时叠加。
+spec: "0.1"
+
+meta:
+  id: s67-p01
+  title: 高阶等差数列
+  line: worked
+  units: [S6]
+  grade: 高二
+  author: Boxi Yu
+  license: CC-BY-4.0
+  sources:
+    - kind: problem
+      cite: §6.7 例1(1)
+      note: 题面引用；讲解与旁白为原创
+
+pedagogy:
+  insight: 某一层差数列是等差的，就能往下做差、在那一层补全、再逐层加回
+  misconception: 只给了五项，求不出第八项
+  status: method
+  landing: GeneralTerm
+
+style:
+  theme: paper
+  canvas: "16:9"
+  voice:
+    persona: teacher-hs
+    speed: 1.25
+  subtitles: soft
+
+data:
+  A: [2, 5, 11, 21, 36, 57, 85, 121]
+  B: [3, 6, 10, 15, 21, 28, 36]
+  C: [3, 4, 5, 6, 7, 8]
+
+objects:
+  title:
+    type: text
+    text: 高阶等差数列
+    role: A
+    in: stage
+  subtitle:
+    type: text
+    text: 新情境、新定义：把没见过的名词翻译回熟悉的数列
+    below: title
+    gap: md
+  steps:
+    widget: think_box
+    in: stage
+    lines:
+      - '[解新定义题的三步]{.bold}'
+      - 一、把定义一句一句读完
+      - 二、翻译成你熟悉的式子
+      - 三、照着定义，一条一条算，一条一条验
+  card:
+    widget: problem_card
+    pin: top
+    lines:
+      - '[例1(1)]{.bold} 定义：对数列 $\{A_n\}$，令 [$b_n=A_{n+1}-A_n$]{#b_def .B}，则 $\{b_n\}$ 称为 $\{A_n\}$ 的一阶差数列；'
+      - '再令 [$c_n=b_{n+1}-b_n$]{#c_def .C}，则 $\{c_n\}$ 称为 $\{A_n\}$ 的二阶差数列．'
+      - '已知 $\{A_n\}$ 为 [$2,5,11,21,36,\cdots$]{#terms .A}，且[它的二阶差数列是等差数列]{#key .HL}，则 [$A_8=$]{#ask .HL}[\underline{\hspace{3em}}]{#blank}．'
+  answer:
+    type: math
+    tex: '121'
+    role: HL
+    over: card#blank
+  table:
+    widget: diff_table
+    in: stage
+    rows:
+      - {data: A, role: A, label: '$A_n$', name: 原数列}
+      - {data: B, role: B, label: '$b_n$', name: 一阶差数列}
+      - {data: C, role: C, label: '$c_n$', name: 二阶差数列}
+    known: [5, 0, 0]
+  plan:
+    widget: chips
+    in: footer
+    items: ["↓ 往下做差", "→ 在等差层补全", "↑ 逐层加回"]
+  f_c:
+    type: math
+    tex: 'c_n = n + 2'
+    role: C
+    in: side
+  f_b:
+    type: math
+    tex: 'b_n = \tfrac{1}{2}(n+1)(n+2)'
+    role: B
+    below: f_c
+    gap: sm
+  f_a:
+    type: math
+    tex: 'A_n = \tfrac{1}{6}n(n+1)(n+2) + 1'
+    role: A
+    below: f_b
+    gap: sm
+  verify:
+    type: math
+    tex: 'A_8 = \tfrac{8 \cdot 9 \cdot 10}{6} + 1 = 121'
+    role: HL
+    below: f_a
+    gap: md
+  recap:
+    widget: summary
+    in: stage
+    rows:
+      - {tag: 信号, role: A, text: 给了前几项，又说某一层差数列等差或为常数}
+      - {tag: 求某一项, role: B, text: 往下做差，在等差那层补全，再往上逐层加回}
+      - {tag: 求通项, role: HL, text: 从等差那层开始，一层一层累加}
+  question:
+    widget: think_box
+    below: recap
+    gap: lg
+    lines:
+      - '[想一想]{.bold}'
+      - '第三层全是 1，而 $A_n$ 恰好是 $n$ 的三次式，这是巧合吗？'
+
+beats:
+  - id: Opening
+    say:
+      - {id: s1, pace: normal, text: 今天来看数列压轴题里很常见的一类：新情境、新定义。}
+      - {id: s2, pace: slow, text: 题目会临时规定一个你没见过的名词。}
+      - {id: s3, pace: normal, text: 别慌。你要做的，是把它翻译回你熟悉的等差、等比和递推。}
+    do:
+      - {at: s1, act: show, target: title, style: write}
+      - {at: s3, act: show, target: subtitle}
+
+  - id: Method
+    say:
+      - {id: s1, pace: normal, text: 解这类题，方法就三步。}
+      - {id: s2, pace: normal, text: "{@r1}第一，把定义一句一句读完；{@r2}第二，翻译成你熟悉的式子；{@r3}第三，照着定义，一条一条算，一条一条验。"}
+      - {id: s3, pace: slow, text: 一句话：照章办事。}
+    do:
+      - {at: s1, act: hide, target: title}
+      - {with: prev, act: hide, target: subtitle}
+      - {at: s1, act: show, target: steps}
+      - {at: s2@r1, act: focus, target: "steps[1]"}
+      - {at: s2@r2, act: focus, target: "steps[2]"}
+      - {at: s2@r3, act: focus, target: "steps[3]"}
+      - {at: s3, act: unfocus, target: steps}
+
+  - id: Problem
+    say:
+      - {id: s1, pace: normal, text: 来看例一的第一问。}
+      - {id: s2, pace: normal, text: "题目先定义了两个新数列。后一项减前一项，得到的 b n，{@b}叫一阶差数列；"}
+      - {id: s3, pace: normal, text: "b n 再相邻相减，得到的 c n，{@c}叫二阶差数列。"}
+      - {id: s4, pace: normal, text: "然后告诉我们：{@t}数列 A n 是二、五、十一、二十一、三十六，后面省略，而且，{@k}它的二阶差数列是等差数列。"}
+      - {id: s5, pace: ask, text: "那么，{@q}A 八等于多少？"}
+    do:
+      - {at: s1, act: hide, target: steps}
+      - {at: s1, act: show, target: card}
+      - {at: s2@b, act: underline, target: "card#b_def"}
+      - {at: s3@c, act: underline, target: "card#c_def"}
+      - {at: s4@t, act: underline, target: "card#terms"}
+      - {at: s4@k, act: underline, target: "card#key"}
+      - {at: s5@q, act: circle, target: "card#ask"}
+
+  - id: Translate
+    shows: misconception
+    say:
+      - {id: s1, pace: ask, text: 先别急着算。题目只给了五项，却要第八项，中间差了三项，拿什么补？}
+      - {id: s2, pace: slow, text: "关键就在这一句：{@k}二阶差数列是等差数列。"}
+      - {id: s3, pace: normal, text: 等差数列我们最熟，知道了公差，就能一直往后写。}
+      - {id: s4, pace: normal, text: "所以思路是三步：{@p1}往下做差，找到等差的那一层；{@p2}在那一层往后补；{@p3}再一层一层加回来。"}
+    do:
+      - {at: s2@k, act: mark, target: "card#key"}
+      - {at: s4, act: show, target: plan}
+      - {at: s4@p1, act: focus, target: "plan[0]"}
+      - {at: s4@p2, act: focus, target: "plan[1]"}
+      - {at: s4@p3, act: focus, target: "plan[2]"}
+
+  - id: Down
+    say:
+      - {id: s1, pace: normal, text: "先往下做差。按定义，后一项减前一项：{@d0}五减二，得三。"}
+      - {id: s2, pace: brisk, text: "同样，{@d1}十一减五得六，{@d2}二十一减十一得十，{@d3}三十六减二十一得十五。"}
+      - {id: s3, pace: brisk, text: "一阶差数列再相邻相减：{@e}三、四、五。"}
+      - {id: s4, pace: slow, text: "看，三、四、五，正好是公差为一的等差数列，{@k}和题目给的条件对上了。"}
+    do:
+      - {at: s1, act: focus, target: "plan[0]"}
+      - {at: s1, act: show, target: table}
+      - {at: s1@d0, act: derive, target: table, args: {row: B, index: 0}}
+      - {at: s2@d1, act: derive, target: table, args: {row: B, index: 1}}
+      - {at: s2@d2, act: derive, target: table, args: {row: B, index: 2}}
+      - {at: s2@d3, act: derive, target: table, args: {row: B, index: 3}}
+      - {at: s3@e, act: derive, target: table, args: {row: C, index: "0:3"}, dur: fit}
+      - {at: s4, act: focus, target: "table.C[0:3]"}
+      - {at: s4@k, act: underline, target: "card#key"}
+
+  - id: Up
+    say:
+      - {id: s1, pace: normal, text: "既然公差是一，这一层就往后补：{@c}六、七、八。"}
+      - {id: s2, pace: normal, text: "然后往上加。注意这个小三角形：{@tri}左边加下边，等于右边。十五加六，二十一。"}
+      - {id: s3, pace: brisk, text: "再加七，{@b5}二十八；再加八，{@b6}三十六。"}
+      - {id: s4, pace: brisk, text: "回到原数列，也是一样：三十六加二十一，{@a5}五十七；加二十八，{@a6}八十五；"}
+      - {id: s5, pace: slow, text: "最后加三十六，{@a7}得一百二十一。所以，{@ans}A 八等于一百二十一。"}
+    do:
+      - {at: s1, act: focus, target: "plan[1]"}
+      - {at: s1@c, act: extend, target: table, args: {row: C, index: "3:6"}, dur: fit}
+      - {at: s2, act: focus, target: "plan[2]"}
+      - {at: s2@tri, act: triangle, target: table, args: {row: B, index: 4}}
+      - {at: s3@b5, act: extend, target: table, args: {row: B, index: 5}}
+      - {at: s3@b6, act: extend, target: table, args: {row: B, index: 6}}
+      - {at: s4@a5, act: extend, target: table, args: {row: A, index: 5}}
+      - {at: s4@a6, act: extend, target: table, args: {row: A, index: 6}}
+      - {at: s5@a7, act: extend, target: table, args: {row: A, index: 7}}
+      - {at: s5@ans, act: show, target: answer}
+
+  - id: GeneralTerm
+    shows: landing
+    say:
+      - {id: s1, pace: ask, text: 可如果题目问的是第一百项呢？一项一项补就太慢了，我们得要通项。}
+      - {id: s2, pace: normal, text: "思路不变，只是把补数换成累加。二阶差数列首项是三，公差是一，{@c}所以 c n 等于 n 加二。"}
+      - {id: s3, pace: normal, text: "一阶差数列，就是首项三，再加上前面所有的 c。累加整理，{@b}b n 等于二分之一，乘 n 加一，乘 n 加二。"}
+      - {id: s4, pace: normal, text: "原数列也一样，首项二，加上前面所有的 b，{@a}得到 A n 等于六分之一乘 n，乘 n 加一，再乘 n 加二，最后加一。"}
+      - {id: s5, pace: slow, text: "代 n 等于八检验一下：{@v}八乘九乘十，除以六，一百二十，加一，一百二十一。对上了。"}
+    do:
+      - {at: s2@c, act: transform, from: "table.C[0:6]", to: f_c, match: auto}
+      - {at: s3@b, act: transform, from: "table.B[0:7]", to: f_b, match: auto}
+      - {at: s4@a, act: transform, from: "table.A[0:8]", to: f_a, match: auto}
+      - {at: s5@v, act: show, target: verify}
+      - {after: prev, act: hold, dur: 1.5}
+
+  - id: Close
+    say:
+      - {id: s1, pace: normal, text: 最后收一下，这套方法到底什么时候用、怎么用。}
+      - {id: s2, pace: normal, text: "{@sig}信号是：题目给了前几项，又告诉你某一层差数列是等差的，或者是常数。看到它，就把这张差分表画出来。"}
+      - {id: s3, pace: normal, text: "{@one}只求某一项，就往下做差，在等差那层补全，再往上逐层加回。{@all}要求通项，就从等差那层开始，一层一层累加。"}
+      - {id: s4, pace: normal, text: 顺带记一个名字：像本题这样，要做三次差才变成常数的数列，叫三阶等差数列。}
+      - {id: s5, pace: ask, text: "{@q}最后留个问题给你：本题再往下做一次差，第三层全是一，是常数；而 A n 恰好是 n 的三次式。这是巧合吗？"}
+      - {id: s6, pace: slow, text: 想通了，你就多了一种解法：直接设 A n 是三次式，用前四项待定系数。}
+    do:
+      - {at: s1, act: hide, target: table}
+      - {with: prev, act: hide, target: plan}
+      - {at: s1, act: show, target: recap}
+      - {at: s2@sig, act: focus, target: "recap[0]"}
+      - {at: s3@one, act: focus, target: "recap[1]"}
+      - {at: s3@all, act: focus, target: "recap[2]"}
+      - {at: s5@q, act: show, target: question}
+
+  - id: Think
+    pause:
+      type: think
+      prompt: 第三层全是 1，而 A_n 是 n 的三次式，这是巧合吗？
+      hold: 3

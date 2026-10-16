@@ -1,0 +1,360 @@
+"""第二层：语义检查。只在结构检查通过之后运行，所以可以放心假定字段类型正确。
+
+检查内容（设计稿 §8）：
+- 引用的对象、片段、子元素、句子、书签都存在；
+- 动作是内置动作或目标组件提供的动作，参数齐全；
+- 不出现色值，不出现表达式；
+- 产品线要求的洞察卡片字段齐全，并且被 beat 的 shows 标注引用；
+- 绝对坐标：insight 线报错，其余警告并计数。
+"""
+
+from __future__ import annotations
+
+import re
+
+from . import selectors, widgets
+from .report import Report
+from .textmarks import parse_object_text, parse_say_text
+
+BUILTIN_ACTS = {
+    "show", "hide", "transform", "move", "focus", "unfocus", "mark", "unmark",
+    "underline", "circle", "cross", "set", "camera", "hold",
+}
+NEEDS_TARGET = BUILTIN_ACTS - {"transform", "camera", "hold"}
+KNOWN_THEMES = {"paper", "chalk", "jade", "xuan", "blueprint", "riso"}
+LAYOUT_REFS = ("below", "above", "left_of", "right_of", "within", "over")
+DEMO_WORDS = ("演示", "不是证明", "不算证明", "并非证明")
+
+REQUIRED_PEDAGOGY = {
+    "insight": ("insight", "misconception", "non_example", "status", "landing"),
+    "worked": ("insight", "status"),
+    "contest": ("status",),
+}
+
+_COLOR = re.compile(r"^(#[0-9a-fA-F]{3}|#[0-9a-fA-F]{6}|#[0-9a-fA-F]{8}|(rgb|rgba|hsl|hsla)\(.*\))$")
+
+
+class _Checker:
+    def __init__(self, doc: dict, report: Report):
+        self.doc = doc
+        self.r = report
+        self.meta = doc["meta"]
+        self.line = self.meta["line"]
+        self.data = doc.get("data", {})
+        self.objects: dict[str, dict] = doc.get("objects", {})
+        self.beats: list[dict] = doc["beats"]
+        self.exposed: dict[str, widgets.Exposed] = {}
+        self.referenced: set[str] = set()
+        self.stats = {
+            "beats": len(self.beats),
+            "sentences": 0,
+            "actions": 0,
+            "custom_beats": 0,
+            "absolute_coords": 0,
+            "unregistered_widgets": 0,
+        }
+
+    # ---------- 全文扫描 ----------
+
+    def scan_literals(self, node: object, path: str) -> None:
+        if isinstance(node, dict):
+            for key, value in node.items():
+                self.scan_literals(value, f"{path}.{key}" if path else key)
+        elif isinstance(node, list):
+            for i, value in enumerate(node):
+                self.scan_literals(value, f"{path}[{i}]")
+        elif isinstance(node, str):
+            if _COLOR.match(node.strip()):
+                self.r.error("SS350", path, f"不允许直接写颜色 {node!r}，请用语义角色（FG/A/B/C/HL/NO/DIM）")
+            if "${" in node:
+                self.r.error("SS351", path, "不支持表达式 ${...}；data 只放字面量，需要计算的内容请用脚本生成")
+
+    # ---------- 对象 ----------
+
+    def check_objects(self) -> None:
+        # 先算出所有对象暴露的子元素，再检查布局引用（布局可以引用后声明的对象）
+        for obj_id, definition in self.objects.items():
+            path = f"objects.{obj_id}"
+            if "widget" in definition:
+                self.check_widget(obj_id, definition, path)
+            else:
+                self.check_basic(obj_id, definition, path)
+        for obj_id, definition in self.objects.items():
+            self.check_layout(obj_id, definition, f"objects.{obj_id}")
+
+    def check_basic(self, obj_id: str, definition: dict, path: str) -> None:
+        exposed = widgets.Exposed()
+        kind = definition["type"]
+        if kind == "text":
+            if "text" not in definition:
+                self.r.error("SS204", path, "text 对象需要 text")
+            else:
+                parsed = parse_object_text(definition["text"])
+                for problem in parsed.problems:
+                    self.r.error("SS210", f"{path}.text", problem)
+                ids = [s.id for s in parsed.spans if s.id]
+                for dup in {i for i in ids if ids.count(i) > 1}:
+                    self.r.error("SS211", f"{path}.text", f"片段 #{dup} 重复")
+                exposed.spans = set(ids)
+        elif kind == "math" and "tex" not in definition:
+            self.r.error("SS204", path, "math 对象需要 tex")
+        elif kind == "shape" and "shape" not in definition:
+            self.r.error("SS204", path, "shape 对象需要 shape")
+        elif kind == "group":
+            children = definition.get("children")
+            if not children:
+                self.r.error("SS204", path, "group 对象需要 children")
+            else:
+                for child in children:
+                    if child not in self.objects:
+                        self.r.error("SS310", f"{path}.children", f"没有对象 {child!r}")
+                    elif child == obj_id:
+                        self.r.error("SS341", f"{path}.children", "group 不能包含自己")
+                    self.referenced.add(child)
+                exposed.items = len(children)
+        self.exposed[obj_id] = exposed
+
+    def check_widget(self, obj_id: str, definition: dict, path: str) -> None:
+        widget = widgets.lookup(definition["widget"])
+        if widget is None:
+            self.stats["unregistered_widgets"] += 1
+            self.r.warning("SS370", f"{path}.widget", f"组件 {definition['widget']!r} 未登记，参数和引用无法校验")
+            self.exposed[obj_id] = None  # 未知：放行所有子元素引用
+            return
+        widgets.check_params(widget, definition, self.r, path)
+        exposed = widget.expose(definition, self.data)
+        self.exposed[obj_id] = exposed
+        if widget.validate:
+            widget.validate(widgets.WidgetContext(obj_id, definition, self.data, exposed), self.r, path)
+
+    def check_layout(self, obj_id: str, definition: dict, path: str) -> None:
+        for key in LAYOUT_REFS:
+            if key in definition:
+                self.resolve(definition[key], f"{path}.{key}", self_id=obj_id)
+        for axis, ref in (definition.get("align") or {}).items():
+            self.resolve(ref, f"{path}.align.{axis}", self_id=obj_id)
+        if definition.get("pin"):
+            self.referenced.add(obj_id)
+        if "at" in definition:
+            self.stats["absolute_coords"] += 1
+            if self.line == "insight":
+                self.r.error("SS342", f"{path}.at", "洞察系列不允许绝对坐标，请改用布局约束，或把这部分画面放进 custom beat")
+            else:
+                self.r.warning("SS342", f"{path}.at", "使用了绝对坐标，布局求解器不会管它")
+
+    # ---------- 选择器 ----------
+
+    def resolve(self, text: str, path: str, self_id: str | None = None) -> selectors.Selector | None:
+        sel = selectors.parse(text)
+        if sel is None:  # 结构层已经保证格式，这里只是保险
+            self.r.error("SS310", path, f"选择器 {text!r} 格式不对")
+            return None
+        if sel.obj not in self.objects:
+            self.r.error("SS310", path, f"没有对象 {sel.obj!r}")
+            return None
+        if self_id is not None and sel.obj == self_id:
+            self.r.error("SS341", path, "布局约束不能引用自己")
+        self.referenced.add(sel.obj)
+        exposed = self.exposed.get(sel.obj, widgets.Exposed())
+        if exposed is None:  # 未登记组件
+            return sel
+        if sel.span is not None and sel.span not in exposed.spans:
+            known = "、".join(f"#{s}" for s in sorted(exposed.spans)) or "无"
+            self.r.error("SS311", path, f"{sel.obj} 里没有片段 #{sel.span}（现有：{known}）")
+        if sel.part is not None:
+            if sel.part not in exposed.parts:
+                known = "、".join(sorted(exposed.parts)) or "无"
+                self.r.error("SS312", path, f"{sel.obj} 没有部件 .{sel.part}（现有：{known}）")
+            elif sel.index is not None and sel.index[1] > exposed.parts[sel.part]:
+                self.r.error("SS312", path, f"{sel.obj}.{sel.part} 只有 {exposed.parts[sel.part]} 个元素，下标越界")
+        if sel.part is None and sel.index is not None:
+            if exposed.items is None:
+                self.r.error("SS313", path, f"{sel.obj} 不是列表，不能用下标")
+            elif sel.index[1] > exposed.items:
+                self.r.error("SS313", path, f"{sel.obj} 只有 {exposed.items} 项，下标越界")
+        if sel.index is not None and sel.index[0] >= sel.index[1]:
+            self.r.error("SS313", path, "切片 i:j 需要 i < j")
+        return sel
+
+    # ---------- beats ----------
+
+    def check_beats(self) -> None:
+        seen: dict[str, int] = {}
+        for n, beat in enumerate(self.beats):
+            path = f"beats[{n}]"
+            if beat["id"] in seen:
+                self.r.error("SS301", f"{path}.id", f"beat id {beat['id']!r} 与 beats[{seen[beat['id']]}] 重复")
+            seen[beat["id"]] = n
+            if not any(k in beat for k in ("say", "do", "pause", "custom")):
+                self.r.warning("SS380", path, "这个 beat 是空的（没有 say、do、pause、custom）")
+            if "custom" in beat:
+                self.stats["custom_beats"] += 1
+            sentences = self.check_say(beat, path)
+            self.check_actions(beat, sentences, path)
+
+    def check_say(self, beat: dict, path: str) -> list[tuple[str | None, set[str]]]:
+        """返回每句的 (id, 书签集合)。"""
+        out: list[tuple[str | None, set[str]]] = []
+        ids: set[str] = set()
+        for i, sentence in enumerate(beat.get("say", [])):
+            self.stats["sentences"] += 1
+            spath = f"{path}.say[{i}]"
+            sid = sentence.get("id")
+            if sid is not None:
+                if sid in ids:
+                    self.r.error("SS302", f"{spath}.id", f"句子 id {sid!r} 重复")
+                if sid.isdigit():
+                    self.r.error("SS302", f"{spath}.id", "句子 id 不能是纯数字（会和下标混淆）")
+                ids.add(sid)
+            marks, problems = parse_say_text(sentence["text"])
+            for problem in problems:
+                self.r.error("SS303", f"{spath}.text", problem)
+            out.append((sid, set(marks)))
+        return out
+
+    def check_time(self, ref: object, sentences: list, path: str) -> None:
+        if isinstance(ref, int):
+            sentence_ref, mark = str(ref), None
+        else:
+            body = ref.split("+", 1)[0]
+            sentence_ref, _, mark = body.partition("@")
+            mark = mark or None
+        if not sentences:
+            if sentence_ref != "0" or mark is not None:
+                self.r.error("SS320", path, "这个 beat 没有旁白，时间点只能写 at: 0（beat 开始）")
+            return
+        if sentence_ref.isdigit():
+            index = int(sentence_ref)
+            if index >= len(sentences):
+                self.r.error("SS320", path, f"这个 beat 只有 {len(sentences)} 句旁白，没有第 {index} 句（从 0 数）")
+                return
+        else:
+            matches = [i for i, (sid, _) in enumerate(sentences) if sid == sentence_ref]
+            if not matches:
+                known = "、".join(sid for sid, _ in sentences if sid) or "无"
+                self.r.error("SS320", path, f"没有 id 为 {sentence_ref!r} 的句子（现有：{known}）")
+                return
+            index = matches[0]
+        if mark is not None and mark not in sentences[index][1]:
+            known = "、".join(f"@{m}" for m in sorted(sentences[index][1])) or "无"
+            self.r.error("SS321", path, f"这一句里没有书签 @{mark}（现有：{known}）")
+
+    def check_actions(self, beat: dict, sentences: list, path: str) -> None:
+        for i, action in enumerate(beat.get("do", [])):
+            self.stats["actions"] += 1
+            apath = f"{path}.do[{i}]"
+            if "at" in action:
+                self.check_time(action["at"], sentences, f"{apath}.at")
+            elif i == 0:
+                key = "after" if "after" in action else "with"
+                self.r.error("SS322", f"{apath}.{key}", "第一个动作前面没有动作，不能用 prev；请用 at")
+            self.check_action(action, apath)
+
+    def check_action(self, action: dict, path: str) -> None:
+        act = action["act"]
+        target = self.resolve(action["target"], f"{path}.target") if "target" in action else None
+        for key in ("from", "to"):
+            if key in action:
+                self.resolve(action[key], f"{path}.{key}")
+
+        if act in BUILTIN_ACTS:
+            if act in NEEDS_TARGET and "target" not in action:
+                self.r.error("SS331", path, f"{act} 需要 target")
+            if act == "transform":
+                if "from" not in action or "to" not in action:
+                    self.r.error("SS331", path, "transform 需要 from 和 to")
+                if "target" in action:
+                    self.r.error("SS331", f"{path}.target", "transform 用 from / to，不用 target")
+            elif "from" in action or "to" in action:
+                self.r.error("SS331", path, f"只有 transform 用 from / to，{act} 请用 target")
+            if act == "hold":
+                if "dur" not in action:
+                    self.r.error("SS331", path, "hold 需要 dur")
+                if "target" in action:
+                    self.r.error("SS331", f"{path}.target", "hold 不需要 target")
+            if "match" in action and act != "transform":
+                self.r.error("SS331", f"{path}.match", "只有 transform 用 match")
+            return
+
+        # 组件提供的动作
+        if target is None:
+            self.r.error("SS330", path, f"{act!r} 不是内置动作；组件动作需要 target 指向提供它的组件")
+            return
+        definition = self.objects[target.obj]
+        widget = widgets.lookup(definition["widget"]) if "widget" in definition else None
+        if "widget" in definition and widget is None:
+            return  # 未登记组件：已经给过警告
+        if widget is None or act not in widget.actions:
+            provided = "、".join(sorted(widget.actions)) if widget and widget.actions else "无"
+            self.r.error("SS330", f"{path}.act", f"{act!r} 不是内置动作，{target.obj} 也不提供它（它提供：{provided}）")
+            return
+        if target.span or target.part or target.index:
+            self.r.error("SS333", f"{path}.target", f"组件动作 {act} 的 target 应指向整个组件 {target.obj}")
+            return
+        ctx = widgets.WidgetContext(target.obj, definition, self.data, self.exposed[target.obj])
+        widget.actions[act](action.get("args", {}), ctx, self.r, path)
+
+    # ---------- 教学信息 ----------
+
+    def check_pedagogy(self) -> None:
+        ped = self.doc.get("pedagogy", {})
+        for key in REQUIRED_PEDAGOGY[self.line]:
+            if key not in ped:
+                self.r.error("SS360", "pedagogy", f"{self.line} 线必须填写 pedagogy.{key}")
+        if self.line == "insight" and self.meta.get("episode") is None:
+            self.r.error("SS360", "meta.episode", "insight 线必须填写选题编号 episode")
+
+        shows: dict[str, list[str]] = {"misconception": [], "non_example": [], "landing": []}
+        for beat in self.beats:
+            kinds = beat.get("shows", [])
+            for kind in [kinds] if isinstance(kinds, str) else kinds:
+                shows[kind].append(beat["id"])
+
+        for kind in ("misconception", "non_example"):
+            if kind in ped and not shows[kind]:
+                self.r.error("SS362", f"pedagogy.{kind}", f"填了 {kind}，但没有任何 beat 标注 shows: {kind}")
+            if shows[kind] and kind not in ped:
+                self.r.error("SS363", "pedagogy", f"beat {shows[kind]} 标注了 shows: {kind}，但 pedagogy.{kind} 没填")
+
+        beat_ids = {b["id"] for b in self.beats}
+        landing = ped.get("landing")
+        if landing is not None:
+            if landing not in beat_ids:
+                self.r.error("SS361", "pedagogy.landing", f"没有 id 为 {landing!r} 的 beat")
+            elif landing not in shows["landing"]:
+                self.r.error("SS362", "pedagogy.landing", f"beat {landing} 需要标注 shows: landing")
+        extra_landing = [b for b in shows["landing"] if b != landing]
+        if extra_landing:
+            self.r.error("SS363", "pedagogy.landing", f"beat {extra_landing} 标注了 shows: landing，但 pedagogy.landing 指向 {landing!r}")
+
+        if ped.get("status") == "demo":
+            spoken = "".join(s["text"] for b in self.beats for s in b.get("say", []))
+            if not any(word in spoken for word in DEMO_WORDS):
+                self.r.error("SS364", "pedagogy.status", "status 是 demo，但旁白里没有说明这是演示、不是证明")
+
+        if self.line == "insight" and not any(b.get("pause", {}).get("type") == "predict" for b in self.beats):
+            self.r.error("SS365", "beats", "insight 线至少要有一个 pause: {type: predict} 预测暂停")
+
+    # ---------- 其他 ----------
+
+    def check_misc(self) -> None:
+        theme = self.doc.get("style", {}).get("theme")
+        if theme and theme not in KNOWN_THEMES:
+            self.r.warning("SS371", "style.theme", f"主题 {theme!r} 不在 palette 的公开主题里（{'、'.join(sorted(KNOWN_THEMES))}）")
+        if self.line == "worked" and not self.meta.get("sources"):
+            self.r.warning("SS372", "meta.sources", "例题讲解通常引用了题目，请在 meta.sources 写明来源")
+        for obj_id in self.objects:
+            if obj_id not in self.referenced:
+                self.r.warning("SS381", f"objects.{obj_id}", "这个对象没有被任何动作或布局引用，也没有钉住")
+
+    def run(self) -> None:
+        self.scan_literals(self.doc, "")
+        self.check_objects()
+        self.check_beats()
+        self.check_pedagogy()
+        self.check_misc()
+        self.r.stats.update(self.stats)
+
+
+def check(doc: dict, report: Report) -> None:
+    _Checker(doc, report).run()

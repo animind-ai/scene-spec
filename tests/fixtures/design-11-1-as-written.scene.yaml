@@ -1,0 +1,64 @@
+# 设计稿 v0.1 §11.1 原样摘录（用来确认读取器能抓出其中的 YAML 写法问题）
+spec: "0.1"
+meta:
+  id: s67-p01
+  title: 高阶等差数列
+  line: worked
+  units: [S6]
+  author: Boxi Yu
+  license: CC-BY-4.0
+  sources:
+    - {kind: problem, cite: "§6.7 例1(1)", note: 题面引用；讲解与旁白为原创}
+
+pedagogy:
+  insight: 某一层差数列是等差的，就能往下做差、在那一层补全、再逐层加回
+  misconception: 只给了五项，求不出第八项
+  status: method
+  landing: GeneralTerm
+
+style:
+  theme: paper
+  voice: {persona: teacher-hs, speed: 1.25}
+
+data:
+  A: [2, 5, 11, 21, 36, 57, 85, 121]
+  B: [3, 6, 10, 15, 21, 28, 36]
+  C: [3, 4, 5, 6, 7, 8]
+
+objects:
+  card:
+    widget: problem_card
+    pin: top
+    lines:
+      - "[例1(1)]{.bold} 定义：对数列 $\{A_n\}$，令 [$b_n=A_{n+1}-A_n$]{#b_def .B}，则 $\{b_n\}$ 称为 $\{A_n\}$ 的一阶差数列；"
+      - "再令 [$c_n=b_{n+1}-b_n$]{#c_def .C}，则 $\{c_n\}$ 称为 $\{A_n\}$ 的二阶差数列．"
+      - "已知 $\{A_n\}$ 为 [$2,5,11,21,36,\cdots$]{#terms .A}，且[它的二阶差数列是等差数列]{#key .HL}，则 [$A_8=$]{#ask .HL}[____]{#blank}．"
+  table:
+    widget: diff_table          # primitives 提供；自己负责三层错位排列
+    in: stage
+    rows:
+      - {data: A, role: A, label: "$A_n$", name: 原数列}
+      - {data: B, role: B, label: "$b_n$", name: 一阶差数列}
+      - {data: C, role: C, label: "$c_n$", name: 二阶差数列}
+    known: [5, 0, 0]            # 一开始每行显示几个数
+  plan:
+    widget: chips
+    in: footer
+    items: ["↓ 往下做差", "→ 在等差层补全", "↑ 逐层加回"]
+
+beats:
+  - id: Down
+    say:
+      - {id: s1, pace: normal, text: "先往下做差。按定义，后一项减前一项：{@d0}五减二，得三。"}
+      - {id: s2, pace: brisk,  text: "同样，{@d1}十一减五得六，{@d2}二十一减十一得十，{@d3}三十六减二十一得十五。"}
+      - {id: s3, pace: brisk,  text: "一阶差数列再相邻相减：{@e}三、四、五。"}
+      - {id: s4, pace: slow,   text: "看，三、四、五，正好是公差为一的等差数列，{@k}和题目给的条件对上了。"}
+    do:
+      - {at: s1, act: focus, target: plan[0]}
+      - {at: s1@d0, act: derive, target: table, args: {row: B, index: 0}}
+      - {at: s2@d1, act: derive, target: table, args: {row: B, index: 1}}
+      - {at: s2@d2, act: derive, target: table, args: {row: B, index: 2}}
+      - {at: s2@d3, act: derive, target: table, args: {row: B, index: 3}}
+      - {at: s3@e, act: derive, target: table, args: {row: C, index: "0:3"}, dur: fit}
+      - {at: s4, act: focus, target: "table.C[0:3]"}
+      - {at: s4@k, act: underline, target: "card#key"}
