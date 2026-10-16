@@ -6,7 +6,7 @@
 
 - **JSON Schema**：`schema/scene-spec-0.1.schema.json`
 - **检查器**：受限 YAML 读取、结构检查、语义检查（引用、时间点、组件参数、教学信息）
-- **示例**：`examples/s67-p01.scene.yaml`，一支完整的例题讲解视频
+- **示例**：`examples/s67-p01.scene.yaml`（高阶等差数列）和 `examples/s67-p02.scene.yaml`（d-等差比数列），两支完整的例题讲解视频
 
 格式的设计说明见 [docs/design.md](docs/design.md)。渲染不在本仓库，由 `kit`（Manim 运行时）负责。
 
