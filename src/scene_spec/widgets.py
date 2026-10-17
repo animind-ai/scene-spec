@@ -1589,6 +1589,12 @@ from .dissect import register as _register_dissect  # noqa: E402
 
 _register_dissect(REGISTRY)
 
+# ---------- 坐标平面（plane）：向量、复平面乘 i、矩阵变形；检查在 plane.py ----------
+
+from .plane import register as _register_plane  # noqa: E402
+
+_register_plane(REGISTRY, Widget, Exposed, _unknown_args)
+
 
 def lookup(name: str) -> Widget | None:
     """按名字找组件，忽略 @版本。"""
