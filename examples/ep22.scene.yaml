@@ -85,7 +85,7 @@ objects:
     gap: lg
   xint:
     type: readout
-    label: "和 $x$ 轴交于 $x$ ="
+    label: "$x$ 轴交点 ="
     value: "-b/k"
     digits: 2
     role: NO
@@ -112,7 +112,7 @@ objects:
     in: footer
   practice:
     widget: think_box
-    lines: ["[练一练]{.HL}", "横走 2 格，竖走 3 格", "斜率 $k$ = ？"]
+    lines: ["[练一练]{.HL}", "横走 2 格", "竖走 3 格", "斜率 $k$ = ？"]
     below: kval
     gap: xl
 

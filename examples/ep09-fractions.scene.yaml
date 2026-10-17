@@ -5,7 +5,7 @@
 # 按错误想法只跳五个 2/3：连 4 都不到，打叉；只看 0 到 1：切三份、两份一跳，预测暂停后看出 1 里面有一个半（3/2 个）；
 # 六个一就有九跳，比 6 大；非例 6 ÷ 3/2 只有四跳（上一组九跳留成残影对照）；
 # 落到算式：6 ÷ 2/3 = 6 × 3/2 = 9，和"通分后分子相除"18 ÷ 2 = 9 并排，轴下 18 格两格一组正好九组；
-# 结尾回扣整个系列：四集的算式依次出现，都是"换一个合适的单位去量"。英文旁白一句对一句写在 "# en:" 注释里。
+# 结尾回扣整个系列：四集的算式依次出现，都是"换一个合适的单位去量"。英文字幕一句对一句写在每句的 en 里（双语字幕的第二行）。
 spec: "0.1"
 
 meta:
@@ -33,7 +33,6 @@ style:
     speed: 1.0
   segmented: true
   step_hold: 1.0
-  subtitles: soft
 
 objects:
   # 开场用的问题：单独占 top，位置和上一集片尾的同一行字一致；Myth 段变形成下面带一行小字的 q
@@ -113,10 +112,8 @@ beats:
   - id: Hook
     pause: {type: predict, prompt: 6 ÷ 2/3 比 6 大还是小？先猜一下。, hold: 3, app_item: ep09-before-1}
     say:
-      - {id: s1, pace: ask, text: "六除以三分之二，{@q}比六大，还是比六小？"}
-        # en: Six divided by two thirds: is it bigger than six, or smaller?
-      - {id: s2, pace: normal, text: "先猜一下，想三秒。"}
-        # en: Take a guess. Think for three seconds.
+      - {id: s1, pace: ask, text: "六除以三分之二，{@q}比六大，还是比六小？", en: "Six divided by two thirds: is it bigger than six, or smaller?"}
+      - {id: s2, pace: normal, text: "先猜一下，想三秒。", en: "Take a guess. Think for three seconds."}
     do:
       # 开场：#8 的片尾画面
       - {at: s1, act: show, target: line, dur: 0.01}
@@ -126,8 +123,7 @@ beats:
   - id: Myth
     shows: misconception
     say:
-      - {id: s1, pace: normal, text: "很多人说更小，{@m}因为除法一定让数变小。"}
-        # en: Most people say smaller, because dividing always makes things smaller.
+      - {id: s1, pace: normal, text: "很多人说更小，{@m}因为除法一定让数变小。", en: "Most people say smaller, because dividing always makes things smaller."}
     do:
       - {at: s1, act: unmark, target: q0}
       - {after: prev, act: transform, from: q0, to: q}
@@ -137,15 +133,13 @@ beats:
   # Setup 拆成两段：0–1 数轴要和 ask（footer）同在一段里，排版才和 #8 片尾一致（区域占用按 beat 算）
   - id: Setup
     say:
-      - {id: s1, pace: normal, text: "除法问的是，{@ask}六里面有几个三分之二。"}
-        # en: Division is asking: how many two thirds fit inside six?
+      - {id: s1, pace: normal, text: "除法问的是，{@ask}六里面有几个三分之二。", en: "Division is asking: how many two thirds fit inside six?"}
     do:
       - {at: s1@ask, act: show, target: ask}
 
   - id: Stretch
     say:
-      - {id: s2, pace: normal, text: "{@long}把数轴拉长，从零一直延伸到六，{@one}每一格是一。"}
-        # en: Let's stretch the number line all the way from zero to six, one unit per step.
+      - {id: s2, pace: normal, text: "{@long}把数轴拉长，从零一直延伸到六，{@one}每一格是一。", en: "Let's stretch the number line all the way from zero to six, one unit per step."}
     do:
       - {at: s2@long, act: transform, from: line, to: line6}
       - {with: prev, act: hide, target: line}
@@ -156,10 +150,8 @@ beats:
   - id: WrongIdea
     shows: misconception
     say:
-      - {id: s1, pace: ask, text: "如果答案比六小，{@five}比如说五个，够不够？"}
-        # en: If the answer were less than six, say five, would that be enough?
-      - {id: s2, pace: normal, text: "{@short}五个三分之二接起来，连四都不到，{@far}离六还远着呢。"}
-        # en: Five two thirds end to end don't even reach four. Six is still a long way off.
+      - {id: s1, pace: ask, text: "如果答案比六小，{@five}比如说五个，够不够？", en: "If the answer were less than six, say five, would that be enough?"}
+      - {id: s2, pace: normal, text: "{@short}五个三分之二接起来，连四都不到，{@far}离六还远着呢。", en: "Five two thirds end to end don't even reach four. Six is still a long way off."}
     do:
       - {at: s1@five, act: jump, target: line6, args: {length: "2/3", count: 5, role: "NO"}, dur: fit}
       - {at: s2@short, act: focus, target: "line6.jump[4]"}
@@ -171,10 +163,8 @@ beats:
 
   - id: OneUnit
     say:
-      - {id: s1, pace: normal, text: "我们先只看零到一这一段，{@cut}把它平均切成三份。"}
-        # en: Let's look at just zero to one first, and cut it into three equal parts.
-      - {id: s2, pace: normal, text: "{@two}两份，就是一个三分之二。"}
-        # en: Two of those parts make one two thirds.
+      - {id: s1, pace: normal, text: "我们先只看零到一这一段，{@cut}把它平均切成三份。", en: "Let's look at just zero to one first, and cut it into three equal parts."}
+      - {id: s2, pace: normal, text: "{@two}两份，就是一个三分之二。", en: "Two of those parts make one two thirds."}
     do:
       - {at: s1, act: focus, target: "line6.unit[0]"}
       - {at: s1@cut, act: subdivide, target: line6, args: {parts: 3}, dur: 1.2}
@@ -183,17 +173,13 @@ beats:
   - id: Predict
     pause: {type: predict, prompt: 1 里面能放下几个 2/3？, hold: 3, app_item: ep09-predict-1}
     say:
-      - {id: s1, pace: ask, text: "一里面，{@q}能放下几个三分之二？"}
-        # en: So how many two thirds fit inside one?
+      - {id: s1, pace: ask, text: "一里面，{@q}能放下几个三分之二？", en: "So how many two thirds fit inside one?"}
 
   - id: Half
     say:
-      - {id: s1, pace: normal, text: "{@one}放下一个，{@left}还剩一份，这一份正好是半个三分之二。"}
-        # en: One fits, with one part left over, and that part is exactly half of a two thirds.
-      - {id: s2, pace: slow, text: "所以一里面，{@h}有一个半，也就是二分之三个。"}
-        # en: So one holds one and a half of them: three halves.
-      - {id: s3, pace: normal, text: "每一个一里面都一样。{@six}六个一，就有六个一个半。"}
-        # en: Every unit is the same. Six units hold six lots of one and a half.
+      - {id: s1, pace: normal, text: "{@one}放下一个，{@left}还剩一份，这一份正好是半个三分之二。", en: "One fits, with one part left over, and that part is exactly half of a two thirds."}
+      - {id: s2, pace: slow, text: "所以一里面，{@h}有一个半，也就是二分之三个。", en: "So one holds one and a half of them: three halves."}
+      - {id: s3, pace: normal, text: "每一个一里面都一样。{@six}六个一，就有六个一个半。", en: "Every unit is the same. Six units hold six lots of one and a half."}
     do:
       - {at: s1@left, act: highlight, target: line6, args: {from: "2/3", to: 1, role: B}, dur: 0.8}
       - {at: s2@h, act: hide, target: ask}
@@ -204,10 +190,8 @@ beats:
 
   - id: Count
     say:
-      - {id: s1, pace: brisk, text: "{@c}一、二、三、四、五、六、七、八、九。"}
-        # en: One, two, three, four, five, six, seven, eight, nine.
-      - {id: s2, pace: slow, text: "{@nine}九个！{@big}比六还大。"}
-        # en: Nine! More than six.
+      - {id: s1, pace: brisk, text: "{@c}一、二、三、四、五、六、七、八、九。", en: "One, two, three, four, five, six, seven, eight, nine."}
+      - {id: s2, pace: slow, text: "{@nine}九个！{@big}比六还大。", en: "Nine! More than six."}
     do:
       - {at: s1@c, act: jump, target: line6, args: {length: "2/3"}, dur: fit}
       - {at: s2@nine, act: mark, target: "line6.count[8]"}
@@ -217,12 +201,9 @@ beats:
   - id: NonExample
     shows: non_example
     say:
-      - {id: s1, pace: ask, text: "{@q}换一个比一大的除数，六除以二分之三，会怎样？"}
-        # en: Now divide by something bigger than one. What happens with six divided by three halves?
-      - {id: s2, pace: normal, text: "{@cut}每个一里面只放得下三分之二个，{@four}六里面就只有四个，{@small}变小了。"}
-        # en: Each unit only holds two thirds of one, so six holds just four. Smaller this time.
-      - {id: s3, pace: normal, text: "所以，{@only}只有除以比一大的数，结果才会变小。"}
-        # en: So the result only gets smaller when you divide by something bigger than one.
+      - {id: s1, pace: ask, text: "{@q}换一个比一大的除数，六除以二分之三，会怎样？", en: "Now divide by something bigger than one. What happens with six divided by three halves?"}
+      - {id: s2, pace: normal, text: "{@cut}每个一里面只放得下三分之二个，{@four}六里面就只有四个，{@small}变小了。", en: "Each unit only holds two thirds of one, so six holds just four. Smaller this time."}
+      - {id: s3, pace: normal, text: "所以，{@only}只有除以比一大的数，结果才会变小。", en: "So the result only gets smaller when you divide by something bigger than one."}
     do:
       - {at: s1, act: unmark, target: "line6.count[8]"}
       - {with: prev, act: hide, target: inone}
@@ -239,10 +220,8 @@ beats:
   - id: Landing
     shows: landing
     say:
-      - {id: s1, pace: normal, text: "每个一里有二分之三个，{@so}所以除以三分之二，就是乘二分之三。"}
-        # en: Every unit holds three halves of them, so dividing by two thirds is the same as multiplying by three halves.
-      - {id: s2, pace: normal, text: "还有一种做法，{@rn}先通分。六是三分之十八，{@grp}两份一组，正好九组。"}
-        # en: Or rename first: six is eighteen thirds, and grouping them two at a time gives exactly nine groups.
+      - {id: s1, pace: normal, text: "每个一里有二分之三个，{@so}所以除以三分之二，就是乘二分之三。", en: "Every unit holds three halves of them, so dividing by two thirds is the same as multiplying by three halves."}
+      - {id: s2, pace: normal, text: "还有一种做法，{@rn}先通分。六是三分之十八，{@grp}两份一组，正好九组。", en: "Or rename first: six is eighteen thirds, and grouping them two at a time gives exactly nine groups."}
     do:
       - {at: s1, act: unmark, target: "line6.count[3]"}
       - {with: prev, act: unghost, target: line6}
@@ -262,10 +241,8 @@ beats:
 
   - id: Close
     say:
-      - {id: s1, pace: normal, text: "所以除法不一定让数变小，{@m}要看除的是什么数。"}
-        # en: So dividing doesn't always make things smaller. It depends on what you divide by.
-      - {id: s2, pace: slow, text: "{@four}这四集，我们一直在做同一件事，{@unit}换一个合适的单位去量。"}
-        # en: Across these four episodes, we've really been doing one thing: measuring with a better unit.
+      - {id: s1, pace: normal, text: "所以除法不一定让数变小，{@m}要看除的是什么数。", en: "So dividing doesn't always make things smaller. It depends on what you divide by."}
+      - {id: s2, pace: slow, text: "{@four}这四集，我们一直在做同一件事，{@unit}换一个合适的单位去量。", en: "Across these four episodes, we've really been doing one thing: measuring with a better unit."}
     do:
       - {at: s1, act: show, target: myth}
       - {after: prev, act: cross, target: myth}

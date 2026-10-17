@@ -280,7 +280,9 @@
           "maximum": 10
         },
         "subtitles": {
+          "description": "字幕：burned 烧进画面（默认，另出一份画面干净、带软字幕轨的副本）| soft 只封装可关的软字幕轨 | none 不出",
           "enum": [
+            "burned",
             "soft",
             "none"
           ]
@@ -629,6 +631,11 @@
           ]
         },
         "text": {
+          "type": "string",
+          "minLength": 1
+        },
+        "en": {
+          "description": "这句的英文字幕（双语字幕的第二行；不念，不影响配音）",
           "type": "string",
           "minLength": 1
         }

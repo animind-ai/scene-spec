@@ -1,9 +1,9 @@
 # 洞察系列 #8 分数乘法：取"一部分的一部分"（分数小系列第三集，三到五年级）。
 # 开场就是 #7 的片尾画面（四等份数轴、顶部 2/3 × 3/4 = ?）；钩子问会不会比 3/4 大、停三秒，再说出"乘法一定让数变大"；
 # 数轴上涂出 0 到 3/4，按错误想法在 3/4 右边放一个问号点；把 0 到 3/4 切成三份（每份正好一个 1/4），预测暂停后取两份，
-# 停在 2/4 = 1/2，比 3/4 小，问号点打叉；换正方形验证：竖切四列涂三列、横切三行取两行，交叠六格 / 共十二格 = 1/2；
+# 停在 2/4 = 1/2，比 3/4 小，问号点打叉；一句「换个角度看」收起数轴，换正方形验证：竖切四列涂三列、横切三行取两行，交叠六格 / 共十二格 = 1/2；
 # 非例：3/4 × 3/2 在 0–2 的数轴上走到 9/8，比 3/4 大；落到算式：分母 4×3、分子 3×2；
-# 结尾只留 0–1 数轴，顶部写 6 ÷ 2/3 = ?（#9 的开头画面）。英文旁白一句对一句写在 "# en:" 注释里。
+# 结尾只留 0–1 数轴，顶部写 6 ÷ 2/3 = ?（#9 的开头画面）。英文字幕一句对一句写在每句的 en 里（双语字幕的第二行）。
 spec: "0.1"
 
 meta:
@@ -31,7 +31,6 @@ style:
     speed: 1.0
   segmented: true
   step_hold: 1.0
-  subtitles: soft
 
 objects:
   # 开场用的问题：单独占 top，位置和上一集片尾的同一行字一致；Myth 段变形成下面带一行小字的 q
@@ -104,10 +103,8 @@ beats:
   - id: Hook
     pause: {type: predict, prompt: 2/3 × 3/4 比 3/4 大还是小？先猜一下。, hold: 3, app_item: ep08-before-1}
     say:
-      - {id: s1, pace: ask, text: "三分之二乘四分之三，{@q}会比四分之三大吗？"}
-        # en: Is two thirds times three fourths bigger than three fourths?
-      - {id: s2, pace: normal, text: "先猜一下，想三秒。"}
-        # en: Take a guess. Think for three seconds.
+      - {id: s1, pace: ask, text: "三分之二乘四分之三，{@q}会比四分之三大吗？", en: "Is two thirds times three fourths bigger than three fourths?"}
+      - {id: s2, pace: normal, text: "先猜一下，想三秒。", en: "Take a guess. Think for three seconds."}
     do:
       # 开场：#7 的片尾画面
       - {at: s1, act: show, target: line, dur: 0.01}
@@ -118,8 +115,7 @@ beats:
   - id: Myth
     shows: misconception
     say:
-      - {id: s1, pace: normal, text: "很多人觉得一定更大，{@m}因为乘法会让数变大。"}
-        # en: Plenty of people say bigger, for sure, because multiplying makes things bigger.
+      - {id: s1, pace: normal, text: "很多人觉得一定更大，{@m}因为乘法会让数变大。", en: "Plenty of people say bigger, for sure, because multiplying makes things bigger."}
     do:
       - {at: s1, act: unmark, target: q0}
       - {after: prev, act: transform, from: q0, to: q}
@@ -128,10 +124,8 @@ beats:
 
   - id: Setup
     say:
-      - {id: s1, pace: normal, text: "先在数轴上找到四分之三，{@take}切四份，取三份。"}
-        # en: First find three fourths on the number line: four parts, take three.
-      - {id: s2, pace: normal, text: "乘三分之二，{@m}意思是，取它的三分之二。"}
-        # en: Times two thirds means: take two thirds of it.
+      - {id: s1, pace: normal, text: "先在数轴上找到四分之三，{@take}切四份，取三份。", en: "First find three fourths on the number line: four parts, take three."}
+      - {id: s2, pace: normal, text: "乘三分之二，{@m}意思是，取它的三分之二。", en: "Times two thirds means: take two thirds of it."}
     do:
       - {at: s1@take, act: highlight, target: line, args: {to: "3/4", role: A}, dur: 1.2}
       - {at: s2@m, act: show, target: take}
@@ -139,17 +133,14 @@ beats:
   - id: WrongIdea
     shows: misconception
     say:
-      - {id: s1, pace: normal, text: "如果乘法一定变大，{@r}答案就该落在四分之三的右边。"}
-        # en: If multiplying always made things bigger, the answer would land to the right of three fourths.
+      - {id: s1, pace: normal, text: "如果乘法一定变大，{@r}答案就该落在四分之三的右边。", en: "If multiplying always made things bigger, the answer would land to the right of three fourths."}
     do:
       - {at: s1@r, act: mark_point, target: line, args: {at: "7/8", label: '?', role: "NO"}}
 
   - id: TakePart
     say:
-      - {id: s1, pace: normal, text: "现在把零到四分之三这一段，{@cut}平均切成三份。"}
-        # en: Now cut the stretch from zero to three fourths into three equal parts.
-      - {id: s2, pace: normal, text: "{@each}每一份，正好是一个四分之一。"}
-        # en: Each part turns out to be exactly one fourth.
+      - {id: s1, pace: normal, text: "现在把零到四分之三这一段，{@cut}平均切成三份。", en: "Now cut the stretch from zero to three fourths into three equal parts."}
+      - {id: s2, pace: normal, text: "{@each}每一份，正好是一个四分之一。", en: "Each part turns out to be exactly one fourth."}
     do:
       - {at: s1@cut, act: jump, target: line, args: {length: "1/4", count: 3}, dur: fit}
       - {at: s2@each, act: focus, target: "line.jump[0]"}
@@ -159,15 +150,12 @@ beats:
   - id: Predict
     pause: {type: predict, prompt: 取其中两份，会停在哪里？在 3/4 右边吗？, hold: 3, app_item: ep08-predict-1}
     say:
-      - {id: s1, pace: ask, text: "取其中两份，会停在哪里？{@q}先想一想，在右边吗？"}
-        # en: Take two of those parts. Where do we stop? Think: is it out to the right?
+      - {id: s1, pace: ask, text: "取其中两份，会停在哪里？{@q}先想一想，在右边吗？", en: "Take two of those parts. Where do we stop? Think: is it out to the right?"}
 
   - id: Land
     say:
-      - {id: s1, pace: normal, text: "{@one}一份，两份，{@stop}停在四分之二，也就是二分之一。"}
-        # en: One part, two parts, and we stop at two fourths, which is one half.
-      - {id: s2, pace: slow, text: "{@small}比四分之三还小！{@part}取一部分，当然变小了。"}
-        # en: Smaller than three fourths! Take just a part, and of course you get less.
+      - {id: s1, pace: normal, text: "{@one}一份，两份，{@stop}停在四分之二，也就是二分之一。", en: "One part, two parts, and we stop at two fourths, which is one half."}
+      - {id: s2, pace: slow, text: "{@small}比四分之三还小！{@part}取一部分，当然变小了。", en: "Smaller than three fourths! Take just a part, and of course you get less."}
     do:
       - {at: s1@one, act: highlight, target: line, args: {to: "1/2", role: B, keep: true}, dur: 1.0}
       - {at: s1@stop, act: mark_point, target: line, args: {at: "1/2"}}
@@ -179,13 +167,13 @@ beats:
 
   - id: Square
     say:
-      - {id: s1, pace: normal, text: "{@sq}换一个正方形再看。{@col}竖着切成四份，{@shade}涂三份，这是四分之三。"}
-        # en: Let's look again with a square. Cut it into four columns and shade three: that's three fourths.
-      - {id: s2, pace: normal, text: "{@row}再横着切成三份，{@take}取其中两份。"}
-        # en: Now cut it across into three rows and take two of them.
+      # 衔接句（2026-10-17 加）：数轴先收起，正方形再出来，中间用一句话过渡
+      - {id: s0, pace: normal, text: "换个角度看。", en: "Let's look at it another way."}
+      - {id: s1, pace: normal, text: "{@sq}换一个正方形再看。{@col}竖着切成四份，{@shade}涂三份，这是四分之三。", en: "Let's look again with a square. Cut it into four columns and shade three: that's three fourths."}
+      - {id: s2, pace: normal, text: "{@row}再横着切成三份，{@take}取其中两份。", en: "Now cut it across into three rows and take two of them."}
     do:
-      - {at: s1@sq, act: hide, target: line}
-      - {with: prev, act: show, target: square}
+      - {at: s0, act: hide, target: line}
+      - {at: s1@sq, act: show, target: square}
       - {at: s1@col, act: cut, target: square, args: {axis: cols}, dur: 0.8}
       - {at: s1@shade, act: shade, target: square, args: {cols: 3, role: A}, dur: 0.8}
       - {at: s2@row, act: cut, target: square, args: {axis: rows}, dur: 0.8}
@@ -193,10 +181,8 @@ beats:
 
   - id: Reveal
     say:
-      - {id: s1, pace: normal, text: "{@ov}交叠的格子有六个，{@all}整个正方形有十二格。"}
-        # en: Six cells are in both, and the whole square has twelve.
-      - {id: s2, pace: normal, text: "{@h}十二分之六，就是二分之一，{@m}和数轴上对上了。"}
-        # en: Six twelfths is one half, matching the number line exactly.
+      - {id: s1, pace: normal, text: "{@ov}交叠的格子有六个，{@all}整个正方形有十二格。", en: "Six cells are in both, and the whole square has twelve."}
+      - {id: s2, pace: normal, text: "{@h}十二分之六，就是二分之一，{@m}和数轴上对上了。", en: "Six twelfths is one half, matching the number line exactly."}
     do:
       - {at: s1@ov, act: overlap, target: square, dur: fit}
       - {at: s1@all, act: focus, target: square}
@@ -210,12 +196,9 @@ beats:
   - id: NonExample
     shows: non_example
     say:
-      - {id: s1, pace: ask, text: "{@q}那乘二分之三呢？结果会变大吗？"}
-        # en: And what about times three halves? Does that get bigger?
-      - {id: s2, pace: normal, text: "{@w}取一个四分之三，{@half}再加上它的一半，{@stop}停在八分之九，比四分之三大了。"}
-        # en: Take one three fourths, then half of it again, and we stop at nine eighths. That's more than three fourths.
-      - {id: s3, pace: normal, text: "{@less}乘比一小的数，会变小；{@more}乘比一大的数，才会变大。"}
-        # en: Multiply by less than one and it shrinks. Only multiplying by more than one makes it grow.
+      - {id: s1, pace: ask, text: "{@q}那乘二分之三呢？结果会变大吗？", en: "And what about times three halves? Does that get bigger?"}
+      - {id: s2, pace: normal, text: "{@w}取一个四分之三，{@half}再加上它的一半，{@stop}停在八分之九，比四分之三大了。", en: "Take one three fourths, then half of it again, and we stop at nine eighths. That's more than three fourths."}
+      - {id: s3, pace: normal, text: "{@less}乘比一小的数，会变小；{@more}乘比一大的数，才会变大。", en: "Multiply by less than one and it shrinks. Only multiplying by more than one makes it grow."}
     do:
       - {at: s1@q, act: hide, target: line}
       - {with: prev, act: hide, target: sq_eq}
@@ -233,10 +216,8 @@ beats:
   - id: Landing
     shows: landing
     say:
-      - {id: s1, pace: normal, text: "{@back}回到算式。{@den}十二格是四乘三，所以分母乘分母。"}
-        # en: Back to the formula. Twelve cells is four times three, so the bottoms multiply.
-      - {id: s2, pace: normal, text: "{@num}交叠的六格是三乘二，所以分子乘分子。"}
-        # en: The six overlapping cells are three times two, so the tops multiply.
+      - {id: s1, pace: normal, text: "{@back}回到算式。{@den}十二格是四乘三，所以分母乘分母。", en: "Back to the formula. Twelve cells is four times three, so the bottoms multiply."}
+      - {id: s2, pace: normal, text: "{@num}交叠的六格是三乘二，所以分子乘分子。", en: "The six overlapping cells are three times two, so the tops multiply."}
     do:
       - {at: s1, act: hide, target: line2}
       - {with: prev, act: hide, target: q2}
@@ -253,10 +234,8 @@ beats:
 
   - id: Close
     say:
-      - {id: s1, pace: slow, text: "{@m}乘法不一定让数变大，{@part}乘一个比一小的分数，就是取一部分。"}
-        # en: Multiplying doesn't always make things bigger. Multiplying by a fraction less than one means taking a part.
-      - {id: s2, pace: ask, text: "那除以一个分数呢？{@next}六除以三分之二，比六大还是小？"}
-        # en: So what about dividing by a fraction? Is six divided by two thirds bigger than six, or smaller?
+      - {id: s1, pace: slow, text: "{@m}乘法不一定让数变大，{@part}乘一个比一小的分数，就是取一部分。", en: "Multiplying doesn't always make things bigger. Multiplying by a fraction less than one means taking a part."}
+      - {id: s2, pace: ask, text: "那除以一个分数呢？{@next}六除以三分之二，比六大还是小？", en: "So what about dividing by a fraction? Is six divided by two thirds bigger than six, or smaller?"}
     do:
       - {at: s1@m, act: cross, target: myth}
       - {at: s1@part, act: mark, target: "eq#ans"}
