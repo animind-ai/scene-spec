@@ -1595,6 +1595,12 @@ from .plane import register as _register_plane  # noqa: E402
 
 _register_plane(REGISTRY, Widget, Exposed, _unknown_args)
 
+# ---------- 随机试验：抛硬币频率（coin_flips）、高尔顿板（galton）、样本空间方格（outcomes）；检查在 chance.py ----------
+
+from .chance import register as _register_chance  # noqa: E402
+
+_register_chance(REGISTRY, Widget, Exposed, _unknown_args)
+
 
 # ---------- 立体（solid）：轴测图、立方体剖成三个四棱锥、水平截面；检查在 solid.py ----------
 
