@@ -1,0 +1,164 @@
+# 数的世界入门 #1–#5 的画面组件示例：十格框（凑十）、点阵（转 90°、补满到 10、淡出一列、点变方格）、
+# area_grid 的 rect 模式（分配律切一刀、竖式乘法切四块）。不是一集成片，每个 beat 演一个组件的全部动作，
+# 给 kit 的截图回归和 inspect 分镜用；成片的稿子在各集自己的目录里。
+spec: "0.1"
+
+meta:
+  id: numbers
+  title: 数的世界入门：组件示例
+  line: insight
+  units: [P1]
+  episode: 1
+  grade: 一到四年级
+  author: Boxi Yu
+  license: CC-BY-4.0
+
+pedagogy:
+  insight: 把数排成一块，转一转、切一刀、挪一挪，数就看得见了
+  misconception: 把 5 拆成 2 和 3，数就变了
+  non_example: 3 加 4 不到十，凑十帮不上
+  status: proof
+  landing: Landing
+
+style:
+  theme: paper
+  canvas: "16:9"
+  voice:
+    persona: friend-ps
+    speed: 1.0
+
+objects:
+  sum:
+    type: text
+    text: '$8+5=10+3$'
+    level: title
+    in: top
+  tf:
+    widget: ten_frame
+    side: 5
+    in: stage
+  turn:
+    type: text
+    text: '$3\times4=4\times3$'
+    level: title
+    in: top
+  arr:
+    widget: dot_array
+    rows: 3
+    cols: 4
+    room: [4, 10]
+    in: stage
+  nine:
+    type: text
+    text: '$9\times4=10\times4-4$'
+    level: title
+    in: top
+  cut:
+    type: text
+    text: '$(5+3)\times4=5\times4+3\times4$'
+    level: title
+    in: top
+  rect:
+    widget: area_grid
+    cols: 8
+    rows: 4
+    rect: true
+    in: stage
+  long:
+    type: text
+    text: '$23\times14=200+30+80+12=322$'
+    level: title
+    in: top
+  big:
+    widget: area_grid
+    cols: 23
+    rows: 14
+    rect: true
+    lines: false
+    in: stage
+
+beats:
+  - id: MakeTen
+    shows: misconception
+    say:
+      - {id: s1, pace: normal, text: "框里有八个，{@b}旁边还有五个。", en: "Eight in the frame, five more beside it."}
+      - {id: s2, pace: normal, text: "{@c}一个一个数：九、十、十一、十二、十三。", en: "Count on: nine, ten, eleven, twelve, thirteen."}
+      - {id: s3, pace: normal, text: "{@j}跳两个进去，{@f}框满了，就是一个十。", en: "Two jump in, the frame is full: that's one ten."}
+    do:
+      - {at: s1, act: show, target: tf}
+      - {with: prev, act: fill, target: tf, args: {count: 8}, dur: 1.6}
+      - {at: s1@b, act: side, target: tf, args: {count: 5}, dur: 1.0}
+      - {at: s2@c, act: count, target: tf, args: {start: 9}, dur: 2.0}
+      - {at: s3@j, act: move_in, target: tf, args: {count: 2}, dur: 1.6}
+      - {at: s3@f, act: recolor, target: tf, args: {which: frame, role: A}}
+      - {with: prev, act: show, target: sum}
+      - {after: prev, act: hold, dur: 0.6}
+      - {after: prev, act: remove, target: tf, args: {which: side}}
+
+  - id: Predict
+    pause: {type: predict, prompt: 五排、每排两个，和两排、每排五个一样多吗？, hold: 3}
+    say:
+      - {id: s1, pace: ask, text: "五排两个，一样多吗？", en: "Five rows of two: the same amount?"}
+
+  - id: Rotate
+    say:
+      - {id: s1, pace: normal, text: "三排，每排四个。{@r}整个转一下，{@d}变成四排，每排三个。", en: "Three rows of four. Turn the whole thing, and it's four rows of three."}
+    do:
+      - {at: s1, act: hide, target: tf}
+      - {with: prev, act: hide, target: sum}
+      - {after: prev, act: show, target: arr}
+      - {at: s1@r, act: rotate, target: arr, dur: 1.4}
+      - {at: s1@d, act: show, target: turn}
+
+  - id: Nines
+    say:
+      - {id: s1, pace: normal, text: "{@e}每排补满到十个，{@f}再拿掉最后一个，一排就是九个。", en: "Fill each row up to ten, then take the last one away: nine in a row."}
+    do:
+      - {at: s1, act: hide, target: turn}
+      - {at: s1@e, act: extend, target: arr, args: {cols: 10, role: B}, dur: 1.4}
+      - {at: s1@f, act: fade_col, target: arr}
+      - {with: prev, act: show, target: nine}
+
+  - id: Squares
+    say:
+      - {id: s1, pace: normal, text: "{@s}每个点放进一个小方格，点阵就成了一块长方形。", en: "Put each dot in a little square, and the array becomes a rectangle."}
+    do:
+      - {at: s1@s, act: squares, target: arr, args: {fill: A, dots: false}, dur: 1.2}
+
+  - id: Cut
+    say:
+      - {id: s1, pace: normal, text: "{@c}四排八格，在五和三之间切一刀，{@a}分开。", en: "Four rows of eight. Cut between five and three, and pull apart."}
+      - {id: s2, pace: normal, text: "{@l}左边二十格，右边十二格，{@j}拼回去还是三十二格。", en: "Twenty on the left, twelve on the right; put them back, still thirty-two."}
+    do:
+      - {at: s1, act: hide, target: arr}
+      - {with: prev, act: hide, target: nine}
+      - {after: prev, act: show, target: rect}
+      - {at: s1@c, act: split, target: rect, args: {cols: [5, 3]}, dur: 1.0}
+      - {at: s1@a, act: apart, target: rect, args: {gap: 0.5}}
+      - {at: s2@l, act: fill, target: rect, args: {col: 0, role: A, label: true}}
+      - {with: prev, act: fill, target: rect, args: {col: 1, role: B, label: true}}
+      - {at: s2@j, act: join, target: rect}
+      - {with: prev, act: show, target: cut}
+
+  - id: Wrong
+    shows: non_example
+    say:
+      - {id: s1, pace: normal, text: "{@w}只乘一项，就只有右边这块，再加五个散格子。", en: "Multiply only one part, and you get just the right block plus five loose squares."}
+    do:
+      - {at: s1, act: unfill, target: rect}
+      - {at: s1@w, act: fill, target: rect, args: {col: 1, role: "NO"}}
+      - {with: prev, act: fill, target: rect, args: {cells: "0:5", role: "NO"}}
+
+  - id: Landing
+    shows: landing
+    say:
+      - {id: s1, pace: slow, text: "{@c}二十三乘十四，横竖各切一刀，{@a}四块加起来是三百二十二。", en: "Twenty-three times fourteen: cut once each way, and the four blocks add up to three hundred twenty-two."}
+    do:
+      - {at: s1, act: hide, target: rect}
+      - {with: prev, act: hide, target: cut}
+      - {after: prev, act: show, target: big}
+      - {at: s1@c, act: split, target: big, args: {cols: [20, 3], rows: [10, 4]}, dur: 1.2}
+      - {after: prev, act: apart, target: big, args: {gap: 0.6}}
+      - {at: s1@a, act: fill, target: big, args: {row: 0, role: A, label: true}}
+      - {with: prev, act: fill, target: big, args: {row: 1, role: B, label: true}}
+      - {after: prev, act: show, target: long}

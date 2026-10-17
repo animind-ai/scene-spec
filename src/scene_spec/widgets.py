@@ -633,17 +633,38 @@ REGISTRY["number_line"] = Widget(
              "mark_point": _nl_mark_point, "erase": _nl_no_args, "bar": _nl_bar, "fill": _nl_fill, "group": _nl_group},
 )
 
-# ---------- 格子正方形（area_grid）：分数乘法的交叠格 ----------
+# ---------- 格子正方形（area_grid）：分数乘法的交叠格；rect 模式切长方形 ----------
 # kit 的 mx/grid.py：cols × rows 格；cut 画切线，shade 涂列或行，overlap 标出交叠格。
+# rect: true 时每格是小方格，整块是 cols × rows 的长方形：split 切段、apart / join 分开拼回、fill 涂块写格数、unfill 收起。
+# 动作按顺序推演 split 的段数（exposed.state），fill 的 col / row 不能超出段数。
+
+GRID_FRACTION_ACTS = {"cut", "shade", "overlap"}
+GRID_RECT_ACTS = {"split", "apart", "join", "fill", "unfill"}
 
 
 def _expose_area_grid(definition: dict, data: dict) -> Exposed:
     cols, rows = definition.get("cols"), definition.get("rows")
     n = cols * rows if isinstance(cols, int) and isinstance(rows, int) else 0
+    if definition.get("rect") is True:
+        return Exposed(parts={"cell": n, "cut": 1, "areas": 1}, state={"cols": [cols], "rows": [rows], "apart": False})
     return Exposed(parts={"cols": 1, "rows": 1, "overlap": 1, "cell": n})
 
 
+def _grid_mode(act: str, ctx: WidgetContext, report: Report, path: str) -> bool:
+    """动作和模式对得上返回 True；rect 模式只有切块的动作，正方形模式只有分数乘法的动作。"""
+    rect = ctx.definition.get("rect") is True
+    if rect and act in GRID_FRACTION_ACTS:
+        report.error("SS264", f"{path}.act", f"{ctx.obj_id} 是 rect 模式，没有 {act}（可用：{'、'.join(sorted(GRID_RECT_ACTS))}）")
+        return False
+    if not rect and act in GRID_RECT_ACTS:
+        report.error("SS264", f"{path}.act", f"{act} 只在 rect 模式下有：先在 {ctx.obj_id} 上写 rect: true")
+        return False
+    return True
+
+
 def _grid_cut(args: dict, ctx: WidgetContext, report: Report, path: str) -> None:
+    if not _grid_mode("cut", ctx, report, path):
+        return
     if args.get("axis") not in ("cols", "rows"):
         report.error("SS281", f"{path}.args.axis", "cut 需要 axis: cols 或 rows")
     for key in sorted(set(args) - {"axis"}):
@@ -651,6 +672,8 @@ def _grid_cut(args: dict, ctx: WidgetContext, report: Report, path: str) -> None
 
 
 def _grid_shade(args: dict, ctx: WidgetContext, report: Report, path: str) -> None:
+    if not _grid_mode("shade", ctx, report, path):
+        return
     keys = {"cols", "rows"} & set(args)
     if len(keys) != 1:
         report.error("SS281", f"{path}.args", "shade 要写 cols 或 rows 其中一个（涂几列 / 几行）")
@@ -660,22 +683,327 @@ def _grid_shade(args: dict, ctx: WidgetContext, report: Report, path: str) -> No
     v = args[key]
     if _positive_int(v) or (isinstance(limit, int) and v > limit):
         report.error("SS281", f"{path}.args.{key}", f"应为 1 到 {limit} 的整数")
-    if "role" in args and args["role"] not in ROLES:
-        report.error("SS281", f"{path}.args.role", f"role 应为 {'/'.join(sorted(ROLES))} 之一")
+    _role_arg(args, report, path)
     for k in sorted(set(args) - {"cols", "rows", "role"}):
         report.error("SS281", f"{path}.args.{k}", f"shade 没有参数 {k}")
 
 
-def _grid_no_args(args: dict, ctx: WidgetContext, report: Report, path: str) -> None:
+def _grid_overlap(args: dict, ctx: WidgetContext, report: Report, path: str) -> None:
+    if _grid_mode("overlap", ctx, report, path):
+        _no_args(args, ctx, report, path)
+
+
+def _grid_split(args: dict, ctx: WidgetContext, report: Report, path: str) -> None:
+    if not _grid_mode("split", ctx, report, path):
+        return
+    keys = {"cols", "rows"} & set(args)
+    if not keys:
+        report.error("SS281", f"{path}.args", "split 要写 cols 和 / 或 rows：各段的长度，例如 cols: [20, 3]")
+    state = ctx.exposed.state
+    if state.get("apart"):
+        report.error("SS265", path, "块还分开着：先 join 拼回去再重新切")
+    for key in sorted(keys):
+        total = ctx.definition.get(key)
+        pieces = args[key]
+        if not isinstance(pieces, list) or not pieces or any(_positive_int(n) for n in pieces):
+            report.error("SS281", f"{path}.args.{key}", "应为正整数列表（各段的长度）")
+            continue
+        if isinstance(total, int) and sum(pieces) != total:
+            report.error("SS263", f"{path}.args.{key}", f"各段加起来是 {sum(pieces)}，{ctx.obj_id}.{key} 是 {total}")
+            continue
+        state[key] = pieces
+    for k in sorted(set(args) - {"cols", "rows"}):
+        report.error("SS281", f"{path}.args.{k}", f"split 没有参数 {k}")
+
+
+def _grid_apart(args: dict, ctx: WidgetContext, report: Report, path: str) -> None:
+    if not _grid_mode("apart", ctx, report, path):
+        return
+    state = ctx.exposed.state
+    if len(state.get("cols", [])) * len(state.get("rows", [])) < 2:
+        report.error("SS265", path, "还没切开（先 split），分不开")
+    if "gap" in args and _positive_number(args["gap"]):
+        report.error("SS281", f"{path}.args.gap", "gap 应为正数（画面单位，默认 0.35）")
+    for k in sorted(set(args) - {"gap"}):
+        report.error("SS281", f"{path}.args.{k}", f"apart 没有参数 {k}")
+    state["apart"] = True
+
+
+def _grid_join(args: dict, ctx: WidgetContext, report: Report, path: str) -> None:
+    if not _grid_mode("join", ctx, report, path):
+        return
+    _no_args(args, ctx, report, path)
+    ctx.exposed.state["apart"] = False
+
+
+def _grid_fill(args: dict, ctx: WidgetContext, report: Report, path: str) -> None:
+    if not _grid_mode("fill", ctx, report, path):
+        return
+    state = ctx.exposed.state
+    if "cells" in args:
+        sl = selectors.parse_slice(args["cells"])
+        n = ctx.exposed.parts.get("cell", 0)
+        if sl is None or sl[1] > n:
+            report.error("SS281", f"{path}.args.cells", f"cells 应为 0 到 {n} 之间的 \"a:b\"（按行从左往右数的格子）")
+        if {"col", "row"} & set(args):
+            report.error("SS281", f"{path}.args", "cells 和 col / row 只写一种")
+        if isinstance(args.get("label"), (bool, str)) and args.get("label"):
+            report.error("SS281", f"{path}.args.label", "label 只给整块用（col / row），cells 涂的散格子不写数")
+    for key, axis in (("col", "cols"), ("row", "rows")):
+        if key in args:
+            n = len(state.get(axis, [None]))
+            v = args[key]
+            if not isinstance(v, int) or isinstance(v, bool) or not 0 <= v < n:
+                report.error("SS265", f"{path}.args.{key}", f"{key} 应为 0 到 {n - 1} 的整数（现在切成 {n} 段）")
+    if "label" in args and not (isinstance(args["label"], bool) or (isinstance(args["label"], str) and args["label"])):
+        report.error("SS281", f"{path}.args.label", "label 应为 true（写格数）或 LaTeX 字符串")
+    _role_arg(args, report, path)
+    for k in sorted(set(args) - {"cells", "col", "row", "role", "label"}):
+        report.error("SS281", f"{path}.args.{k}", f"fill 没有参数 {k}")
+
+
+def _grid_unfill(args: dict, ctx: WidgetContext, report: Report, path: str) -> None:
+    if _grid_mode("unfill", ctx, report, path):
+        _no_args(args, ctx, report, path)
+
+
+def _role_arg(args: dict, report: Report, path: str, key: str = "role") -> None:
+    if key in args and args[key] not in ROLES:
+        report.error("SS281", f"{path}.args.{key}", f"{key} 应为 {'/'.join(sorted(ROLES))} 之一")
+
+
+def _no_args(args: dict, ctx: WidgetContext, report: Report, path: str) -> None:
     for key in sorted(args):
         report.error("SS281", f"{path}.args.{key}", f"这个动作不带参数（多了 {key}）")
 
 
+def _count_arg(args: dict, report: Report, path: str, act: str) -> int | None:
+    """动作的 count：必填的正整数（点的个数要是精确的整数，不收小数、布尔、表达式）。"""
+    v = args.get("count")
+    if _positive_int(v):
+        report.error("SS281", f"{path}.args.count", f"{act} 需要 count：正整数（几个点）")
+        return None
+    return v
+
+
+def _unknown_args(args: dict, allowed: set[str], act: str, report: Report, path: str) -> None:
+    for k in sorted(set(args) - allowed):
+        report.error("SS281", f"{path}.args.{k}", f"{act} 没有参数 {k}（可用：{'、'.join(sorted(allowed)) or '无'}）")
+
+
 REGISTRY["area_grid"] = Widget(
     "area_grid",
-    params={"cols": (True, _positive_int), "rows": (True, _positive_int)},
+    params={"cols": (True, _positive_int), "rows": (True, _positive_int), "rect": (False, _bool), "lines": (False, _bool)},
     expose=_expose_area_grid,
-    actions={"cut": _grid_cut, "shade": _grid_shade, "overlap": _grid_no_args},
+    actions={"cut": _grid_cut, "shade": _grid_shade, "overlap": _grid_overlap, "split": _grid_split,
+             "apart": _grid_apart, "join": _grid_join, "fill": _grid_fill, "unfill": _grid_unfill},
+)
+
+# ---------- 十格框（ten_frame）：凑十 ----------
+# kit 的 mx/dots.py：两排五格的框，框旁边一堆点。按动作顺序推演框里、框旁边各有几个点：
+# 框里最多 10 个，旁边不超过参数 side（排版预留的地方），move_in 不能比旁边现有的点多、也不能比框里的空格多。
+
+TEN_FRAME_GROUPS = ("side", "frame", "all")
+
+
+def _expose_ten_frame(definition: dict, data: dict) -> Exposed:
+    return Exposed(parts={"frame": 1, "cell": 10, "dots": 1}, state={"frame": 0, "side": 0})
+
+
+def _tf_which(args: dict, report: Report, path: str, default: str, choices=TEN_FRAME_GROUPS) -> str:
+    which = args.get("which", default)
+    if which not in choices:
+        report.error("SS281", f"{path}.args.which", f"which 应为 {' / '.join(choices)} 之一")
+        return default
+    return which
+
+
+def _tf_fill(args: dict, ctx: WidgetContext, report: Report, path: str) -> None:
+    n = _count_arg(args, report, path, "fill")
+    state = ctx.exposed.state
+    if n is not None:
+        if state["frame"] + n > 10:
+            report.error("SS261", f"{path}.args.count", f"框里已经有 {state['frame']} 个点，只剩 {10 - state['frame']} 个空格")
+            n = 10 - state["frame"]
+        state["frame"] += n
+    _role_arg(args, report, path)
+    _unknown_args(args, {"count", "role"}, "fill", report, path)
+
+
+def _tf_side(args: dict, ctx: WidgetContext, report: Report, path: str) -> None:
+    n = _count_arg(args, report, path, "side")
+    state = ctx.exposed.state
+    room = ctx.definition.get("side", 0)
+    if n is not None:
+        if isinstance(room, int) and state["side"] + n > room:
+            report.error("SS261", f"{path}.args.count", f"框旁边要放 {state['side'] + n} 个点，{ctx.obj_id}.side 只预留了 "
+                         f"{room} 个；把 side 写大一些")
+        state["side"] += n
+    _role_arg(args, report, path)
+    _unknown_args(args, {"count", "role"}, "side", report, path)
+
+
+def _tf_move_in(args: dict, ctx: WidgetContext, report: Report, path: str) -> None:
+    n = _count_arg(args, report, path, "move_in")
+    state = ctx.exposed.state
+    if n is not None:
+        if n > state["side"]:
+            report.error("SS261", f"{path}.args.count", f"框旁边只有 {state['side']} 个点")
+        elif state["frame"] + n > 10:
+            report.error("SS261", f"{path}.args.count", f"框里只剩 {10 - state['frame']} 个空格")
+        else:
+            state["side"] -= n
+            state["frame"] += n
+    _unknown_args(args, {"count"}, "move_in", report, path)
+
+
+def _tf_count(args: dict, ctx: WidgetContext, report: Report, path: str) -> None:
+    which = _tf_which(args, report, path, "side", ("side", "frame"))
+    if ctx.exposed.state[which] == 0:
+        report.error("SS261", path, f"{which} 那边还没有点，没东西可数")
+    if "start" in args and _nonneg_int(args["start"]):
+        report.error("SS281", f"{path}.args.start", "start 应为非负整数（第一个点标几）")
+    _unknown_args(args, {"which", "start"}, "count", report, path)
+
+
+def _tf_recolor(args: dict, ctx: WidgetContext, report: Report, path: str) -> None:
+    _tf_which(args, report, path, "all")
+    if "role" not in args:
+        report.error("SS281", f"{path}.args", "recolor 需要 role")
+    _role_arg(args, report, path)
+    _unknown_args(args, {"which", "role"}, "recolor", report, path)
+
+
+def _tf_remove(args: dict, ctx: WidgetContext, report: Report, path: str) -> None:
+    which = _tf_which(args, report, path, "all")
+    state = ctx.exposed.state
+    for k in ("side", "frame"):
+        if which in (k, "all"):
+            state[k] = 0
+    _unknown_args(args, {"which"}, "remove", report, path)
+
+
+REGISTRY["ten_frame"] = Widget(
+    "ten_frame",
+    params={"side": (False, _nonneg_int)},
+    expose=_expose_ten_frame,
+    actions={"fill": _tf_fill, "side": _tf_side, "move_in": _tf_move_in, "count": _tf_count,
+             "recolor": _tf_recolor, "remove": _tf_remove},
+)
+
+# ---------- 点阵（dot_array）：转 90°、补满、淡出一列、点变方格 ----------
+# kit 的 mx/dots.py：rows × cols 的点，中心不动。按动作顺序推演现在几排几列：rotate 交换排和列，extend 只能变多；
+# 每个状态都要放得进 room（排版预留的 [排, 列]，默认 max(rows, cols) 的正方形）。
+
+
+def _room(value: object) -> str | None:
+    ok = isinstance(value, list) and len(value) == 2 and not any(_positive_int(v) for v in value)
+    return None if ok else "应为两个正整数 [排, 列]：排版时给点阵预留多大"
+
+
+def _da_room(definition: dict) -> tuple[int, int] | None:
+    rows, cols = definition.get("rows"), definition.get("cols")
+    if _room(definition.get("room")) is None:
+        return tuple(definition["room"])
+    if isinstance(rows, int) and isinstance(cols, int):
+        return max(rows, cols), max(rows, cols)
+    return None
+
+
+def _expose_dot_array(definition: dict, data: dict) -> Exposed:
+    return Exposed(parts={"dots": 1, "cells": 1},
+                   state={"rows": definition.get("rows"), "cols": definition.get("cols")})
+
+
+def _validate_dot_array(ctx: WidgetContext, report: Report, path: str) -> None:
+    room = _da_room(ctx.definition)
+    rows, cols = ctx.definition.get("rows"), ctx.definition.get("cols")
+    if room and isinstance(rows, int) and isinstance(cols, int) and (rows > room[0] or cols > room[1]):
+        report.error("SS262", f"{path}.room", f"{rows} × {cols} 的点阵放不进 room {list(room)}")
+
+
+def _da_fits(ctx: WidgetContext, report: Report, path: str) -> None:
+    room, state = _da_room(ctx.definition), ctx.exposed.state
+    if room and isinstance(state["rows"], int) and isinstance(state["cols"], int) and (state["rows"] > room[0] or state["cols"] > room[1]):
+        report.error("SS262", path, f"这一步之后是 {state['rows']} 排 × {state['cols']} 列，放不进 room {list(room)}；"
+                     f"在 {ctx.obj_id} 上写 room: [{max(room[0], state['rows'])}, {max(room[1], state['cols'])}]")
+
+
+def _da_ready(ctx: WidgetContext) -> bool:
+    state = ctx.exposed.state
+    return isinstance(state.get("rows"), int) and isinstance(state.get("cols"), int)
+
+
+def _da_rotate(args: dict, ctx: WidgetContext, report: Report, path: str) -> None:
+    if "dir" in args and args["dir"] not in ("ccw", "cw"):
+        report.error("SS281", f"{path}.args.dir", "dir 应为 ccw（逆时针，默认）或 cw（顺时针）")
+    _unknown_args(args, {"dir"}, "rotate", report, path)
+    if _da_ready(ctx):
+        state = ctx.exposed.state
+        state["rows"], state["cols"] = state["cols"], state["rows"]
+        _da_fits(ctx, report, path)
+
+
+def _da_extend(args: dict, ctx: WidgetContext, report: Report, path: str) -> None:
+    keys = {"rows", "cols"} & set(args)
+    if not keys:
+        report.error("SS281", f"{path}.args", "extend 要写 cols 和 / 或 rows：补到几列 / 几排（新的总数）")
+    state = ctx.exposed.state
+    for key in sorted(keys):
+        v = args[key]
+        if _positive_int(v):
+            report.error("SS281", f"{path}.args.{key}", f"{key} 应为正整数（新的总数）")
+        elif isinstance(state.get(key), int):
+            if v < state[key]:
+                report.error("SS261", f"{path}.args.{key}", f"现在已经有 {state[key]}，extend 只能变多（拿掉用 fade_col）")
+            else:
+                state[key] = v
+    _role_arg(args, report, path)
+    _role_arg(args, report, path, "faded_role")
+    _unknown_args(args, {"rows", "cols", "role", "faded_role"}, "extend", report, path)
+    _da_fits(ctx, report, path)
+
+
+def _da_index(args: dict, key: str, limit: object, report: Report, path: str) -> None:
+    v = args[key]
+    if not isinstance(v, int) or isinstance(v, bool) or (isinstance(limit, int) and not -limit <= v < limit):
+        report.error("SS281", f"{path}.args.{key}", f"{key} 应为整数，从 0 数，负数从末尾数（现在有 {limit}）")
+
+
+def _da_fade_col(args: dict, ctx: WidgetContext, report: Report, path: str) -> None:
+    if "col" in args:
+        _da_index(args, "col", ctx.exposed.state.get("cols"), report, path)
+    o = args.get("opacity")
+    if o is not None and (not isinstance(o, (int, float)) or isinstance(o, bool) or not 0 <= o < 1):
+        report.error("SS281", f"{path}.args.opacity", "opacity 应为 0 到 1 之间（不含 1）的数，默认 0.3")
+    _role_arg(args, report, path)
+    _unknown_args(args, {"col", "role", "opacity"}, "fade_col", report, path)
+
+
+def _da_squares(args: dict, ctx: WidgetContext, report: Report, path: str) -> None:
+    _role_arg(args, report, path, "fill")
+    if "dots" in args and not isinstance(args["dots"], bool):
+        report.error("SS281", f"{path}.args.dots", "dots 应为 true / false（false：圆点淡出，只剩方格）")
+    _unknown_args(args, {"fill", "dots"}, "squares", report, path)
+
+
+def _da_recolor(args: dict, ctx: WidgetContext, report: Report, path: str) -> None:
+    if "role" not in args:
+        report.error("SS281", f"{path}.args", "recolor 需要 role")
+    _role_arg(args, report, path)
+    for key, axis in (("row", "rows"), ("col", "cols")):
+        if key in args:
+            _da_index(args, key, ctx.exposed.state.get(axis), report, path)
+    _unknown_args(args, {"role", "row", "col"}, "recolor", report, path)
+
+
+REGISTRY["dot_array"] = Widget(
+    "dot_array",
+    params={"rows": (True, _positive_int), "cols": (True, _positive_int), "cells": (False, _bool), "room": (False, _room)},
+    expose=_expose_dot_array,
+    actions={"rotate": _da_rotate, "extend": _da_extend, "fade_col": _da_fade_col, "squares": _da_squares,
+             "recolor": _da_recolor},
+    validate=_validate_dot_array,
 )
 
 # ---------- 函数图像（graph）：坐标轴、曲线、点、割线、切线 ----------
