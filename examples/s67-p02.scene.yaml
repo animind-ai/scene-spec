@@ -102,12 +102,12 @@ objects:
     gap: sm
   tr_d0:
     type: text
-    text: '$d=0$ $\Longrightarrow$ [就是等比数列]{.B}'
+    text: '$d=0$\quad$\Longrightarrow$\quad[就是等比数列]{.B}'
     below: tr_zero
     gap: lg
   tr_d1:
     type: text
-    text: '$d\ne 0$ $\Longrightarrow$ 和等比差一个常数 $d$'
+    text: '$d\ne 0$\quad$\Longrightarrow$\quad和等比差一个常数 $d$'
     below: tr_d0
     gap: sm
 
@@ -149,12 +149,12 @@ objects:
     dots: true
   g_n1:
     type: text
-    text: '$n=1$：$2^2-1\cdot b_3=1$ $\Rightarrow$ [$b_3=3$]{.HL}'
+    text: '$n=1$：\ $2^2-1\cdot b_3=1$\ \ $\Rightarrow$\ \ [$b_3=3$]{.HL}'
     below: g_seq
     gap: md
   g_n2:
     type: text
-    text: '$n=2$：$3^2-2\cdot b_4=1$ $\Rightarrow$ [$b_4=4$]{.HL}'
+    text: '$n=2$：\ $3^2-2\cdot b_4=1$\ \ $\Rightarrow$\ \ [$b_4=4$]{.HL}'
     below: g_n1
     gap: sm
   g_guess:
@@ -207,7 +207,7 @@ objects:
     gap: md
   pv_result:
     type: text
-    text: '$\{b_n\}$ 等差，首项 $1$，公差 $1$ $\Rightarrow$ [$b_n=n$]{.HL}'
+    text: '$\{b_n\}$ 等差，首项 $1$，公差 $1$\ \ $\Rightarrow$\ \ [$b_n=n$]{.HL}'
     below: pv_mid
     gap: sm
 
@@ -242,7 +242,7 @@ objects:
     dots: true
   pt_answer:
     type: text
-    text: '最小值 $1$ $\Rightarrow$ [$\lambda\le 1$]{.HL}'
+    text: '最小值 $1$\ \ $\Rightarrow$\ \ [$\lambda\le 1$]{.HL}'
     right_of: pt_vals
     gap: lg
 
