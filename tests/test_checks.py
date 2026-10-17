@@ -306,3 +306,21 @@ def test_bad_text_in_object_is_reported(example):
 def test_bad_say_text_is_reported(example):
     beat(example, "Down")["say"][0]["text"] = "先往下做差{d0}"
     assert codes(example) == ["SS303", "SS321"]
+
+
+def test_number_line_unit_must_be_positive(example):
+    example["objects"]["axis"] = {"widget": "number_line", "range": [0, 1], "unit": 9, "in": "stage"}
+    assert "SS202" not in codes(example)
+    example["objects"]["axis"]["unit"] = 0
+    assert "SS202" in codes(example)
+
+
+def test_area_grid_actions(example):
+    example["objects"]["sq"] = {"widget": "area_grid", "cols": 4, "rows": 3, "in": "stage"}
+    do = beat(example, "Down")["do"]
+    do.append({"after": "prev", "act": "cut", "target": "sq", "args": {"axis": "cols"}})
+    do.append({"after": "prev", "act": "shade", "target": "sq", "args": {"cols": 3, "role": "A"}})
+    do.append({"after": "prev", "act": "overlap", "target": "sq"})
+    assert not [c for c in codes(example) if c.startswith("SS28")]
+    do.append({"after": "prev", "act": "shade", "target": "sq", "args": {"rows": 5}})
+    assert "SS281" in codes(example)

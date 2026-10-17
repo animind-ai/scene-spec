@@ -81,6 +81,11 @@ def _positive_int(value: object) -> str | None:
     return None if ok else "应为正整数"
 
 
+def _positive_number(value: object) -> str | None:
+    ok = isinstance(value, (int, float)) and not isinstance(value, bool) and value > 0
+    return None if ok else "应为正数"
+
+
 def _enum(*choices: str) -> ParamCheck:
     def check(value: object) -> str | None:
         return None if value in choices else f"应为 {' / '.join(choices)} 之一"
@@ -502,7 +507,8 @@ def _expose_number_line(definition: dict, data: dict) -> Exposed:
     # tick / label：整数刻度和数字；unit：每个单位一格；frac：第一格的分数标注；span：高亮段；
     # jump / count：跳跃弧和计数（按 measures 里最多的整跳数预留）；rest：剩余段；point：点
     return Exposed(parts={"tick": n + 1, "label": n + 1, "unit": n, "frac": 1, "span": 1,
-                          "jump": slots, "count": slots, "rest": 1, "point": NUMBER_LINE_POINTS})
+                          "jump": slots, "count": slots, "rest": 1, "point": NUMBER_LINE_POINTS,
+                          "strip": 1, "groups": 1})
 
 
 def _nl_value(args: dict, key: str, report: Report, path: str, ctx: WidgetContext, required: bool = True):
@@ -520,6 +526,16 @@ def _nl_value(args: dict, key: str, report: Report, path: str, ctx: WidgetContex
     return f
 
 
+def _nl_role(args: dict, report: Report, path: str) -> None:
+    if "role" in args and args["role"] not in ROLES:
+        report.error("SS281", f"{path}.args.role", f"role 应为 {'/'.join(sorted(ROLES))} 之一")
+
+
+def _nl_flag(args: dict, key: str, report: Report, path: str) -> None:
+    if key in args and not isinstance(args[key], bool):
+        report.error("SS281", f"{path}.args.{key}", f"{key} 应为 true / false")
+
+
 def _nl_jump(args: dict, ctx: WidgetContext, report: Report, path: str) -> None:
     import math
 
@@ -533,14 +549,20 @@ def _nl_jump(args: dict, ctx: WidgetContext, report: Report, path: str) -> None:
                      f"{args['length']} 不在 measures 里；把它加进 {ctx.obj_id}.measures，跳跃弧的引用才能按它预留")
     count = args.get("count")
     bounds = _nl_bounds(ctx.definition)
+    origin = _nl_value(args, "from", report, path, ctx, required=False) if "from" in args else None
+    if origin is None and bounds:
+        origin = bounds[0]
     if count is not None:
         if not isinstance(count, int) or isinstance(count, bool) or count <= 0:
             report.error("SS283", f"{path}.args.count", "count 应为正整数（不写就跳到放不下为止）")
-        elif bounds and count > math.floor((bounds[1] - bounds[0]) / length):
-            report.error("SS285", f"{path}.args.count", f"长度 {args['length']} 在 {list(bounds)} 上最多跳 "
-                         f"{math.floor((bounds[1] - bounds[0]) / length)} 次")
-    for key in sorted(set(args) - {"length", "count"}):
-        report.error("SS281", f"{path}.args.{key}", f"jump 没有参数 {key}（可用：length、count）")
+        elif bounds and count > math.floor((bounds[1] - origin) / length):
+            report.error("SS285", f"{path}.args.count", f"长度 {args['length']} 从 {origin} 到 {bounds[1]} 最多跳 "
+                         f"{math.floor((bounds[1] - origin) / length)} 次")
+    _nl_role(args, report, path)
+    _nl_flag(args, "keep", report, path)
+    _nl_flag(args, "numbers", report, path)
+    for key in sorted(set(args) - {"length", "count", "from", "keep", "role", "numbers"}):
+        report.error("SS281", f"{path}.args.{key}", f"jump 没有参数 {key}（可用：length、count、from、keep、role、numbers）")
 
 
 def _nl_subdivide(args: dict, ctx: WidgetContext, report: Report, path: str) -> None:
@@ -554,12 +576,41 @@ def _nl_highlight(args: dict, ctx: WidgetContext, report: Report, path: str) -> 
     b = _nl_value(args, "to", report, path, ctx)
     if a is not None and b is not None and b <= a:
         report.error("SS282", f"{path}.args", "highlight 的 to 要大于 from")
+    _nl_role(args, report, path)
+    _nl_flag(args, "keep", report, path)
 
 
 def _nl_mark_point(args: dict, ctx: WidgetContext, report: Report, path: str) -> None:
     _nl_value(args, "at", report, path, ctx)
     if "label" in args and _str(args["label"]):
         report.error("SS281", f"{path}.args.label", "label 应为非空的 LaTeX 字符串")
+    _nl_role(args, report, path)
+
+
+def _nl_needs_bars(ctx: WidgetContext, report: Report, path: str) -> None:
+    if ctx.definition.get("bars") is not True:
+        report.error("SS287", path, f"分数条动作要先在 {ctx.obj_id} 上写 bars: true（预留位置）")
+
+
+def _nl_bar(args: dict, ctx: WidgetContext, report: Report, path: str) -> None:
+    _nl_needs_bars(ctx, report, path)
+    problem = _positive_int(args.get("parts"))
+    if problem:
+        report.error("SS286", f"{path}.args.parts", f"bar 需要 parts（每个单位几格）：{problem}")
+
+
+def _nl_fill(args: dict, ctx: WidgetContext, report: Report, path: str) -> None:
+    _nl_needs_bars(ctx, report, path)
+    if selectors.parse_slice(args.get("cells")) is None:
+        report.error("SS281", f"{path}.args.cells", "cells 应为非负整数或 \"a:b\"（从 0 数的格子）")
+    _nl_role(args, report, path)
+
+
+def _nl_group(args: dict, ctx: WidgetContext, report: Report, path: str) -> None:
+    _nl_needs_bars(ctx, report, path)
+    problem = _positive_int(args.get("size"))
+    if problem:
+        report.error("SS286", f"{path}.args.size", f"group 需要 size（几格一组）：{problem}")
 
 
 def _nl_no_args(args: dict, ctx: WidgetContext, report: Report, path: str) -> None:
@@ -574,10 +625,57 @@ REGISTRY["number_line"] = Widget(
         "parts": (False, _positive_int),
         "measures": (False, _nl_measures),
         "fractions": (False, _bool),
+        "unit": (False, _positive_number),
+        "bars": (False, _bool),
     },
     expose=_expose_number_line,
     actions={"jump": _nl_jump, "remainder": _nl_no_args, "subdivide": _nl_subdivide, "highlight": _nl_highlight,
-             "mark_point": _nl_mark_point, "erase": _nl_no_args},
+             "mark_point": _nl_mark_point, "erase": _nl_no_args, "bar": _nl_bar, "fill": _nl_fill, "group": _nl_group},
+)
+
+# ---------- 格子正方形（area_grid）：分数乘法的交叠格 ----------
+# kit 的 mx/grid.py：cols × rows 格；cut 画切线，shade 涂列或行，overlap 标出交叠格。
+
+
+def _expose_area_grid(definition: dict, data: dict) -> Exposed:
+    cols, rows = definition.get("cols"), definition.get("rows")
+    n = cols * rows if isinstance(cols, int) and isinstance(rows, int) else 0
+    return Exposed(parts={"cols": 1, "rows": 1, "overlap": 1, "cell": n})
+
+
+def _grid_cut(args: dict, ctx: WidgetContext, report: Report, path: str) -> None:
+    if args.get("axis") not in ("cols", "rows"):
+        report.error("SS281", f"{path}.args.axis", "cut 需要 axis: cols 或 rows")
+    for key in sorted(set(args) - {"axis"}):
+        report.error("SS281", f"{path}.args.{key}", f"cut 没有参数 {key}")
+
+
+def _grid_shade(args: dict, ctx: WidgetContext, report: Report, path: str) -> None:
+    keys = {"cols", "rows"} & set(args)
+    if len(keys) != 1:
+        report.error("SS281", f"{path}.args", "shade 要写 cols 或 rows 其中一个（涂几列 / 几行）")
+        return
+    key = keys.pop()
+    limit = ctx.definition.get(key)
+    v = args[key]
+    if _positive_int(v) or (isinstance(limit, int) and v > limit):
+        report.error("SS281", f"{path}.args.{key}", f"应为 1 到 {limit} 的整数")
+    if "role" in args and args["role"] not in ROLES:
+        report.error("SS281", f"{path}.args.role", f"role 应为 {'/'.join(sorted(ROLES))} 之一")
+    for k in sorted(set(args) - {"cols", "rows", "role"}):
+        report.error("SS281", f"{path}.args.{k}", f"shade 没有参数 {k}")
+
+
+def _grid_no_args(args: dict, ctx: WidgetContext, report: Report, path: str) -> None:
+    for key in sorted(args):
+        report.error("SS281", f"{path}.args.{key}", f"这个动作不带参数（多了 {key}）")
+
+
+REGISTRY["area_grid"] = Widget(
+    "area_grid",
+    params={"cols": (True, _positive_int), "rows": (True, _positive_int)},
+    expose=_expose_area_grid,
+    actions={"cut": _grid_cut, "shade": _grid_shade, "overlap": _grid_no_args},
 )
 
 # ---------- 函数图像（graph）：坐标轴、曲线、点、割线、切线 ----------
