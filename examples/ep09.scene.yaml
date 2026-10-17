@@ -22,7 +22,7 @@ pedagogy:
   insight: 除以 p/q 就是数"里面有几个 p/q"：每个 1 分成 q 份（乘 q），p 份一跳（除以 p），合起来就是乘 q/p
   misconception: 除法一定让数变小
   non_example: 6÷4/5 跳七次还剩两份，不够一跳；剩下的要按"一跳"来读（两份是半跳），答案是 7½，不能按单位 1 读成 7又2/5
-  status: demo
+  status: proof
   landing: Landing
 
 style:
@@ -219,7 +219,7 @@ beats:
 
   - id: Close
     say:
-      - {id: s1, pace: normal, text: "这只是演示，换别的分数也一样。"}
+      - {id: s1, pace: normal, text: "换别的分数，道理也一样。"}
       - {id: s2, pace: normal, text: "{@m}除法不一定让数变小。{@q}练一练，六除以四分之三等于几？"}
     do:
       - {at: s1, act: unfocus, target: two}
