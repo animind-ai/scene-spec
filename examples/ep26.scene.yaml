@@ -1,0 +1,235 @@
+# 洞察系列 #26 图像平移为什么是"左加右减"（高一）。按脚本 insight/ep26-graph-shift/script.yaml（第 1 轮）写。
+# 开场接 #24 片尾的问题；钩子问 f(x + 2) 为什么左移、停三秒、说出"加 2 就该右移"；
+# 拿 y = √x 追踪 y = 2 这个值：先照右移试，√(6 + 2) ≠ 2 对不上；括号里要是 4，x = 2 就够，提前两格；
+# 预测暂停 f(x − 3)：x = 7，晚三格，右移；起点从 0 到 −2；非例 f(x) + 2 加在外面往上移；落到"x 处的值 = f 在 x + 2 处的值"。
+# 画面只用 graph 组件 + 场景参数 s（y = √(x + s)）。
+spec: "0.1"
+
+meta:
+  id: ep26
+  title: 图像平移为什么是"左加右减"
+  line: insight
+  units: [S2, S3]
+  episode: 26
+  grade: 高一
+  author: Boxi Yu
+  license: CC-BY-4.0
+
+pedagogy:
+  insight: y = f(x + 2) 在 x 处取到的是 f 在 x + 2 处的值；原来走到 a 才出现的值，现在走到 a − 2 就出现了，每个值都提前两格，所以整条曲线左移两格
+  misconception: 加 2 就是往右移 2
+  non_example: y = f(x) + 2 加在外面改的是 y，曲线往上移 2，方向和符号一致；只有加在括号里才左右移
+  status: proof
+  landing: Landing
+
+style:
+  theme: paper
+  canvas: "16:9"
+  voice:
+    persona: teacher-hs
+    speed: 1.0
+  segmented: true
+  step_hold: 1.0
+
+params:
+  s: {value: 0, min: -3, max: 2}   # y = √(x + s)
+
+objects:
+  g:
+    widget: graph
+    x: [-3.0, 8.0]
+    y: [-0.6, 4.6]
+    plots:
+      - {f: "sqrt(x)", label: "y=\\sqrt{x}"}
+      - {f: "sqrt(x+s)", role: B}
+      - {f: "sqrt(x-2)", role: "NO"}
+      - {f: "sqrt(x)+2", role: C}
+    points:
+      - {x: 4, role: HL, label: "(4,2)", label_dir: dr}
+      - {x: 6, plot: 2, role: "NO", label: "(6,2)", label_dir: d}
+      - {x: "4-s", plot: 1, role: HL}
+      - {x: "-s", plot: 1, role: B}
+      - {x: 0, role: A}
+      - {x: 4, plot: 3, role: C, label: "(4,4)", label_dir: u}
+    lines:
+      - {through: [0, 2], slope: 0, role: DIM}
+    in: stage
+  fx:
+    type: math
+    tex: 'y=f(x+2)'
+    role: B
+    level: title
+    in: side
+  wrong:
+    type: text
+    text: '[加 2 → 右移 2？]{#m}'
+    role: "NO"
+    below: fx
+    gap: lg
+  calc:
+    type: math
+    tex: '\sqrt{6+2}=\sqrt{8}\ne 2'
+    role: "NO"
+    below: wrong
+    gap: md
+  solve:
+    type: math
+    tex: 'x+2=4\ \Rightarrow\ x=2'
+    role: B
+    below: calc
+    gap: md
+  fm3:
+    type: math
+    tex: 'y=f(x-3)'
+    role: B
+    level: title
+    in: side
+  ask:
+    type: text
+    text: 往哪边移？
+    role: HL
+    below: fm3
+    gap: lg
+  solve3:
+    type: math
+    tex: 'x-3=4\ \Rightarrow\ x=7'
+    role: B
+    below: fm3
+    gap: lg
+  fup:
+    type: math
+    tex: 'y=f(x)+2'
+    role: C
+    level: title
+    in: side
+  upnote:
+    type: text
+    text: 加在外面：改的是 $y$
+    role: C
+    below: fup
+    gap: lg
+  wrong_b:
+    type: text
+    text: '[加 2 → 右移 2？]{#m}'
+    role: "NO"
+    below: fx
+    gap: lg
+  law:
+    type: text
+    text: '$y=f(x+2)$：$x$ 处的值 = $f$ 在 $x+2$ 处的值'
+    role: HL
+    in: footer
+  nq:
+    type: text
+    text: 每走一格就翻一倍？
+    role: HL
+    level: title
+    in: side
+
+beats:
+  - id: Hook
+    pause: {type: predict, prompt: y = f(x + 2) 的图像为什么往左移？先想一想。, hold: 3, app_item: ep26-before-1}
+    say:
+      - {id: s1, pace: ask, text: "{@f}y 等于 f 括号 x 加二，图像为什么是往左移？", en: "Why does the graph of y equals f of x plus two move to the left?"}
+      - {id: s2, pace: normal, text: "先想一想，三秒。", en: "Think about it for three seconds."}
+    do:
+      - {at: s1, act: show, target: g.axes}
+      - {at: s1@f, act: show, target: fx}
+
+  - id: Myth
+    shows: misconception
+    say:
+      - {id: s1, pace: normal, text: "很多人觉得，{@w}加二就该往右移两格。", en: "Lots of people feel that plus two should mean two units to the right."}
+    do:
+      - {at: s1@w, act: show, target: wrong}
+
+  - id: Setup
+    say:
+      - {id: s1, pace: normal, text: "{@r}拿根号 x 来看，它在 x 等于四的时候，{@y}y 等于二。", en: "Take the square root of x. At x equals four, y is two."}
+      - {id: s2, pace: normal, text: "先照往右移来试试，{@w}右移两格的话，{@p}这个二要到六才出现。", en: "First try shifting right. Moved two to the right, this two would only show up at six."}
+      - {id: s3, pace: normal, text: "可把六代进去，{@c}六加二等于八，根号八{@x}不等于二。", en: "But plug in six: six plus two is eight, and root eight is not two."}
+      - {id: s4, pace: normal, text: "要得到二，括号里得是四，{@s}x 加二等于四，x 等于二就够了。", en: "To get two, the bracket must be four. x plus two equals four, so x equals two is enough."}
+      - {id: s5, pace: normal, text: "{@m}原来走到四才有的二，现在走到二就有了，提前了两格。", en: "The two that used to need x equals four now appears at x equals two: two units early."}
+    do:
+      - {at: s1@r, act: draw, target: g, args: {plot: 0}}
+      - {with: prev, act: show, target: "g.plot_label[0]"}
+      - {after: prev, act: show, target: "g.point[0]"}
+      - {at: s1@y, act: show, target: "g.line[0]"}
+      - {at: s2@w, act: draw, target: g, args: {plot: 2}}
+      - {at: s2@p, act: show, target: "g.point[1]"}
+      - {at: s3@c, act: show, target: calc}
+      - {at: s3@x, act: cross, target: "wrong#m"}
+      - {with: prev, act: hide, target: "g.plot[2]"}
+      - {with: prev, act: hide, target: "g.point[1]"}
+      - {at: s4@s, act: show, target: solve}
+      - {at: s5@m, act: show, target: "g.plot[1]"}
+      - {with: prev, act: show, target: "g.point[2]"}
+      - {after: prev, act: tween, args: {s: 2}, dur: fit}
+
+  - id: Predict
+    pause: {type: predict, prompt: y = f(x − 3) 会往哪边移？, hold: 3, app_item: ep26-why-1}
+    say:
+      - {id: s1, pace: ask, text: "照这个道理，{@ask}换成 f 括号 x 减三，会往哪边移？", en: "By the same logic, if it's f of x minus three, which way will it move?"}
+    do:
+      - {at: s1, act: hide, target: fx}
+      - {with: prev, act: hide, target: wrong}
+      - {with: prev, act: hide, target: calc}
+      - {with: prev, act: hide, target: solve}
+      - {at: s1@ask, act: show, target: fm3}
+      - {with: prev, act: show, target: ask}
+
+  - id: Shift
+    say:
+      - {id: s1, pace: normal, text: "括号里要等于四，{@x}x 就得等于七，{@r}晚出现三格，所以是往右移三格。", en: "For the bracket to be four, x has to be seven. Three units late, so it shifts three to the right."}
+      - {id: s2, pace: normal, text: "{@b}再回到加二，{@st}曲线的起点也一样，从零挪到了负二。", en: "Back to plus two: the starting point does the same, moving from zero to minus two."}
+      - {id: s3, pace: normal, text: "每一个值都提前两格出现，{@all}整条曲线就往左移两格。", en: "Every value shows up two units early, so the whole curve shifts two units left."}
+    do:
+      - {at: s1, act: hide, target: ask}
+      - {at: s1@x, act: show, target: solve3}
+      - {at: s1@r, act: tween, args: {s: -3}, dur: fit}
+      - {at: s2@b, act: hide, target: fm3}
+      - {with: prev, act: hide, target: solve3}
+      - {with: prev, act: show, target: fx}
+      - {with: prev, act: tween, args: {s: 2}, dur: 1.5}
+      - {at: s2@st, act: show, target: "g.point[4]"}
+      - {with: prev, act: show, target: "g.point[3]"}
+      - {at: s3@all, act: tween, args: {s: 0}, dur: 0.8}
+      - {after: prev, act: tween, args: {s: 2}, dur: 1.6}
+
+  - id: NonExample
+    shows: non_example
+    say:
+      - {id: s1, pace: ask, text: "{@q}那要是把二加在括号外面呢？", en: "And what if the two is added outside the bracket?"}
+      - {id: s2, pace: normal, text: "加在外面改的是 y，{@up}每个 y 都多二，曲线往上移，和符号同一个方向。", en: "Outside, it changes y. Every y gets two more, and the curve moves up, the same way as the sign."}
+      - {id: s3, pace: normal, text: "只有加在括号里，改的是 x，{@h}曲线才会左右移。", en: "Only inside the bracket does it change x, and only then does the curve move sideways."}
+    do:
+      - {at: s1@q, act: hide, target: fx}
+      - {after: prev, act: show, target: fup}
+      - {at: s2@up, act: draw, target: g, args: {plot: 3}}
+      - {with: prev, act: show, target: "g.point[5]"}
+      - {with: prev, act: show, target: upnote}
+      - {at: s3@h, act: hide, target: "g.plot[3]"}
+      - {with: prev, act: hide, target: "g.point[5]"}
+      - {with: prev, act: hide, target: fup}
+      - {with: prev, act: hide, target: upnote}
+      - {after: prev, act: show, target: fx}
+
+  - id: Landing
+    shows: landing
+    say:
+      - {id: s1, pace: slow, text: "所以 f 括号 x 加二，{@law}在 x 处取的是 f 在 x 加二处的值。", en: "So f of x plus two takes, at x, the value f has at x plus two."}
+      - {id: s2, pace: normal, text: "每个值都提前两格出现，图像就往左移两格。", en: "Every value turns up two units early, so the graph moves two units left."}
+      - {id: s3, pace: normal, text: "{@w}左加右减不用死记，{@x}问一句这个值什么时候出现就行。", en: "No need to memorize 'plus means left'. Just ask when a value shows up."}
+    do:
+      - {at: s1@law, act: show, target: law}
+      - {at: s3@w, act: show, target: wrong_b}
+      - {at: s3@x, act: cross, target: "wrong_b#m"}
+
+  - id: Close
+    say:
+      - {id: s1, pace: normal, text: "还记得顶点在括号等于零的地方吗？那也是同一件事。", en: "Remember the vertex sits where the bracket is zero? That's the same idea."}
+      - {id: s2, pace: ask, text: "{@q}要是每往右走一格，y 就翻一倍，这条曲线会长成什么样？", en: "Next: if y doubles with every step to the right, what does the curve look like?"}
+    do:
+      - {at: s2@q, act: hide, target: fx}
+      - {with: prev, act: hide, target: wrong_b}
+      - {after: prev, act: show, target: nq}
