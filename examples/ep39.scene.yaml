@@ -1,0 +1,270 @@
+# 洞察系列 #39 差分：离散的导数（高二）。sums 系列第四集（收尾），接 #31，回访 #29。
+# 按脚本 insight/ep39-finite-differences/script.yaml（第 1 轮）写。
+# 开场就是 #31 的片尾画面（dx = 0.1 的正方形、底部 (x²)′ = 2x、右侧「边长只能取整数呢？」）；钩子问差的差为什么总是 2、
+# 停三秒、说出"数列和函数是两回事"；边长只能取整数：3 × 3 点阵长成 4 × 4，两条 n 个点、角上一个点丢不得，(n+1)² − n² = 2n + 1；
+# 差分表 0 1 4 9 16 25 → 1 3 5 7 9 → 2 2 2 2，和 (x²)′ = 2x、(2x)′ = 2 并排对照；非例 2ⁿ 差一次还是自己；
+# 落到二阶差分是常数；片尾回访 #29：1 + 3 + 5 + 7 + 9 按 L 形一圈一圈拼成 5 × 5。
+spec: "0.1"
+
+meta:
+  id: ep39
+  title: 差分：离散的导数
+  line: insight
+  units: [S6, S7]
+  episode: 39
+  grade: 高二
+  author: Boxi Yu
+  license: CC-BY-4.0
+
+pedagogy:
+  insight: 边长从 n 长到 n 加一，正方形多出两条 n 和一个角块，所以平方数相邻的差是 2n 加一；每长一圈两条各多一个点，差的差总是二；这是导数 2x 的整数版，多出的一正是丢不掉的角块
+  misconception: 数列和函数是两回事；差的差是常数这种题只能背题型
+  non_example: 二的 n 次方 1、2、4、8、16，差一次还是 1、2、4、8，怎么差都不会变成常数
+  status: proof
+  landing: Landing
+
+style:
+  theme: paper
+  canvas: "16:9"
+  voice:
+    persona: teacher-hs
+    speed: 1.0
+  segmented: true
+  step_hold: 1.0
+
+data:
+  sq: [0, 1, 4, 9, 16, 25]
+  d1: [1, 3, 5, 7, 9]
+  d2: [2, 2, 2, 2]
+  p2: [1, 2, 4, 8, 16]
+  q1: [1, 2, 4, 8]
+
+objects:
+  # 开场：#31 的片尾（同样的定义）
+  nq:
+    type: text
+    text: '边长只能取整数呢？'
+    role: HL
+    level: title
+    in: side
+  law:
+    type: text
+    text: "[$(x^2)'=2x$]{#l}"
+    role: HL
+    level: display
+    in: footer
+  chk:
+    type: text
+    text: '$x=1\ \to\ 2$'
+    right_of: law
+    gap: lg
+  sq01:
+    widget: dissect
+    role: A
+    in: stage
+    view: [[-1.2, -1.2], [6.8, 5.6]]
+    shapes:
+      S: {rect: [4, 4], label: '$x^2$'}
+      R: {rect: [0.1, 4], at: [4, 0], role: B}
+      T: {rect: [4, 0.1], at: [0, 4], role: B}
+      C: {rect: [0.1, 0.1], at: [4, 4], role: C}
+    guides:
+      d: {from: [4, -0.5], to: [4.1, -0.5], label: '$dx=0.1$', role: HL, side: below, solid: true}
+  # 本集
+  hq1:
+    type: text
+    text: '$0,\ 1,\ 4,\ 9,\ 16,\ \dots$'
+    level: title
+    in: side
+  hq2:
+    type: text
+    text: '[差的差 $=2$]{#l} [？]{#q .NO}'
+    level: title
+    below: hq1
+    gap: sm
+  myth:
+    type: text
+    text: '[数列和函数是两回事？]{#m}'
+    role: "NO"
+    below: hq2
+    gap: md
+  cmp1:
+    type: text
+    text: '[$(x^2)''=2x$]{#l} [$\Delta(n^2)=2n$]{#r} [$+1$]{#c .C}'
+    below: myth
+    gap: lg
+  cmp2:
+    type: text
+    text: '[$(2x)''=2$]{#l} [$\Delta(2n+1)=2$]{#r}'
+    below: cmp1
+    gap: sm
+  law39:
+    type: text
+    text: '[$(n+1)^2-n^2=$]{#l} [$2n+1$]{#r .HL}'
+    level: display
+    in: footer
+  dots:
+    widget: dissect
+    role: A
+    in: stage
+    view: [[-1.4, -1.2], [5.4, 5.0]]
+    shapes:
+      S: {dots: {points: [[0, 0], [1, 0], [2, 0], [0, 1], [1, 1], [2, 1], [0, 2], [1, 2], [2, 2]]}}
+      R: {dots: {points: [[3, 0], [3, 1], [3, 2]]}, hidden: true, role: B}
+      T: {dots: {points: [[0, 3], [1, 3], [2, 3]]}, hidden: true, role: B}
+      C: {dots: {points: [[3, 3]]}, hidden: true, role: C}
+    guides:
+      nb: {from: [-0.3, -0.6], to: [2.3, -0.6], label: '$n$', role: A, side: below, solid: true}
+      rl: {from: [3.6, -0.3], to: [3.6, 2.3], label: '$n$', role: B, side: right, solid: true}
+      tl: {from: [-0.3, 3.6], to: [2.3, 3.6], label: '$n$', role: B, side: above, solid: true}
+      c1: {from: [2.6, 3.4], to: [3.4, 3.4], role: HL}
+      c2: {from: [3.4, 2.6], to: [3.4, 3.4], role: HL}
+      c3: {from: [2.6, 2.6], to: [2.6, 3.4], role: HL}
+      c4: {from: [2.6, 2.6], to: [3.4, 2.6], role: HL}
+      cl: {from: [3.6, 2.7], to: [3.6, 3.3], label: '$1$', role: C, side: right}
+  tab:
+    widget: diff_table
+    in: stage
+    rows:
+      - {data: sq, role: A, label: '$n^2$', name: 平方数}
+      - {data: d1, role: B, label: '$\Delta$', name: 一阶差}
+      - {data: d2, role: C, label: '$\Delta^2$', name: 二阶差}
+    known: [6, 0, 0]
+  pow:
+    widget: diff_table
+    in: stage
+    rows:
+      - {data: p2, role: A, label: '$2^n$', name: 二的幂}
+      - {data: q1, role: "NO", label: '$\Delta$', name: 一阶差}
+    known: [5, 0]
+  sq5:
+    widget: dissect
+    role: A
+    in: stage
+    view: [[-1.0, -0.8], [5.0, 4.8]]
+    shapes:
+      L0: {dots: {points: [[0, 0]]}, hidden: true, role: A}
+      L1: {dots: {points: [[1, 0], [1, 1], [0, 1]]}, hidden: true, role: B}
+      L2: {dots: {points: [[2, 0], [2, 1], [2, 2], [0, 2], [1, 2]]}, hidden: true, role: C}
+      L3: {dots: {points: [[3, 0], [3, 1], [3, 2], [3, 3], [0, 3], [1, 3], [2, 3]]}, hidden: true, role: A}
+      L4: {dots: {points: [[4, 0], [4, 1], [4, 2], [4, 3], [4, 4], [0, 4], [1, 4], [2, 4], [3, 4]]}, hidden: true, role: B}
+
+beats:
+  - id: Hook
+    pause: {type: predict, prompt: 平方数相邻的差，再求一次差，为什么总是二？先猜一猜。, hold: 3, app_item: ep39-before-1}
+    say:
+      - {id: s1, pace: ask, text: "平方数{@q}相邻的差，再求一次差，为什么总是二？", en: "Take the gaps between square numbers, then the gaps between those: why is it always two?"}
+      - {id: s2, pace: normal, text: "先猜一猜，想三秒。", en: "Take a guess. Think for three seconds."}
+    do:
+      # 开场：一下子摆出 #31 的片尾画面
+      - {at: s1, act: show, target: sq01, dur: 0.01}
+      - {with: prev, act: show, target: "sq01#d", dur: 0.01}
+      - {with: prev, act: show, target: law, dur: 0.01}
+      - {with: prev, act: show, target: chk, dur: 0.01}
+      - {with: prev, act: show, target: nq, dur: 0.01}
+      - {at: s1@q, act: hide, target: nq}
+      - {after: prev, act: show, target: hq1}
+      - {with: prev, act: show, target: hq2}
+
+  - id: Myth
+    shows: misconception
+    say:
+      - {id: s1, pace: normal, text: "很多人觉得{@m}数列是数列，函数是函数，这种题只能背题型。", en: "Lots of people think sequences and functions are different worlds, and this is just a problem type to memorise."}
+    do:
+      - {at: s1@m, act: show, target: myth}
+
+  - id: Setup
+    say:
+      - {id: s1, pace: normal, text: "上一集边长多长了一小段 d x；{@n}现在边长只能是整数，d x 就是一。", en: "Last time the side grew by a little dx. Now the side can only be a whole number, so dx is one."}
+      - {id: s2, pace: normal, text: "边长从 n 变成 n 加一，{@r}多出两条，{@t}各有 n 个点。", en: "The side goes from n to n plus one: two strips appear, each with n dots."}
+    do:
+      - {at: s1@n, act: hide, target: sq01}
+      - {with: prev, act: hide, target: law}
+      - {with: prev, act: hide, target: chk}
+      - {after: prev, act: show, target: dots}
+      - {with: prev, act: show, target: "dots#nb"}
+      - {at: s2@r, act: show, target: "dots#R"}
+      - {with: prev, act: show, target: "dots#rl"}
+      - {at: s2@t, act: show, target: "dots#T"}
+      - {with: prev, act: show, target: "dots#tl"}
+
+  - id: Predict
+    pause: {type: predict, prompt: 右上角还缺一个点。这一次，它还能丢吗？, hold: 3, app_item: ep39-why-1}
+    say:
+      - {id: s1, pace: ask, text: "{@c}右上角还缺一个点。这一次，它还能丢吗？", en: "There's still one dot missing in the top right corner. This time, can we drop it?"}
+    do:
+      - {at: s1@c, act: show, target: "dots#c1"}
+      - {with: prev, act: show, target: "dots#c2"}
+      - {with: prev, act: show, target: "dots#c3"}
+      - {with: prev, act: show, target: "dots#c4"}
+
+  - id: Grow
+    say:
+      - {id: s1, pace: normal, text: "{@c}角上补的是一个点，和长条里的每个点一样大。", en: "The corner is one dot, just as big as every dot in the strips."}
+      - {id: s2, pace: normal, text: "它一点也不小，丢不得。{@law}多出来的就是二 n 加一。", en: "It's not small at all, so it stays. The added part is two n plus one."}
+    do:
+      - {at: s1@c, act: hide, target: "dots#c1"}
+      - {with: prev, act: hide, target: "dots#c2"}
+      - {with: prev, act: hide, target: "dots#c3"}
+      - {with: prev, act: hide, target: "dots#c4"}
+      - {with: prev, act: show, target: "dots#C"}
+      - {with: prev, act: show, target: "dots#cl"}
+      - {at: s2@law, act: show, target: law39}
+
+  - id: Table
+    say:
+      - {id: s1, pace: normal, text: "{@row}把平方数排成一行：零、一、四、九、十六、二十五。", en: "Line up the square numbers: zero, one, four, nine, sixteen, twenty-five."}
+      - {id: s2, pace: normal, text: "相邻两个相减，{@d}得到一、三、五、七、九，{@m}正是二 n 加一。", en: "Subtract neighbours: one, three, five, seven, nine. Exactly two n plus one."}
+      - {id: s3, pace: normal, text: "再减一次，{@e}全是二：每长一圈，两条各多一个点。", en: "Subtract again: all twos. Each new ring, both strips get one dot longer."}
+    do:
+      - {at: s1@row, act: hide, target: dots}
+      - {after: prev, act: show, target: tab}
+      - {at: s2@d, act: derive, target: tab, args: {row: d1, index: "0:5"}, dur: fit}
+      - {at: s2@m, act: mark, target: "law39#r"}
+      - {at: s3@e, act: derive, target: tab, args: {row: d2, index: "0:4"}, dur: fit}
+      - {with: prev, act: unmark, target: "law39#r"}
+
+  - id: Compare
+    say:
+      - {id: s1, pace: normal, text: "这就叫差分。{@a}二 n 加一对应导数二 x，{@c}多出来的一，就是那个角块。", en: "This is called a difference. Two n plus one matches the derivative two x; the extra one is the corner."}
+      - {id: s2, pace: normal, text: "{@b}差的差是二，对应二 x 再求一次导数，也是二。", en: "The second difference is two, just as taking the derivative of two x again gives two."}
+    do:
+      - {at: s1@a, act: show, target: cmp1}
+      - {at: s1@c, act: mark, target: "cmp1#c"}
+      - {at: s2@b, act: unmark, target: "cmp1#c"}
+      - {with: prev, act: show, target: cmp2}
+
+  - id: NonExample
+    shows: non_example
+    say:
+      - {id: s1, pace: normal, text: "{@p}换成二的 n 次方：一、二、四、八、十六。", en: "Now try powers of two: one, two, four, eight, sixteen."}
+      - {id: s2, pace: normal, text: "{@d}差一次还是一、二、四、八，怎么差都不会变成常数。", en: "One round of differences gives one, two, four, eight again. They never settle to a constant."}
+    do:
+      - {at: s1@p, act: hide, target: tab}
+      - {after: prev, act: show, target: pow}
+      - {at: s2@d, act: derive, target: pow, args: {row: q1, index: "0:4"}, dur: fit}
+
+  - id: Landing
+    shows: landing
+    say:
+      - {id: s1, pace: slow, text: "{@back}所以平方数的二阶差分是常数，正像 x 平方的二阶导数是常数。", en: "So the second difference of the squares is constant, just as the second derivative of x squared is constant."}
+      - {id: s2, pace: normal, text: "数列的差分和函数的导数，{@x}是同一件事的两个版本。", en: "Differences of a sequence and derivatives of a function are two versions of the same idea."}
+    do:
+      - {at: s1@back, act: hide, target: pow}
+      - {after: prev, act: show, target: tab}
+      - {at: s2@x, act: cross, target: "myth#m"}
+
+  - id: Close
+    say:
+      - {id: s1, pace: normal, text: "{@st}还记得等差数列的台阶吗？{@l0}一加{@l1}三加{@l2}五加{@l3}七加{@l4}九，正好拼成五乘五。", en: "Remember the staircases of arithmetic series? One plus three plus five plus seven plus nine makes exactly five by five."}
+      - {id: s2, pace: normal, text: "一圈一圈加上去的，{@d}正是差分算出来的那些数。", en: "The rings we add are exactly the numbers the differences gave us."}
+      - {id: s3, pace: ask, text: "那立方数，要差几次才变成常数？", en: "Next: how many rounds of differences does it take for the cubes to become constant?"}
+    do:
+      - {at: s1@st, act: hide, target: tab}
+      - {with: prev, act: show, target: sq5}
+      - {at: s1@l0, act: show, target: "sq5#L0", dur: 0.3}
+      - {at: s1@l1, act: show, target: "sq5#L1", dur: 0.3}
+      - {at: s1@l2, act: show, target: "sq5#L2", dur: 0.3}
+      - {at: s1@l3, act: show, target: "sq5#L3", dur: 0.3}
+      - {at: s1@l4, act: show, target: "sq5#L4", dur: 0.3}
+      - {at: s2@d, act: mark, target: "law39#r"}
