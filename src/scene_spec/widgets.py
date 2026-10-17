@@ -1183,6 +1183,92 @@ REGISTRY["block_bars"] = Widget(
     validate=_validate_block_bars,
 )
 
+# ---------- 天平（balance）：解方程两边同时拿走 ----------
+# kit 的 mx/balance.py：两个盘里放砝码（1）和最多一个未知盒子（"box"，重 box）。按动作顺序推演每个盘里几块砝码：
+# remove 不能拿走比盘里多的砝码（盒子不能拿），add 之后不能超过 room。
+
+
+def _pan_items(value: object) -> str | None:
+    ok = isinstance(value, list) and all(v == 1 or v == "box" for v in value) and sum(v == "box" for v in value) <= 1
+    return None if ok else '应为列表，每项是 1（一块砝码）或 "box"（未知盒子，最多一个）'
+
+
+def _expose_balance(definition: dict, data: dict) -> Exposed:
+    state = {}
+    for side in ("left", "right"):
+        items = definition.get(side)
+        state[side] = sum(v == 1 for v in items) if _pan_items(items) is None else None
+    has_box = any("box" in (definition.get(s) or []) for s in ("left", "right") if isinstance(definition.get(s), list))
+    return Exposed(parts={"left": 1, "right": 1, "beam": 1, "box": 1}, state={**state, "box": has_box})
+
+
+def _bal_room(definition: dict) -> int | None:
+    room = definition.get("room")
+    if isinstance(room, int) and not isinstance(room, bool):
+        return room
+    sizes = [len(definition[s]) for s in ("left", "right") if isinstance(definition.get(s), list)]
+    return max(sizes) if sizes else None
+
+
+def _validate_balance(ctx: WidgetContext, report: Report, path: str) -> None:
+    room = _bal_room(ctx.definition)
+    for side in ("left", "right"):
+        items = ctx.definition.get(side)
+        if isinstance(items, list) and isinstance(room, int) and len(items) > room:
+            report.error("SS262", f"{path}.room", f"{side} 盘里有 {len(items)} 样东西，放不进 room {room}")
+
+
+def _bal_sides(args: dict, report: Report, path: str) -> list[str]:
+    side = args.get("side", "both")
+    if side not in ("left", "right", "both"):
+        report.error("SS281", f"{path}.args.side", "side 应为 left / right / both")
+        return []
+    return ["left", "right"] if side == "both" else [side]
+
+
+def _bal_change(act: str):
+    def check(args: dict, ctx: WidgetContext, report: Report, path: str) -> None:
+        sides = _bal_sides(args, report, path)
+        n = args.get("count", 1)
+        if _positive_int(n):
+            report.error("SS281", f"{path}.args.count", "count 应为正整数（几块砝码，默认 1）")
+            n = None
+        _role_arg(args, report, path)
+        _unknown_args(args, {"side", "count", "role"} if act == "add" else {"side", "count"}, act, report, path)
+        state, room = ctx.exposed.state, _bal_room(ctx.definition)
+        for side in sides:
+            if state.get(side) is None or n is None:
+                continue
+            if act == "remove":
+                if state[side] < n:
+                    report.error("SS261", path, f"{side} 盘里只有 {state[side]} 块砝码，拿不走 {n} 块（盒子不能拿）")
+                    continue
+                state[side] -= n
+            else:
+                state[side] += n
+                items = int(state[side]) + (1 if "box" in (ctx.definition.get(side) or []) else 0)
+                if isinstance(room, int) and items > room:
+                    report.error("SS262", path, f"放完 {side} 盘里有 {items} 样东西，放不进 room {room}")
+    return check
+
+
+def _bal_label(args: dict, ctx: WidgetContext, report: Report, path: str) -> None:
+    if not ctx.exposed.state.get("box"):
+        report.error("SS261", path, f"{ctx.obj_id} 里没有未知盒子（\"box\"），没有字可换")
+    if not isinstance(args.get("text"), (str, int)) or isinstance(args.get("text"), bool):
+        report.error("SS281", f"{path}.args.text", "label 需要 text（盒子上换成的字）")
+    _unknown_args(args, {"text"}, "label", report, path)
+
+
+REGISTRY["balance"] = Widget(
+    "balance",
+    params={"left": (True, _pan_items), "right": (True, _pan_items), "box": (True, _positive_int),
+            "box_label": (False, _number_or_str), "room": (False, _positive_int)},
+    expose=_expose_balance,
+    actions={"remove": _bal_change("remove"), "add": _bal_change("add"), "label": _bal_label},
+    validate=_validate_balance,
+)
+
 # ---------- 函数图像（graph）：坐标轴、曲线、点、割线、切线 ----------
 # 函数写成白名单表达式字符串（见 expr.py），这里检查语法、点是否在定义域里、切线处左右导数是否相等。
 
