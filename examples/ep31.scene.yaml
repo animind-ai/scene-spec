@@ -1,0 +1,289 @@
+# 洞察系列 #31 为什么 (x²)′ = 2x（高二）。sums 系列第三集，接 #30、#39。
+# 按脚本 insight/ep31-derivative-x-squared/script.yaml（第 1 轮）写。
+# 开场就是 #30 的片尾画面（抛物线、P 点、切线，右侧一句「换一个点呢？」，底部导数的定义）；钩子问 (x²)′ 为什么是 2x、停三秒、
+# 说出"角块是硬丢掉的"；x² 画成边长 x 的正方形，边长多长 dx，预测暂停后切出两条 x·dx 的长条和 dx² 的角块；
+# dx 从 1 缩到 0.5、0.1，角块缩得比长条快（0.1 时是长条的 1/40）；非例 dx = x 时角块和长条一样大；落到 (x²)′ = 2x。
+# 片尾画面是 #39 的开头画面。
+spec: "0.1"
+
+meta:
+  id: ep31
+  title: 为什么 (x²)′ = 2x
+  line: insight
+  units: [S7]
+  episode: 31
+  grade: 高二
+  author: Boxi Yu
+  license: CC-BY-4.0
+
+pedagogy:
+  insight: x 的平方是边长 x 的正方形面积；边长多长一点 dx，多出两条 x 乘 dx 的长条和一个 dx 乘 dx 的角块；除以 dx 是 2x 加 dx，dx 趋近于零就是 2x
+  misconception: 角上那一小块是硬丢掉的，所以 2x 只是个近似
+  non_example: dx 不小的时候角块丢不得：dx 等于 x 时，角块和一条长条一样大
+  status: proof
+  landing: Landing
+
+style:
+  theme: paper
+  canvas: "16:9"
+  voice:
+    persona: teacher-hs
+    speed: 1.0
+  segmented: true
+  step_hold: 1.0
+
+objects:
+  # 开场：#30 的片尾（同样的定义）
+  g:
+    widget: graph
+    x: [-2.0, 5.0]
+    y: [-0.7, 4.8]
+    readout_at: [3.05, 2.2]
+    plots:
+      - {f: "x^2", label: "y=x^2"}
+    points:
+      - {x: 1, label: P}
+    secants:
+      - {point: 0, h: 1, label: Q, readout: true, readout_text: 右侧割线斜率}
+      - {point: 0, h: -1, label: "Q'", role: C, label_dir: ul, readout: true, readout_text: 左侧割线斜率}
+    tangents:
+      - {point: 0, role: HL}
+    lines:
+      - {x: 1}
+    in: stage
+  nq30:
+    type: text
+    text: '换一个点呢？'
+    role: HL
+    level: title
+    in: side
+  deriv:
+    type: math
+    tex: "f'(x_0)=\\lim_{h\\to 0}\\frac{f(x_0+h)-f(x_0)}{h}"
+    role: HL
+    in: footer
+
+  # 本集
+  qx:
+    type: text
+    text: "[$(x^2)'=2x$]{#l} [$?$]{#q .NO}"
+    level: title
+    in: side
+  myth:
+    type: text
+    text: '[角块是硬丢掉的？]{#m}'
+    role: "NO"
+    below: qx
+    gap: sm
+  grow:
+    type: text
+    text: '$(x+dx)^2-x^2$'
+    below: myth
+    gap: lg
+  grow2:
+    type: text
+    text: '[$=$]{#e} [$2x\,dx$]{#s .B} [$+\,dx^2$]{#c .C}'
+    below: grow
+    gap: sm
+  rate:
+    type: text
+    text: '[$\div dx:$]{#l} [$2x$]{#a .HL} [$+\,dx$]{#d}'
+    below: grow2
+    gap: md
+  ratio:
+    type: text
+    text: '[$dx^2\div(x\,dx)$]{#l} [$=\frac{1}{40}$]{#r .HL}'
+    below: rate
+    gap: md
+  nq:
+    type: text
+    text: '边长只能取整数呢？'
+    role: HL
+    level: title
+    in: side
+  law:
+    type: text
+    text: "[$(x^2)'=2x$]{#l}"
+    role: HL
+    level: display
+    in: footer
+  chk:
+    type: text
+    text: '$x=1\ \to\ 2$'
+    right_of: law
+    gap: lg
+  sq1:
+    widget: dissect
+    role: A
+    in: stage
+    view: [[-1.2, -1.2], [6.8, 5.6]]
+    shapes:
+      S: {rect: [4, 4], label: '$x^2$', edges: [{at: [[0, 0], [4, 0]], text: '$x$'}, {at: [[0, 0], [0, 4]], text: '$x$'}]}
+      R: {rect: [1, 4], at: [4, 0], hidden: true, role: B}
+      T: {rect: [4, 1], at: [0, 4], hidden: true, role: B, label: '$x\,dx$'}
+      C: {rect: [1, 1], at: [4, 4], hidden: true, role: C}
+    guides:
+      dxr: {from: [4, -0.5], to: [5, -0.5], label: '$dx$', role: HL, side: below, solid: true}
+      dxt: {from: [-0.5, 4], to: [-0.5, 5], label: '$dx$', role: HL, side: left, solid: true}
+      b1: {from: [5, 0], to: [5, 5], role: HL}
+      b2: {from: [0, 5], to: [5, 5], role: HL}
+      cl: {from: [5.4, 4], to: [5.4, 5], label: '$dx^2$', role: C, side: right}
+      rl: {from: [5.4, 0], to: [5.4, 4], label: '$x\,dx$', role: B, side: right}
+  sq05:
+    widget: dissect
+    role: A
+    in: stage
+    view: [[-1.2, -1.2], [6.8, 5.6]]
+    shapes:
+      S: {rect: [4, 4], label: '$x^2$'}
+      R: {rect: [0.5, 4], at: [4, 0], role: B}
+      T: {rect: [4, 0.5], at: [0, 4], role: B}
+      C: {rect: [0.5, 0.5], at: [4, 4], role: C}
+    guides:
+      d: {from: [4, -0.5], to: [4.5, -0.5], label: '$dx=0.5$', role: HL, side: below, solid: true}
+  sq01:
+    widget: dissect
+    role: A
+    in: stage
+    view: [[-1.2, -1.2], [6.8, 5.6]]
+    shapes:
+      S: {rect: [4, 4], label: '$x^2$'}
+      R: {rect: [0.1, 4], at: [4, 0], role: B}
+      T: {rect: [4, 0.1], at: [0, 4], role: B}
+      C: {rect: [0.1, 0.1], at: [4, 4], role: C}
+    guides:
+      d: {from: [4, -0.5], to: [4.1, -0.5], label: '$dx=0.1$', role: HL, side: below, solid: true}
+  sq4:
+    widget: dissect
+    role: A
+    in: stage
+    view: [[-1.0, -1.0], [9.0, 9.0]]
+    shapes:
+      S: {rect: [4, 4], label: '$x^2$'}
+      R: {rect: [4, 4], at: [4, 0], role: B, label: '$x\,dx$'}
+      T: {rect: [4, 4], at: [0, 4], role: B, label: '$x\,dx$'}
+      C: {rect: [4, 4], at: [4, 4], role: "NO", label: '$dx^2$'}
+    guides:
+      d: {from: [4, -0.5], to: [8, -0.5], label: '$dx=x$', role: "NO", side: below, solid: true}
+
+beats:
+  - id: Hook
+    pause: {type: predict, prompt: x 的平方的导数为什么是二 x？先猜一猜。, hold: 3, app_item: ep31-before-1}
+    say:
+      - {id: s1, pace: ask, text: "x 的平方，{@q}在任意一点的导数，为什么是二 x？", en: "Why is the derivative of x squared, at any point, equal to two x?"}
+      - {id: s2, pace: normal, text: "先猜一猜，想三秒。", en: "Take a guess. Think for three seconds."}
+    do:
+      # 开场：一下子摆出 #30 的片尾画面
+      - {at: s1, act: show, target: g.axes, dur: 0.01}
+      - {with: prev, act: draw, target: g, args: {plot: 0}, dur: 0.01}
+      - {with: prev, act: show, target: g.plot_label, dur: 0.01}
+      - {with: prev, act: show, target: "g.point[0]", dur: 0.01}
+      - {with: prev, act: show, target: "g.tangent[0]", dur: 0.01}
+      - {with: prev, act: show, target: nq30, dur: 0.01}
+      - {with: prev, act: show, target: deriv, dur: 0.01}
+      - {at: s1@q, act: hide, target: nq30}
+      - {with: prev, act: hide, target: deriv}
+      - {after: prev, act: show, target: qx}
+
+  - id: Myth
+    shows: misconception
+    say:
+      - {id: s1, pace: normal, text: "很多人会算，却总觉得{@m}角上那一小块是硬丢掉的。", en: "Lots of people can do the algebra, but feel the little corner piece is just thrown away."}
+    do:
+      - {at: s1@m, act: show, target: myth}
+
+  - id: Setup
+    say:
+      - {id: s1, pace: normal, text: "上一集我们在一这个点算出斜率是二，{@v}这次换个看法。", en: "Last time we found the slope at one is two. This time, a different view."}
+      - {id: s2, pace: normal, text: "{@sq}x 的平方，就是边长为 x 的正方形的面积。", en: "x squared is the area of a square with side x."}
+      - {id: s3, pace: normal, text: "让边长多长一点点，{@dx}记作 d x，面积多出多少？", en: "Let the side grow by a tiny bit, call it dx. How much area is added?"}
+    do:
+      - {at: s1@v, act: hide, target: g}
+      - {at: s2@sq, act: show, target: sq1}
+      - {at: s3@dx, act: show, target: "sq1#dxr"}
+      - {with: prev, act: show, target: "sq1#dxt"}
+
+  - id: Predict
+    pause: {type: predict, prompt: 多出来的那一圈，是由哪几块拼成的？, hold: 3, app_item: ep31-why-1}
+    say:
+      - {id: s1, pace: ask, text: "{@b}多出来的那一圈，是由哪几块拼成的？", en: "That extra band around the square: which pieces is it made of?"}
+    do:
+      - {at: s1@b, act: show, target: "sq1#b1"}
+      - {with: prev, act: show, target: "sq1#b2"}
+
+  - id: Grow
+    say:
+      - {id: s1, pace: normal, text: "还记得把长方形切开吗？{@r}右边一条，{@t}上边一条，都是 x 乘 d x。", en: "Remember cutting a rectangle into pieces? One strip on the right, one on top, each x times dx."}
+      - {id: s2, pace: normal, text: "{@c}右上角还剩一小块，d x 乘 d x。", en: "And in the top right corner, one small piece: dx times dx."}
+      - {id: s3, pace: normal, text: "{@g}多出的面积是二 x 乘 d x，加上 d x 的平方。", en: "So the added area is two x dx, plus dx squared."}
+      - {id: s4, pace: normal, text: "再除以 d x，{@r}就是面积长得有多快，二 x 加 d x。", en: "Divide by dx to get how fast the area grows: two x plus dx."}
+    do:
+      - {at: s1, act: hide, target: "sq1#b1"}
+      - {with: prev, act: hide, target: "sq1#b2"}
+      - {at: s1@r, act: show, target: "sq1#R"}
+      - {with: prev, act: show, target: "sq1#rl"}
+      - {at: s1@t, act: show, target: "sq1#T"}
+      - {at: s2@c, act: show, target: "sq1#C"}
+      - {with: prev, act: show, target: "sq1#cl"}
+      - {at: s3@g, act: show, target: grow}
+      - {with: prev, act: show, target: grow2}
+      - {at: s4@r, act: show, target: rate}
+
+  - id: Shrink
+    say:
+      - {id: s1, pace: normal, text: "现在让这一小段 d x 变短，从一，{@h}到零点五，{@t}再到零点一。", en: "Now let dx shrink: from one, to a half, to a tenth."}
+      - {id: s2, pace: normal, text: "长条只是变窄，{@c}角块却缩得快得多，因为它的两条边都在缩。", en: "The strips just get thinner, but the corner shrinks much faster, because both its sides shrink."}
+      - {id: s3, pace: normal, text: "d x 等于零点一时，{@r}角块只有一条长条的四十分之一。", en: "At dx equal to a tenth, the corner is just a fortieth of one strip."}
+    do:
+      - {at: s1@h, act: hide, target: sq1}
+      - {with: prev, act: show, target: sq05}
+      - {with: prev, act: show, target: "sq05#d"}
+      - {at: s1@t, act: hide, target: sq05}
+      - {with: prev, act: show, target: sq01}
+      - {with: prev, act: show, target: "sq01#d"}
+      - {at: s2@c, act: mark, target: "grow2#c"}
+      - {at: s3@r, act: unmark, target: "grow2#c"}
+      - {with: prev, act: show, target: ratio}
+
+  - id: NonExample
+    shows: non_example
+    say:
+      - {id: s1, pace: normal, text: "可要是 d x 不小，{@big}比如 d x 就等于 x 呢？", en: "But what if dx isn't small, say dx is as big as x?"}
+      - {id: s2, pace: normal, text: "{@c}角块和一条长条一样大，这时候它可就丢不得了。", en: "The corner is as big as a strip. Here you can't drop it at all."}
+    do:
+      - {at: s1@big, act: hide, target: sq01}
+      - {with: prev, act: show, target: sq4}
+      - {with: prev, act: show, target: "sq4#d"}
+      - {at: s2@c, act: mark, target: "grow2#c"}
+
+  - id: Landing
+    shows: landing
+    say:
+      - {id: s1, pace: slow, text: "{@back}d x 趋近于零，{@a}二 x 加 d x 就趋近于二 x。", en: "As dx goes to zero, two x plus dx tends to two x."}
+      - {id: s2, pace: slow, text: "{@law}所以 x 平方的导数是二 x。", en: "So the derivative of x squared is two x."}
+      - {id: s3, pace: normal, text: "{@k}代 x 等于一，正好就是上一集算出的斜率二。", en: "Put x equal to one and you get two, the slope we found last time."}
+      - {id: s4, pace: normal, text: "角块不是硬丢的，{@x}而是它比长条小得越来越快。", en: "The corner isn't thrown away: it just gets small much faster than the strips."}
+    do:
+      - {at: s1@back, act: unmark, target: "grow2#c"}
+      - {with: prev, act: hide, target: sq4}
+      - {after: prev, act: show, target: sq01}
+      - {with: prev, act: show, target: "sq01#d"}
+      - {at: s1@a, act: mark, target: "rate#a"}
+      - {at: s2@law, act: show, target: law}
+      - {at: s3@k, act: show, target: chk}
+      - {at: s4@x, act: cross, target: "myth#m"}
+
+  - id: Close
+    say:
+      - {id: s1, pace: normal, text: "台阶一级一级地加，正方形一圈一圈地长，看的都是多出来的那块。", en: "Staircases add step by step, squares grow ring by ring: either way, we look at the piece that's added."}
+      - {id: s2, pace: ask, text: "{@q}如果边长只能取整数，d x 最小是一，角块还能丢吗？", en: "Next: if the side can only be a whole number, so dx is at least one, can we still drop the corner?"}
+    do:
+      # 片尾画面：dx = 0.1 的正方形、底部 (x²)′ = 2x 和右侧一句下一集的问题，不留叠加层，#39 开场好还原
+      - {at: s1, act: unmark, target: "rate#a"}
+      - {with: prev, act: hide, target: qx}
+      - {with: prev, act: hide, target: myth}
+      - {with: prev, act: hide, target: grow}
+      - {with: prev, act: hide, target: grow2}
+      - {with: prev, act: hide, target: rate}
+      - {with: prev, act: hide, target: ratio}
+      - {at: s2@q, act: show, target: nq}
