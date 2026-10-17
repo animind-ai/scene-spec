@@ -91,7 +91,7 @@ beats:
   - id: Myth
     shows: misconception
     say:
-      - {id: s1, pace: normal, text: "很多人觉得，{@m}放大两倍，什么都跟着变两倍，面积也一样。", en: "Lots of people think that if you scale by two, everything doubles, the area too."}
+      - {id: s1, pace: normal, text: "很多人以为{@m}放大两倍，什么都跟着变两倍，面积也一样。", en: "Lots of people think that if you scale by two, everything doubles, the area too."}
     do:
       - {at: s1@m, act: show, target: myth}
 
