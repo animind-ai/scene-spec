@@ -24,6 +24,7 @@ class Exposed:
     spans: set[str] = field(default_factory=set)  # obj#span
     parts: dict[str, int] = field(default_factory=dict)  # obj.part[i]：部件名 → 长度
     items: int | None = None  # obj[i]：列表长度
+    state: dict = field(default_factory=dict)  # 组件自己的检查状态（例如 dissect 按动作顺序推演哪些块存在）
 
 
 ParamCheck = Callable[[object], str | None]  # 返回问题描述，没问题返回 None
@@ -796,6 +797,13 @@ REGISTRY["graph"] = Widget(
     actions={"draw": _graph_draw, "approach": _graph_approach},
     validate=_validate_graph,
 )
+
+
+# ---------- 剖分（dissect）：剪开、刚体移动、拼成另一个图形；几何和检查都在 dissect.py ----------
+
+from .dissect import register as _register_dissect  # noqa: E402
+
+_register_dissect(REGISTRY)
 
 
 def lookup(name: str) -> Widget | None:

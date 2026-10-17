@@ -453,6 +453,21 @@
       "allOf": [
         {
           "$ref": "#/$defs/layout"
+        },
+        {
+          "if": {
+            "properties": {
+              "widget": {
+                "pattern": "^dissect(@[0-9]+)?$"
+              }
+            },
+            "required": [
+              "widget"
+            ]
+          },
+          "then": {
+            "$ref": "#/$defs/dissectParams"
+          }
         }
       ],
       "properties": {
@@ -705,6 +720,326 @@
           "additionalProperties": {
             "$ref": "#/$defs/literal"
           }
+        }
+      }
+    },
+    "dissectPoint": {
+      "description": "图形坐标里的一个点 [x, y]（y 向上）",
+      "type": "array",
+      "items": {
+        "type": "number"
+      },
+      "minItems": 2,
+      "maxItems": 2
+    },
+    "dissectParams": {
+      "description": "剖分组件 dissect 的参数（设计稿 §6.6）。几何是否成立（切线是否切开、边是否存在）由语义检查 SS420–SS439 负责。",
+      "required": [
+        "shapes"
+      ],
+      "properties": {
+        "shapes": {
+          "type": "object",
+          "minProperties": 1,
+          "propertyNames": {
+            "$ref": "#/$defs/name"
+          },
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "polygon": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/dissectPoint"
+                },
+                "minItems": 3
+              },
+              "rect": {
+                "type": "array",
+                "items": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "minItems": 2,
+                "maxItems": 2
+              },
+              "circle": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "sector": {
+                "type": "object",
+                "required": [
+                  "r",
+                  "from",
+                  "to"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "r": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  },
+                  "from": {
+                    "type": "number"
+                  },
+                  "to": {
+                    "type": "number"
+                  }
+                }
+              },
+              "dots": {
+                "type": "object",
+                "additionalProperties": false,
+                "minProperties": 1,
+                "maxProperties": 1,
+                "properties": {
+                  "rows": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer",
+                      "minimum": 0
+                    }
+                  },
+                  "points": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/$defs/dissectPoint"
+                    }
+                  }
+                }
+              },
+              "at": {
+                "$ref": "#/$defs/dissectPoint"
+              },
+              "hidden": {
+                "type": "boolean"
+              },
+              "role": {
+                "$ref": "#/$defs/role"
+              },
+              "label": {
+                "type": "string",
+                "minLength": 1,
+                "description": "面积标签，写在块的重心处，始终正立"
+              },
+              "edges": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "at",
+                    "text"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "at": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/$defs/dissectPoint"
+                      },
+                      "minItems": 2,
+                      "maxItems": 2
+                    },
+                    "text": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  }
+                },
+                "description": "边长标签：at 是块原坐标里的一条边，标签放在边外侧"
+              }
+            }
+          }
+        },
+        "cuts": {
+          "type": "object",
+          "propertyNames": {
+            "$ref": "#/$defs/name"
+          },
+          "additionalProperties": {
+            "type": "object",
+            "required": [
+              "piece",
+              "into"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "piece": {
+                "$ref": "#/$defs/name"
+              },
+              "line": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/dissectPoint"
+                },
+                "minItems": 2,
+                "maxItems": 2
+              },
+              "path": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/dissectPoint"
+                },
+                "minItems": 2
+              },
+              "sectors": {
+                "type": "integer",
+                "minimum": 2,
+                "maximum": 360
+              },
+              "from": {
+                "type": "number"
+              },
+              "into": {
+                "oneOf": [
+                  {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/$defs/name"
+                    },
+                    "minItems": 2
+                  },
+                  {
+                    "$ref": "#/$defs/name"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "copies": {
+          "type": "object",
+          "propertyNames": {
+            "$ref": "#/$defs/name"
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/name"
+          }
+        },
+        "guides": {
+          "type": "object",
+          "propertyNames": {
+            "$ref": "#/$defs/name"
+          },
+          "additionalProperties": {
+            "type": "object",
+            "required": [
+              "from",
+              "to"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "from": {
+                "$ref": "#/$defs/dissectPoint"
+              },
+              "to": {
+                "$ref": "#/$defs/dissectPoint"
+              },
+              "label": {
+                "type": "string",
+                "minLength": 1
+              },
+              "role": {
+                "$ref": "#/$defs/role"
+              },
+              "solid": {
+                "type": "boolean"
+              },
+              "side": {
+                "enum": [
+                  "above",
+                  "below",
+                  "left",
+                  "right"
+                ]
+              }
+            }
+          }
+        },
+        "merges": {
+          "type": "object",
+          "propertyNames": {
+            "$ref": "#/$defs/name"
+          },
+          "additionalProperties": {
+            "type": "object",
+            "required": [
+              "pieces"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "pieces": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/name"
+                },
+                "minItems": 1
+              },
+              "label": {
+                "type": "string",
+                "minLength": 1
+              },
+              "role": {
+                "$ref": "#/$defs/role"
+              }
+            }
+          }
+        },
+        "pieces": {
+          "type": "object",
+          "propertyNames": {
+            "$ref": "#/$defs/name"
+          },
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "role": {
+                "$ref": "#/$defs/role"
+              },
+              "label": {
+                "type": "string",
+                "minLength": 1,
+                "description": "面积标签，写在块的重心处，始终正立"
+              },
+              "edges": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "at",
+                    "text"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "at": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/$defs/dissectPoint"
+                      },
+                      "minItems": 2,
+                      "maxItems": 2
+                    },
+                    "text": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  }
+                },
+                "description": "边长标签：at 是块原坐标里的一条边，标签放在边外侧"
+              }
+            }
+          }
+        },
+        "view": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/dissectPoint"
+          },
+          "minItems": 2,
+          "maxItems": 2
         }
       }
     }
