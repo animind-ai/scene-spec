@@ -1,0 +1,136 @@
+# 洞察系列 #38 高尔顿板与二项分布（高二）。单集，演示。按脚本 insight/ep38-galton-board/script.yaml（第 1 轮）写。
+# 一个洞察：每颗钉子左右各一半，每条路机会一样；落进哪格只看往右几次，通向中间的路最多（1 6 15 20 15 6 1），所以堆成钟形。
+# 组件 galton（rows 6、seed 3814，最多 128 个球）。钩子问为什么堆成钟形、停三秒、说出"每格一样"；第一个球的路 左右左左左右 → 第三格；
+# 前十个 [0,2,4,2,0,1,1] 看不出规律；预测暂停"会一样高吗"；128 个 [3,12,31,39,30,11,2]；数路：最左 1 条、中间 20 条，
+# 格子下写杨辉三角第六行，画期望台阶（128×20÷64 = 40）；非例：每格一样的水平线 ≈ 18；说明是演示；埋：抛十次正好五次正面怎么数路。
+spec: "0.1"
+
+meta:
+  id: ep38
+  title: 高尔顿板与二项分布
+  line: insight
+  units: [S12, S13]
+  episode: 38
+  grade: 高二
+  author: Boxi Yu
+  license: CC-BY-4.0
+
+pedagogy:
+  insight: 每颗钉子左右各一半，每条路机会一样；落进哪格只看往右拐几次，通向中间的路最多，所以球堆成钟形
+  misconception: 每个格子落球的机会一样，球该落得差不多平
+  non_example: 七格机会一样的话每格该有十八个左右，实际最边上只有三个和两个，中间有三十九个
+  status: demo
+  landing: Landing
+
+style:
+  theme: paper
+  canvas: "16:9"
+  voice:
+    persona: teacher-hs
+    speed: 1.0
+  segmented: true
+  step_hold: 1.0
+
+objects:
+  q:
+    type: text
+    text: '为什么堆成钟形？'
+    level: title
+    in: top
+  myth:
+    type: text
+    text: '[每格一样？]{#m}'
+    role: "NO"
+    level: title
+    right_of: q
+    gap: lg
+  board:
+    widget: galton
+    rows: 6
+    balls: 128
+    seed: 3814
+    in: stage
+  law:
+    type: text
+    text: '[$128\times 20\div 64$]{#l} [$=40$]{#r .HL}'
+    level: title
+    in: footer
+
+beats:
+  - id: Hook
+    pause: {type: predict, prompt: 小球左右乱弹，为什么会堆成钟的形状？先猜一猜。, hold: 3, app_item: ep38-before-1}
+    say:
+      - {id: s1, pace: ask, text: "{@q}小球左右乱弹，为什么会堆成钟的形状？", en: "Balls bounce left and right at random. Why do they pile into a bell shape?"}
+      - {id: s2, pace: normal, text: "先猜一猜，想三秒钟。", en: "Take a guess. Think for three seconds."}
+    do:
+      - {at: s1@q, act: show, target: q}
+      - {with: prev, act: show, target: board}
+
+  - id: Myth
+    shows: misconception
+    say:
+      - {id: s1, pace: normal, text: "很多人觉得，{@m}七个格子机会一样，球该落得差不多平。", en: "Lots of people think the seven slots are equally likely, so the balls should land about flat."}
+    do:
+      - {at: s1@m, act: show, target: myth}
+
+  - id: Setup
+    say:
+      - {id: s1, pace: normal, text: "我们一起看。{@d}球每碰到一颗钉子，就往左或往右，机会各一半。", en: "Let's look together. Each time a ball hits a peg, it goes left or right, half and half."}
+      - {id: s2, pace: normal, text: "一共六层钉子，{@p}落进哪一格，只看它往右拐了几次。", en: "There are six rows of pegs; the slot it lands in depends only on how many times it went right."}
+      - {id: s3, pace: normal, text: "这个球是左右左左左右，往右两次，落进左数第三格。", en: "This ball went left, right, left, left, left, right: two rights, so it lands in the third slot from the left."}
+    do:
+      - {at: s1@d, act: drop, target: board, args: {count: 1, expect: [0, 0, 1, 0, 0, 0, 0]}, dur: 2.4}
+      - {at: s2@p, act: path, target: board, args: {ball: 0}, dur: 1.6}
+
+  - id: Few
+    say:
+      - {id: s1, pace: normal, text: "{@c}再落九个，一共十个，{@l}各格高高低低，看不出规律。", en: "Drop nine more, ten in all: the slots are up and down, with no pattern yet."}
+    do:
+      - {at: s1@c, act: erase, target: board}
+      - {with: prev, act: drop, target: board, args: {count: 9, expect: [0, 2, 4, 2, 0, 1, 1]}, dur: 3.5}
+
+  - id: Predict
+    pause: {type: predict, prompt: 落一百多个球以后，七个格子会一样高吗？, hold: 3, app_item: ep38-why-1}
+    say:
+      - {id: s1, pace: ask, text: "落一百多个球以后，七个格子会一样高吗？", en: "After more than a hundred balls, will the seven slots be the same height?"}
+
+  - id: Many
+    say:
+      - {id: s1, pace: normal, text: "{@d}再落一百一十八个，一共一百二十八个。", en: "Drop a hundred and eighteen more: a hundred and twenty-eight in all."}
+      - {id: s2, pace: normal, text: "中间高、两边低，堆成了一座山。", en: "High in the middle, low at the sides: they've piled into a hill."}
+      - {id: s3, pace: normal, text: "最边上两格只有三个和两个，正中间有三十九个。", en: "The two outer slots have only three and two; the middle one has thirty-nine."}
+    do:
+      - {at: s1@d, act: drop, target: board, args: {count: 118, expect: [3, 12, 31, 39, 30, 11, 2]}, dur: 7.0}
+
+  - id: Count
+    say:
+      - {id: s1, pace: normal, text: "为什么？因为通向中间的路多。", en: "Why? Because there are more routes to the middle."}
+      - {id: s2, pace: normal, text: "落进最左边，六次都得往左，只有一条路。", en: "To land at the far left, all six turns must be left: just one route."}
+      - {id: s3, pace: normal, text: "落进正中间，三左三右，顺序随便排，有二十条路。", en: "To land in the middle: three lefts and three rights in any order, twenty routes."}
+      - {id: s4, pace: slow, text: "{@p}七个格子的路数是一、六、十五、二十、十五、六、一。", en: "The routes to the seven slots number one, six, fifteen, twenty, fifteen, six, one."}
+      - {id: s5, pace: normal, text: "一共六十四条，每条路的机会一样，路多的格子球就多。", en: "Sixty-four in all, each route equally likely, so slots with more routes get more balls."}
+      - {id: s6, pace: normal, text: "{@e}按路数算，中间一格该有四十个左右，实际三十九个。", en: "By the route count, the middle should get about forty; in fact it got thirty-nine."}
+    do:
+      - {at: s4@p, act: pascal, target: board}
+      - {at: s6@e, act: expect, target: board}
+      - {with: prev, act: show, target: law}
+
+  - id: NonExample
+    shows: non_example
+    say:
+      - {id: s1, pace: normal, text: "{@f}要是七格机会一样，每格该有十八个左右，{@x}两边远远不到。", en: "If the seven slots were equally likely, each would hold about eighteen. The sides are nowhere near."}
+    do:
+      - {at: s1@f, act: flat, target: board}
+      - {at: s1@x, act: cross, target: "myth#m"}
+
+  - id: Landing
+    shows: landing
+    say:
+      - {id: s1, pace: slow, text: "所以钟形是数出来的：{@m}通向中间的路最多。", en: "So the bell shape comes from counting: the most routes lead to the middle."}
+      - {id: s2, pace: normal, text: "这是演示，不是证明；这些路数就是二项分布的来历。", en: "This is a demonstration, not a proof; these route counts are where the binomial distribution comes from."}
+    do:
+      - {at: s1@m, act: mark, target: "law#r"}
+
+  - id: Close
+    say:
+      - {id: s1, pace: ask, text: "抛十次硬币正好五次正面，又该怎么数路呢？", en: "Ten coin flips with exactly five heads: how would you count the routes for that?"}
