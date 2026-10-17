@@ -1,0 +1,180 @@
+# 洞察系列 #33 乘以 i 就是转 90°（高一 / 高二）。单集，回访 #15。按脚本 insight/ep33-multiply-by-i/script.yaml（第 1 轮）写。
+# 一个洞察：乘 −1 是转半圈（#15）；如果有个数乘一次转 90°，乘两次就是转半圈 = 乘 −1，所以它的平方是 −1，这就是 i；
+# 它不在数轴上，数轴扩成复平面，乘 i 就是整个平面转 90°（组件 plane 的 rotate：不写 name 时整个网格一起转）。
+# 钩子问 i² 为什么是 −1、停三秒、说出"虚数不存在"；3×(−1) 转半圈；预测暂停"转四分之一圈是乘什么"；
+# 1 → 上方 → −1，推出平方是 −1；(3+i)×i = 3i+i² = −1+3i，和整个平面转 90° 的落点一致；
+# 非例：加 i 只是往上平移一格到 3+2i；落到 i×i = −1 = 转两次 90°；埋 #34（矩阵把平面变形）。
+spec: "0.1"
+
+meta:
+  id: ep33
+  title: 乘以 i 就是转 90°
+  line: insight
+  units: [S9]
+  episode: 33
+  grade: 高一/高二
+  author: Boxi Yu
+  license: CC-BY-4.0
+
+pedagogy:
+  insight: 如果乘法要能表示转九十度，那个数乘两次就是转半圈，也就是乘负一，所以它的平方必须是负一；乘 i 就是整个平面转九十度
+  misconception: 虚数是不存在的数，是硬编出来凑答案的
+  non_example: 乘 i 不是加 i：加 i 只是往上平移一格，箭头没有转
+  status: proof
+  landing: Landing
+
+style:
+  theme: paper
+  canvas: "16:9"
+  voice:
+    persona: teacher-hs
+    speed: 1.0
+  segmented: true
+  step_hold: 1.0
+
+objects:
+  q:
+    type: text
+    text: '$i^2=-1\ ?$'
+    level: title
+    in: top
+  myth:
+    type: text
+    text: '[不存在？]{#m}'
+    role: "NO"
+    level: title
+    right_of: q
+    gap: lg
+  plane:
+    widget: plane
+    x: [-4, 4]
+    y: [-1, 4]
+    complex: true
+    numbers: false
+    mesh: true
+    mesh_role: C
+    in: stage
+  f1:
+    type: text
+    text: '$3\times(-1)=-3$'
+    level: title
+    in: footer
+  law:
+    type: text
+    text: '[$i\times i=-1$]{#l}'
+    role: HL
+    level: title
+    in: footer
+  f2:
+    type: text
+    text: '[$(3+i)\times i$]{#l} [$=3i+i^2$]{#m} [$=-1+3i$]{#r .HL}'
+    level: title
+    in: footer
+
+beats:
+  - id: Hook
+    pause: {type: predict, prompt: 为什么 i 的平方等于负一？先猜一猜。, hold: 3, app_item: ep33-before-1}
+    say:
+      - {id: s1, pace: ask, text: "{@q}为什么 i 的平方等于负一？", en: "Why does i squared equal negative one?"}
+      - {id: s2, pace: normal, text: "先猜一猜，想三秒钟。", en: "Take a guess. Think for three seconds."}
+    do:
+      - {at: s1@q, act: show, target: q}
+      - {with: prev, act: show, target: plane}
+      - {with: prev, act: hide, target: plane.mesh, dur: 0.1}
+
+  - id: Myth
+    shows: misconception
+    say:
+      - {id: s1, pace: normal, text: "很多人说，{@m}虚数是不存在的数，是硬编出来的。", en: "Lots of people say imaginary numbers don't exist; someone just made them up."}
+    do:
+      - {at: s1@m, act: show, target: myth}
+
+  - id: Recall
+    say:
+      - {id: s1, pace: normal, text: "我们一起看。还记得负负得正吗？{@a}乘负一就是转半圈。", en: "Let's look together. Remember negative times negative? Times negative one is a half turn."}
+      - {id: s2, pace: normal, text: "三乘负一，{@t}就是让箭头绕零转半圈，{@r}从三转到负三。", en: "Three times negative one: the arrow turns half a turn around zero, from three to negative three."}
+    do:
+      - {at: s1@a, act: vector, target: plane, args: {name: r, v: [3, 0], label: '3'}}
+      - {at: s2@t, act: rotate, target: plane, args: {name: r, angle: 180, label: '\times(-1)'}, dur: 1.6}
+      - {at: s2@r, act: relabel, target: plane, args: {name: r, label: '-3'}}
+      - {with: prev, act: show, target: f1}
+
+  - id: Predict
+    pause: {type: predict, prompt: 转半圈是乘负一，转四分之一圈是乘什么？, hold: 3, app_item: ep33-why-1}
+    say:
+      - {id: s1, pace: ask, text: "转半圈是乘负一，那转四分之一圈，是乘什么？", en: "Half a turn is times negative one. What would a quarter turn be?"}
+
+  - id: Turn
+    say:
+      - {id: s1, pace: normal, text: "{@c}假设有一个数，{@a}乘它一次，箭头就转九十度。", en: "Suppose there is a number that turns things ninety degrees when you multiply by it."}
+      - {id: s2, pace: normal, text: "{@u}一乘它，箭头转到正上方；{@d}再乘它，就转到了负一。", en: "One times it: the arrow turns straight up. Times it again: it turns to negative one."}
+      - {id: s3, pace: normal, text: "{@h}乘它两次就是转了半圈，也就是乘了负一。", en: "Twice is a half turn, which is times negative one."}
+      - {id: s4, pace: slow, text: "所以这个数的平方必须是负一，{@i}我们叫它 i。", en: "So this number's square has to be negative one. We call it i."}
+      - {id: s5, pace: normal, text: "数轴上找不到它，它在零的正上方，{@p}数轴要扩成平面。", en: "It isn't on the number line: it sits straight above zero, so the line has to grow into a plane."}
+    do:
+      - {at: s1@c, act: remove, target: plane}
+      - {with: prev, act: hide, target: f1}
+      - {at: s1@a, act: vector, target: plane, args: {name: u, v: [1, 0], label: '1'}}
+      - {at: s2@u, act: rotate, target: plane, args: {name: u, angle: 90, label: '\times\,?'}, dur: 1.2}
+      - {at: s2@d, act: rotate, target: plane, args: {name: u, angle: 90, label: '\times\,?'}, dur: 1.2}
+      - {after: prev, act: relabel, target: plane, args: {name: u, label: '-1'}}
+      - {at: s3@h, act: mark, target: plane.items}
+      - {at: s4@i, act: unmark, target: plane.items}
+      - {with: prev, act: point, target: plane, args: {name: i, at: [0, 1], label: 'i', dir: u}}
+      - {with: prev, act: show, target: law}
+      - {at: s5@p, act: mark, target: plane.grid}
+
+  - id: Check
+    say:
+      - {id: s1, pace: normal, text: "{@c}我们来验证一下：{@z}三加 i 乘 i，按分配律展开算。", en: "Let's check: three plus i, times i, using the distributive law."}
+      - {id: s2, pace: normal, text: "{@m}结果是三 i 加 i 的平方，{@r}也就是负一加三 i。", en: "We get three i plus i squared, which is negative one plus three i."}
+      - {id: s3, pace: normal, text: "放到平面上看，{@t}乘 i 就是让整个平面绕着零转九十度。", en: "On the plane, times i turns the whole plane by ninety degrees around zero."}
+      - {id: s4, pace: normal, text: "{@l}三加 i 正好转到负一加三 i，{@e}算的和转的一样。", en: "Three plus i lands exactly on negative one plus three i: the algebra and the turn agree."}
+    do:
+      - {at: s1@c, act: unmark, target: plane.grid}
+      - {with: prev, act: remove, target: plane}
+      - {with: prev, act: hide, target: law}
+      - {at: s1@z, act: vector, target: plane, args: {name: z, v: [3, 1], label: '3+i'}}
+      - {at: s2@m, act: show, target: f2}
+      - {at: s2@r, act: mark, target: "f2#r"}
+      - {at: s3@t, act: unmark, target: "f2#r"}
+      - {with: prev, act: show, target: plane.mesh}
+      - {after: prev, act: rotate, target: plane, args: {angle: 90}, dur: 2.0}
+      - {at: s4@l, act: relabel, target: plane, args: {name: z, label: '-1+3i'}}
+      - {with: prev, act: point, target: plane, args: {name: e, at: [-1, 3]}}
+      - {at: s4@e, act: mark, target: "f2#r"}
+
+  - id: NonExample
+    shows: non_example
+    say:
+      - {id: s1, pace: normal, text: "{@c}注意，乘 i 可不是加 i，这两件事很容易混。", en: "Careful: times i is not plus i. These two are easy to mix up."}
+      - {id: s2, pace: normal, text: "三加 i 再加 i，{@u}只是往上挪一格，{@s}到三加二 i，没有转。", en: "Three plus i, plus i, just moves up one square to three plus two i. No turn."}
+    do:
+      - {at: s1@c, act: hide, target: plane.mesh}
+      - {with: prev, act: remove, target: plane}
+      - {with: prev, act: hide, target: f2}
+      - {after: prev, act: vector, target: plane, args: {name: z0, v: [3, 1], label: '3+i', side: r}}
+      - {at: s2@u, act: vector, target: plane, args: {name: up, v: [0, 1], at: [3, 1], role: C, label: '+i', side: r}}
+      - {at: s2@s, act: vector, target: plane, args: {name: z2, v: [3, 2], role: "NO", label: '3+2i'}}
+
+  - id: Landing
+    shows: landing
+    say:
+      - {id: s1, pace: slow, text: "{@c}所以 i 乘 i 等于负一：{@a}转两次九十度，{@b}就是转半圈。", en: "So i times i is negative one: two ninety-degree turns make a half turn."}
+      - {id: s2, pace: normal, text: "负负得正是转两次半圈，正好转回原来的方向。", en: "Negative times negative is two half turns, back to where it started."}
+    do:
+      - {at: s1@c, act: remove, target: plane}
+      - {with: prev, act: show, target: law}
+      - {after: prev, act: vector, target: plane, args: {name: v, v: [2, 0], label: '1'}}
+      - {at: s1@a, act: rotate, target: plane, args: {name: v, angle: 90, label: '\times i'}, dur: 1.2}
+      - {after: prev, act: relabel, target: plane, args: {name: v, label: 'i'}}
+      - {at: s1@b, act: rotate, target: plane, args: {name: v, angle: 90, label: '\times i'}, dur: 1.2}
+      - {after: prev, act: relabel, target: plane, args: {name: v, label: '-1'}}
+      - {with: prev, act: mark, target: "law#l"}
+
+  - id: Close
+    say:
+      - {id: s1, pace: normal, text: "{@x}虚数不是硬编出来的，它是让乘法能够转弯的那个数。", en: "Imaginary numbers aren't made up. They are the numbers that let multiplication turn."}
+      - {id: s2, pace: ask, text: "能不能把整个平面拉一拉、扭一扭，也写成乘法？", en: "Could stretching and twisting the whole plane be written as a multiplication too?"}
+    do:
+      - {at: s1@x, act: cross, target: "myth#m"}

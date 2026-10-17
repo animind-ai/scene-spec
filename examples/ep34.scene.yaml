@@ -1,0 +1,198 @@
+# 洞察系列 #34 矩阵是把整个平面变形（高二拓展）。单集，回访 #2。按脚本 insight/ep34-matrix-transform/script.yaml（第 1 轮）写。
+# 一个洞察：2×2 矩阵把整个平面一起变形（组件 plane 的 warp：彩色网格、箭头、单位方格一起变），两列写着两支基本箭头的去处；
+# 每个点都是这两支拼出来的，所以它们的去处决定一切；单位方格的面积倍数就是行列式。
+# 钩子问矩阵对平面做了什么、停三秒、说出"只是一张数表，先后无所谓"；M=(2 1; 0 1)：e₁→(2,0)、e₂→(1,1)；
+# 预测暂停：(1,2) 去哪 → 1·(2,0)+2·(1,1)=(4,2)；面积 2 = det M；
+# 非例（回访 #2 的交换律）：先转 90° 再横拉 2 倍，e₁ 到 (0,1)；先拉再转，到 (0,2)。埋：行列式为 0 时平面压成一条线。
+spec: "0.1"
+
+meta:
+  id: ep34
+  title: 矩阵是把整个平面变形
+  line: insight
+  units: [S8, S9]
+  episode: 34
+  grade: 高二拓展
+  author: Boxi Yu
+  license: CC-BY-4.0
+
+pedagogy:
+  insight: 二乘二的矩阵把整个平面一起变形，两列写着两支基本箭头的去处；每个点都是这两支拼出来的，所以它们的去处决定一切，面积倍数就是行列式
+  misconception: 矩阵只是四个数排成的表，乘起来和数一样，先后顺序无所谓
+  non_example: 先转九十度再横着拉两倍，向右那支到了零、一；先拉再转，它到了零、二
+  status: proof
+  landing: Landing
+
+style:
+  theme: paper
+  canvas: "16:9"
+  voice:
+    persona: teacher-hs
+    speed: 1.0
+  segmented: true
+  step_hold: 1.0
+
+objects:
+  q:
+    type: text
+    text: '$\begin{pmatrix}2&1\\0&1\end{pmatrix}\ ?$'
+    level: title
+    in: top
+  myth:
+    type: text
+    text: '[只是一张数表？]{#m}'
+    role: "NO"
+    level: title
+    right_of: q
+    gap: lg
+  plane:
+    widget: plane
+    x: [-2, 5]
+    y: [-1, 3]
+    numbers: false
+    mesh: true
+    mesh_role: B
+    in: stage
+  mat:
+    type: text
+    text: '[$M=$]{#n} [$\begin{pmatrix}2&1\\0&1\end{pmatrix}$]{#m}'
+    level: title
+    in: footer
+  calc:
+    type: text
+    text: '[$1\cdot(2,0)+2\cdot(1,1)$]{#l} [$=(4,2)$]{#r .HL}'
+    level: title
+    in: footer
+  det:
+    type: text
+    text: '[$\det M=2\times 1-1\times 0$]{#l} [$=2$]{#r .HL}'
+    level: title
+    in: footer
+  oa:
+    type: text
+    text: '先转再拉：$(0,1)$'
+    level: title
+    in: footer
+  ob:
+    type: text
+    text: '先拉再转：$(0,2)$'
+    role: "NO"
+    level: title
+    right_of: oa
+    gap: lg
+
+beats:
+  - id: Hook
+    pause: {type: predict, prompt: 一个二乘二的矩阵，到底对平面做了什么？先猜一猜。, hold: 3, app_item: ep34-before-1}
+    say:
+      - {id: s1, pace: ask, text: "{@q}一个二乘二的矩阵，到底对平面做了什么？", en: "What does a two-by-two matrix actually do to the plane?"}
+      - {id: s2, pace: normal, text: "先猜一猜，想三秒钟。", en: "Take a guess. Think for three seconds."}
+    do:
+      - {at: s1@q, act: show, target: q}
+      - {with: prev, act: show, target: plane}
+
+  - id: Myth
+    shows: misconception
+    say:
+      - {id: s1, pace: normal, text: "很多人以为{@m}它只是一张数表，乘的时候先后也无所谓。", en: "Lots of people think it's just a table of numbers, and the order you multiply doesn't matter."}
+    do:
+      - {at: s1@m, act: show, target: myth}
+
+  - id: Setup
+    say:
+      - {id: s1, pace: normal, text: "我们一起看。平面上有两支基本箭头：{@r}向右一格，{@u}向上一格。", en: "Let's look together. The plane has two basic arrows: one square right, one square up."}
+      - {id: s2, pace: normal, text: "{@c}矩阵的第一列，说向右那支要去哪：{@p}二、零。", en: "The matrix's first column says where the right arrow goes: two, zero."}
+      - {id: s3, pace: normal, text: "第二列，说向上那支要去的地方：{@p}一、一。", en: "The second column says where the up arrow goes: one, one."}
+    do:
+      - {at: s1@r, act: vector, target: plane, args: {name: e1, v: [1, 0], label: '\vec e_1', side: r}}
+      - {at: s1@u, act: vector, target: plane, args: {name: e2, v: [0, 1], role: C, label: '\vec e_2'}}
+      - {after: prev, act: shape, target: plane, args: {name: sq, points: [[0, 0], [1, 0], [1, 1], [0, 1]], role: HL}}
+      - {at: s2@c, act: show, target: mat}
+      - {at: s2@p, act: point, target: plane, args: {name: t1, at: [2, 0], label: '(2,0)', role: A, dir: dr, fixed: true}}
+      - {at: s3@p, act: point, target: plane, args: {name: t2, at: [1, 1], label: '(1,1)', role: C, dir: ur, fixed: true}}
+
+  - id: Warp
+    say:
+      - {id: s1, pace: normal, text: "两支箭头一动，{@w}整张网格就跟着变形。", en: "Move the two arrows, and the whole grid moves with them."}
+      - {id: s2, pace: normal, text: "{@g}格子线还是直的、平行的、等距的，方格变成了平行四边形。", en: "The grid lines stay straight, parallel and evenly spaced; the squares become parallelograms."}
+    do:
+      - {at: s1@w, act: warp, target: plane, args: {matrix: [[2, 1], [0, 1]]}, dur: 2.0}
+      - {after: prev, act: remove, target: plane, args: {name: [t1, t2]}}
+      - {at: s2@g, act: mark, target: plane.mesh}
+
+  - id: Predict
+    pause: {type: predict, prompt: 原来在一、二的点，现在跑到哪里去了？, hold: 3, app_item: ep34-why-1}
+    say:
+      - {id: s1, pace: ask, text: "{@p}那原来在一、二的点，现在跑到哪里去了？", en: "So the point that used to be at one, two: where has it gone?"}
+    do:
+      - {at: s1, act: unmark, target: plane.mesh}
+      - {at: s1@p, act: point, target: plane, args: {name: o, at: [1, 2], label: '(1,2)', role: DIM, dir: ul, fixed: true}}
+
+  - id: Answer
+    say:
+      - {id: s1, pace: normal, text: "一、二就是走一次向右，再走两次向上。", en: "One, two means one step right and two steps up."}
+      - {id: s2, pace: normal, text: "现在{@r}向右变成二、零，{@u}向上变成一、一。", en: "Now right has become two, zero and up has become one, one."}
+      - {id: s3, pace: normal, text: "{@a}一个二、零，加两个一、一，{@e}就是四、二。", en: "One two-zero plus two one-ones is four, two."}
+      - {id: s4, pace: slow, text: "只要知道两支基本箭头去了哪，{@k}整个平面去哪就定了。", en: "Once you know where the two basic arrows go, the whole plane is decided."}
+    do:
+      - {at: s2@r, act: vector, target: plane, args: {name: w1, v: [2, 0], dashed: true}}
+      - {at: s2@u, act: vector, target: plane, args: {name: w2, v: [1, 1], at: [2, 0], role: C, dashed: true}}
+      - {at: s3@a, act: vector, target: plane, args: {name: w3, v: [1, 1], at: [3, 1], role: C, dashed: true}}
+      - {at: s3@e, act: point, target: plane, args: {name: p, at: [4, 2], label: '(4,2)', dir: r, fixed: true}}
+      - {with: prev, act: hide, target: mat}
+      - {with: prev, act: show, target: calc}
+      - {at: s4@k, act: mark, target: "calc#r"}
+
+  - id: Area
+    say:
+      - {id: s1, pace: normal, text: "{@c}原来的单位方格，变成了底二、高一的平行四边形。", en: "The old unit square has become a parallelogram with base two and height one."}
+      - {id: s2, pace: normal, text: "{@a}面积从一变成二，这个倍数就是行列式。", en: "Its area went from one to two, and that factor is the determinant."}
+    do:
+      - {at: s1@c, act: remove, target: plane, args: {name: [w1, w2, w3, o, p]}}
+      - {with: prev, act: hide, target: calc}
+      - {after: prev, act: mark, target: plane.items}
+      - {at: s2@a, act: unmark, target: plane.items}
+      - {with: prev, act: show, target: det}
+
+  - id: NonExample
+    shows: non_example
+    say:
+      - {id: s1, pace: normal, text: "{@c}还记得三乘四等于四乘三吗？把点阵一转就看出来了。", en: "Remember three times four equals four times three? Turn the dot array and you see it."}
+      - {id: s2, pace: normal, text: "矩阵可不一样。{@t}先转九十度，{@s}再横着拉两倍，{@a}它到了零、一。", en: "Matrices are different. Turn ninety degrees, then stretch sideways by two: it lands at zero, one."}
+      - {id: s3, pace: normal, text: "{@s}换个顺序，先横着拉两倍，{@t}再转九十度，{@b}它却到了零、二。", en: "Swap the order: stretch sideways by two first, then turn ninety degrees, and it lands at zero, two."}
+      - {id: s4, pace: normal, text: "顺序一换，结果就变了。", en: "Change the order and the result changes."}
+    do:
+      - {at: s1@c, act: hide, target: det}
+      - {with: prev, act: remove, target: plane, args: {name: [e2, sq]}}
+      - {after: prev, act: reset, target: plane, dur: 1.4}
+      - {at: s2@t, act: warp, target: plane, args: {matrix: [[0, -1], [1, 0]]}, dur: 1.4}
+      - {at: s2@s, act: warp, target: plane, args: {matrix: [[2, 0], [0, 1]]}, dur: 1.2}
+      - {at: s2@a, act: point, target: plane, args: {name: ra, at: [0, 1], label: '(0,1)', role: A, dir: l, fixed: true}}
+      - {with: prev, act: show, target: oa}
+      - {after: prev, act: reset, target: plane, dur: 1.0}
+      - {at: s3@s, act: warp, target: plane, args: {matrix: [[2, 0], [0, 1]]}, dur: 1.0}
+      - {at: s3@t, act: warp, target: plane, args: {matrix: [[0, -1], [1, 0]]}, dur: 1.2}
+      - {at: s3@b, act: point, target: plane, args: {name: rb, at: [0, 2], label: '(0,2)', role: "NO", dir: l, fixed: true}}
+      - {with: prev, act: show, target: ob}
+
+  - id: Landing
+    shows: landing
+    say:
+      - {id: s1, pace: slow, text: "{@c}所以矩阵就是把整个平面变形，{@w}两列写着两支基本箭头的去处。", en: "So a matrix deforms the whole plane, and its two columns record where the two basic arrows go."}
+    do:
+      - {at: s1@c, act: hide, target: oa}
+      - {with: prev, act: hide, target: ob}
+      - {with: prev, act: remove, target: plane}
+      - {after: prev, act: reset, target: plane, dur: 1.0}
+      - {with: prev, act: show, target: mat}
+      - {after: prev, act: vector, target: plane, args: {name: f1, v: [1, 0], label: '\vec e_1', side: r}}
+      - {with: prev, act: vector, target: plane, args: {name: f2, v: [0, 1], role: C, label: '\vec e_2'}}
+      - {with: prev, act: shape, target: plane, args: {name: fs, points: [[0, 0], [1, 0], [1, 1], [0, 1]], role: HL}}
+      - {at: s1@w, act: warp, target: plane, args: {matrix: [[2, 1], [0, 1]]}, dur: 1.8}
+
+  - id: Close
+    say:
+      - {id: s1, pace: normal, text: "{@x}它不只是一张数表，先做哪个变形，也很要紧。", en: "It isn't just a table of numbers, and which change you make first really matters."}
+      - {id: s2, pace: ask, text: "如果行列式是零，整个平面会被压成什么样？", en: "If the determinant is zero, what does the whole plane get squashed into?"}
+    do:
+      - {at: s1@x, act: cross, target: "myth#m"}
