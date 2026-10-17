@@ -85,6 +85,12 @@ objects:
     role: "NO"
     below: ag
     gap: sm
+  nq:
+    type: text
+    text: '曲线每一点涨得多快？'
+    role: HL
+    level: title
+    in: side
   law:
     type: text
     text: '[$S=$]{#s} [$n(a_1+a_n)$]{#nw .HL} [$\div 2$]{#h}'
@@ -256,5 +262,13 @@ beats:
   - id: Close
     say:
       - {id: s1, pace: normal, text: "这种一级一级的台阶，讲差分的时候还会再见到。", en: "We'll meet this staircase again when we get to finite differences."}
-      - {id: s2, pace: ask, text: "一条曲线在每一点涨得有多快，又该怎么看出来？", en: "Next: how can we see how fast a curve is rising at each point?"}
-    do: []
+      - {id: s2, pace: ask, text: "{@q}一条曲线在每一点涨得有多快，又该怎么看出来？", en: "Next: how can we see how fast a curve is rising at each point?"}
+    do:
+      # 片尾画面：长方形、底部公式和右侧一句下一集的问题，不留叠加层（划线、叉），#30 开场好还原
+      - {at: s1, act: clear, target: law}
+      - {with: prev, act: hide, target: q1}
+      - {with: prev, act: hide, target: q3}
+      - {with: prev, act: hide, target: myth}
+      - {with: prev, act: hide, target: a35}
+      - {with: prev, act: hide, target: b35}
+      - {at: s2@q, act: show, target: nq}
