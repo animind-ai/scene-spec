@@ -3,7 +3,8 @@
 检查内容（设计稿 §8）：
 - 引用的对象、片段、子元素、句子、书签都存在；
 - 动作是内置动作或目标组件提供的动作，参数齐全；
-- 不出现色值，不出现表达式；
+- 不出现色值，不出现 ${...} 表达式（参数表达式只能写在指定的属性里，见 params.py）；
+- 场景参数、tween 动作、readout 对象（SS400–SS419，见 params.py）；
 - 产品线要求的洞察卡片字段齐全，并且被 beat 的 shows 标注引用；
 - 绝对坐标：insight 线报错，其余警告并计数。
 """
@@ -12,15 +13,17 @@ from __future__ import annotations
 
 import re
 
+from . import params as P
 from . import selectors, widgets
 from .report import Report
 from .textmarks import parse_object_text, parse_say_text
 
 BUILTIN_ACTS = {
     "show", "hide", "transform", "move", "focus", "unfocus", "mark", "unmark",
-    "underline", "circle", "cross", "clear", "set", "camera", "hold",
+    "underline", "circle", "cross", "clear", "set", "camera", "hold", "tween",
 }
-NEEDS_TARGET = BUILTIN_ACTS - {"transform", "camera", "hold"}
+NEEDS_TARGET = BUILTIN_ACTS - {"transform", "camera", "hold", "tween"}
+READOUT_KEYS = ("value", "label", "digits", "format")
 KNOWN_THEMES = {"paper", "chalk", "jade", "xuan", "blueprint", "riso"}
 LAYOUT_REFS = ("below", "above", "left_of", "right_of", "within", "over")
 DEMO_WORDS = ("演示", "不是证明", "不算证明", "并非证明")
@@ -47,6 +50,7 @@ class _Checker:
         self.beats: list[dict] = doc["beats"]
         self.exposed: dict[str, widgets.Exposed] = {}
         self.referenced: set[str] = set()
+        self.ex = P.ExprChecker(doc, report)
         self.stats = {
             "beats": len(self.beats),
             "sentences": 0,
@@ -87,7 +91,13 @@ class _Checker:
     def check_basic(self, obj_id: str, definition: dict, path: str) -> None:
         exposed = widgets.Exposed()
         kind = definition["type"]
-        if kind == "text":
+        if kind != "readout":
+            for key in READOUT_KEYS:
+                if key in definition:
+                    self.r.error("SS410", f"{path}.{key}", f"{key} 只用于 type: readout")
+        if kind == "readout":
+            P.check_readout(obj_id, definition, path, self.ex, self.r)
+        elif kind == "text":
             if "text" not in definition:
                 self.r.error("SS204", path, "text 对象需要 text")
             else:
@@ -127,7 +137,7 @@ class _Checker:
         exposed = widget.expose(definition, self.data)
         self.exposed[obj_id] = exposed
         if widget.validate:
-            widget.validate(widgets.WidgetContext(obj_id, definition, self.data, exposed), self.r, path)
+            widget.validate(widgets.WidgetContext(obj_id, definition, self.data, exposed, self.ex), self.r, path)
 
     def check_layout(self, obj_id: str, definition: dict, path: str) -> None:
         for key in LAYOUT_REFS:
@@ -259,6 +269,11 @@ class _Checker:
             if key in action:
                 self.resolve(action[key], f"{path}.{key}")
 
+        if "ease" in action and act != "tween":
+            self.r.error("SS408", f"{path}.ease", "ease 只用于 tween（补间参数时的缓动）")
+        if act == "tween":
+            P.check_tween(action, path, self.doc, self.r)
+            return
         if act in BUILTIN_ACTS:
             if act in NEEDS_TARGET and "target" not in action:
                 self.r.error("SS331", path, f"{act} 需要 target")
@@ -295,7 +310,7 @@ class _Checker:
         if target.span or target.part or target.index:
             self.r.error("SS333", f"{path}.target", f"组件动作 {act} 的 target 应指向整个组件 {target.obj}")
             return
-        ctx = widgets.WidgetContext(target.obj, definition, self.data, self.exposed[target.obj])
+        ctx = widgets.WidgetContext(target.obj, definition, self.data, self.exposed[target.obj], self.ex)
         widget.actions[act](action.get("args", {}), ctx, self.r, path)
 
     def check_camera(self, action: dict, target: selectors.Selector | None, path: str) -> None:
@@ -384,11 +399,13 @@ class _Checker:
             self.r.warning("SS371", "style.theme", f"主题 {theme!r} 不在 palette 的公开主题里（{'、'.join(sorted(KNOWN_THEMES))}）")
         if self.line == "worked" and not self.meta.get("sources"):
             self.r.warning("SS372", "meta.sources", "例题讲解通常引用了题目，请在 meta.sources 写明来源")
+        P.check_unused(self.ex, self.doc, self.r)
         for obj_id in self.objects:
             if obj_id not in self.referenced:
                 self.r.warning("SS381", f"objects.{obj_id}", "这个对象没有被任何动作或布局引用，也没有钉住")
 
     def run(self) -> None:
+        P.check_declarations(self.doc, self.r)
         self.scan_literals(self.doc, "")
         self.check_objects()
         self.check_beats()

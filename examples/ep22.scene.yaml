@@ -1,0 +1,226 @@
+# 洞察系列 #22 斜率：一次函数的"坡度"。
+# 钩子说出两种迷思（k 是直线和 x 轴的交点；k 是直线的长度）；在直线上放一个斜率三角形：横走一格、竖走 k 格，
+# 沿直线滑动它，竖走的格数不变；中段预测暂停；连续把 k 调大、调成负数、调成零，直线和三角形联动；
+# 非例：k 不变只改 b，交点跟着动，三角形一点没变，所以 k 不是交点；
+# 最后横走的格数也变一变，竖走 ÷ 横走总是 k，落到 k = Δy / Δx（斜率就是比，呼应 #10）。
+# 画面只用 graph 组件 + 场景参数（params / tween）+ 读数（readout）。
+spec: "0.1"
+
+meta:
+  id: ep22
+  title: 斜率：一次函数的"坡度"
+  line: insight
+  units: [J7, H4]
+  episode: 22
+  grade: 八年级
+  author: Boxi Yu
+  license: CC-BY-4.0
+
+pedagogy:
+  insight: y=kx+b 里的 k 是一个比：沿直线横走 1 格，竖走 k 格；把这个直角三角形沿直线滑到哪儿、放大多少倍，竖走 ÷ 横走 都是 k，所以 k 管的是直线有多陡、往哪边斜
+  misconception: k 是直线和 x 轴的交点；k 是直线的长度
+  non_example: k 保持 2 不变只改 b，直线上下平移，和 x 轴的交点一直在变，但斜率三角形一点没变（横走 1 格仍竖走 2 格）：交点由 b 和 k 一起决定，不是 k；直线画多长只看画面截了多大，和 k 无关
+  status: demo
+  landing: Landing
+
+style:
+  theme: paper
+  canvas: "16:9"
+  voice:
+    persona: peer-ms
+    speed: 1.0
+  segmented: false
+  subtitles: soft
+
+params:
+  k: {value: 0.5, min: -3, max: 3}   # 斜率
+  b: 1                                # 截距
+  t: 0                                # 斜率三角形起点的横坐标
+  r: {value: 1, min: 0.25, max: 3}   # 横走几格
+
+objects:
+  g:
+    widget: graph
+    x: [-4.0, 5.0]
+    y: [-3.0, 5.0]
+    plots:
+      - {f: "kx+b", label: "y=kx+b"}
+    points:
+      - {x: "t", role: C}
+    triangles:
+      - {point: 0, run: "r", role: C}
+    in: stage
+  kval:
+    type: readout
+    label: "斜率 $k$ ="
+    value: k
+    digits: 1
+    role: B
+    level: title
+    in: side
+  wrong_x:
+    type: text
+    text: k = 和 x 轴的交点？
+    role: NO
+    below: kval
+    gap: lg
+  wrong_len:
+    type: text
+    text: k = 直线的长度？
+    role: NO
+    below: wrong_x
+    gap: md
+  ask:
+    type: text
+    text: k 调到 2 会怎样？
+    role: HL
+    below: kval
+    gap: lg
+  bval:
+    type: readout
+    label: "截距 $b$ ="
+    value: b
+    digits: 1
+    below: kval
+    gap: lg
+  xint:
+    type: readout
+    label: "和 $x$ 轴交于 $x$ ="
+    value: "-b/k"
+    digits: 2
+    role: NO
+    below: bval
+    gap: md
+  wrong_x2:
+    type: text
+    text: k = 交点？
+    role: NO
+    below: xint
+    gap: lg
+  ratio:
+    type: readout
+    label: 竖走 ÷ 横走 =
+    value: "(k*r)/r"
+    digits: 2
+    role: HL
+    below: kval
+    gap: lg
+  law:
+    type: text
+    text: '斜率 $k$ = 竖走 ÷ 横走 = $\dfrac{\Delta y}{\Delta x}$'
+    role: HL
+    in: footer
+  practice:
+    widget: think_box
+    lines: ["[练一练]{.HL}", "横走 2 格，竖走 3 格", "斜率 $k$ = ？"]
+    below: kval
+    gap: xl
+
+beats:
+  - id: Hook
+    shows: misconception
+    say:
+      - {id: s1, pace: normal, text: "{@line}这是一次函数 y 等于 k x 加 b 的图像，{@k}现在 k 是零点五。"}
+      - {id: s2, pace: ask, text: "k 到底是什么？有人说，{@w1}k 是直线和 x 轴的交点；{@w2}也有人说，k 是直线的长度。"}
+      - {id: s3, pace: normal, text: "{@look}先别急着下结论，看看 k 在图上管的是什么。"}
+    do:
+      - {at: s1, act: show, target: g.axes}
+      - {at: s1@line, act: draw, target: g, args: {plot: 0}}
+      - {with: prev, act: show, target: g.plot_label}
+      - {at: s1@k, act: show, target: kval}
+      - {at: s2@w1, act: show, target: wrong_x}
+      - {at: s2@w2, act: show, target: wrong_len}
+
+  - id: Slide
+    say:
+      - {id: s1, pace: normal, text: "{@p}在直线上取一点，{@run}从这里向右横走一格，再竖着走回到直线上。"}
+      - {id: s2, pace: normal, text: "{@up}竖着走了零点五格，正好是 k。"}
+      - {id: s3, pace: normal, text: "{@go}把这个小三角形沿着直线滑动：{@back}滑到左边，滑到右边，"}
+      - {id: s4, pace: slow, text: "{@still}不管滑到哪儿，横走一格，竖走的总是零点五格。"}
+    do:
+      - {at: s1, act: hide, target: wrong_x}
+      - {with: prev, act: hide, target: wrong_len}
+      - {at: s1@p, act: show, target: "g.point[0]"}
+      - {at: s1@run, act: show, target: "g.triangle[0]"}
+      - {at: s2@up, act: mark, target: kval}
+      - {at: s3@go, act: tween, args: {t: -3}, dur: fit}
+      - {at: s3@back, act: tween, args: {t: 3}, dur: fit}
+      - {at: s4@still, act: unmark, target: kval}
+      - {after: prev, act: tween, args: {t: 0}, dur: 1.5}
+
+  - id: Predict
+    pause: {type: predict, prompt: 把 k 从 0.5 调到 2，直线会怎么转？小三角形会变成什么样？, hold: 2}
+    say:
+      - {id: s1, pace: ask, text: "{@ask}如果把 k 从零点五调到二，直线会怎么转？"}
+      - {id: s2, pace: ask, text: "小三角形会变成什么样？先想三秒。"}
+    do:
+      - {at: s1@ask, act: show, target: ask}
+
+  - id: Steep
+    say:
+      - {id: s1, pace: normal, text: "{@go}看：k 变大，直线变陡，竖着走的那条边跟着变长。"}
+      - {id: s2, pace: normal, text: "{@two}k 等于二：横走一格，竖走两格。"}
+      - {id: s3, pace: normal, text: "{@neg}k 变成负一：横走一格，竖着往下走一格，直线向下倾斜。"}
+      - {id: s4, pace: normal, text: "{@flat}k 等于零：竖着不用走，直线是水平的。"}
+      - {id: s5, pace: slow, text: "{@sum}所以 k 说的是：横走一格，竖着走几格。它管的是直线有多陡、往哪边斜。"}
+    do:
+      - {at: s1, act: hide, target: ask}
+      - {at: s1@go, act: tween, args: {k: 2}, dur: fit, ease: in_out}
+      - {at: s2@two, act: focus, target: "g.triangle[0]"}
+      - {at: s3@neg, act: unfocus, target: g}
+      - {with: prev, act: tween, args: {k: -1}, dur: 2.5}
+      - {at: s4@flat, act: tween, args: {k: 0}, dur: 2.0}
+      - {at: s5@sum, act: tween, args: {k: 2}, dur: 2.5}
+
+  - id: NonExample
+    shows: non_example
+    say:
+      - {id: s1, pace: ask, text: "{@w}那 k 是不是直线和 x 轴的交点呢？"}
+      - {id: s2, pace: normal, text: "{@b}k 保持二不变，只改 b。{@move}直线上下平移，和 x 轴的交点一直在变，"}
+      - {id: s3, pace: normal, text: "{@same}可小三角形一点没变：横走一格，竖走还是两格，k 还是二。"}
+      - {id: s4, pace: normal, text: "{@x}交点变了，k 没变，所以 k 不是交点。"}
+      - {id: s5, pace: normal, text: "{@len}直线画多长，只看画面截了多大，和 k 也没有关系。"}
+    do:
+      - {at: s1@w, act: show, target: wrong_x2}
+      - {at: s2@b, act: show, target: bval}
+      - {with: prev, act: show, target: xint}
+      - {at: s2@move, act: tween, args: {b: -2}, dur: 3.0}
+      - {at: s3@same, act: focus, target: "g.triangle[0]"}
+      - {at: s4@x, act: unfocus, target: g}
+      - {with: prev, act: cross, target: wrong_x2}
+      - {at: s5@len, act: tween, args: {b: 1}, dur: 2.0}
+
+  - id: Landing
+    shows: landing
+    say:
+      - {id: s1, pace: normal, text: "{@k}再把 k 调成一点五。{@r2}横着也不一定只走一格：走两格，竖走三格；"}
+      - {id: s2, pace: normal, text: "{@r3}走半格，竖走零点七五格。{@ratio}竖走除以横走，总是一点五。"}
+      - {id: s3, pace: slow, text: "{@law}所以 k 就是竖走的距离除以横走的距离，这个比，叫做斜率。"}
+      - {id: s4, pace: normal, text: "{@demo}这是演示，不是证明：直线处处一样斜，所以这个比在哪儿量都一样。"}
+    do:
+      - {at: s1, act: hide, target: bval}
+      - {with: prev, act: hide, target: xint}
+      - {with: prev, act: hide, target: wrong_x2}
+      - {at: s1@k, act: tween, args: {k: 1.5}, dur: 1.5}
+      - {at: s1@r2, act: tween, args: {r: 2}, dur: fit}
+      - {at: s2@r3, act: tween, args: {r: 0.5}, dur: fit}
+      - {at: s2@ratio, act: show, target: ratio}
+      - {after: prev, act: mark, target: ratio}
+      - {at: s3@law, act: show, target: law}
+      - {at: s4@demo, act: tween, args: {r: 1}, dur: 2.0}
+      - {with: prev, act: tween, args: {t: 1}, dur: 2.0}
+
+  - id: Close
+    say:
+      - {id: s1, pace: normal, text: "回到开头：{@w}k 不是交点，也不是长度，它是一个比：横走一格，竖走 k 格。"}
+      - {id: s2, pace: ask, text: "练一练，{@q}一条直线横走两格、竖走三格，它的斜率 k 是多少？"}
+    do:
+      - {at: s1, act: unmark, target: ratio}
+      - {with: prev, act: hide, target: ratio}
+      - {at: s1@w, act: show, target: wrong_x}
+      - {with: prev, act: show, target: wrong_len}
+      - {after: prev, act: cross, target: wrong_x}
+      - {with: prev, act: cross, target: wrong_len}
+      - {at: s2@q, act: hide, target: wrong_x}
+      - {with: prev, act: hide, target: wrong_len}
+      - {after: prev, act: show, target: practice}

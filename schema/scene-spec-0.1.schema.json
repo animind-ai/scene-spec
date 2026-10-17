@@ -32,6 +32,16 @@
         "$ref": "#/$defs/literal"
       }
     },
+    "params": {
+      "description": "场景参数：随时间连续变化的数（tween 动作补间它们），组件属性里可以写引用参数的表达式。值写初值，或 {value, min?, max?}。",
+      "type": "object",
+      "propertyNames": {
+        "$ref": "#/$defs/paramName"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/paramDef"
+      }
+    },
     "objects": {
       "type": "object",
       "propertyNames": {
@@ -390,7 +400,8 @@
             "axes",
             "numberline",
             "grid",
-            "group"
+            "group",
+            "readout"
           ]
         },
         "role": {
@@ -436,6 +447,28 @@
             "body",
             "caption"
           ]
+        },
+        "value": {
+          "$ref": "#/$defs/expr",
+          "description": "readout：显示的值（表达式，可引用参数）"
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "description": "readout：值前面的文字，可混排 $...$ 公式"
+        },
+        "digits": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 6,
+          "description": "readout：小数位数（默认 2）"
+        },
+        "format": {
+          "enum": [
+            "decimal",
+            "fraction"
+          ],
+          "description": "readout：decimal 小数 | fraction 能写成分母不超过 12 的分数时写成分数"
         }
       },
       "unevaluatedProperties": false
@@ -635,6 +668,16 @@
               "const": "fit"
             }
           ]
+        },
+        "ease": {
+          "enum": [
+            "linear",
+            "smooth",
+            "in",
+            "out",
+            "in_out"
+          ],
+          "description": "tween 的缓动（默认 smooth）"
         }
       }
     },
@@ -707,6 +750,49 @@
           }
         }
       }
+    },
+    "paramName": {
+      "type": "string",
+      "pattern": "^[A-Za-z]+(_[A-Za-z0-9]+)?$",
+      "description": "参数名：字母，可带下标 _0、_max（k、theta、x_0）。不能用 x、pi、e 和函数名。"
+    },
+    "paramDef": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "object",
+          "required": [
+            "value"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "value": {
+              "type": "number"
+            },
+            "min": {
+              "type": "number"
+            },
+            "max": {
+              "type": "number"
+            }
+          }
+        }
+      ]
+    },
+    "expr": {
+      "description": "数，或白名单表达式（四则、乘方、括号、sin cos tan exp ln log sqrt abs、pi e 和声明过的参数）",
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        }
+      ]
     }
   }
 }

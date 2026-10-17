@@ -36,6 +36,7 @@ class WidgetContext:
     definition: dict
     data: dict
     exposed: Exposed
+    ex: object = None  # params.ExprChecker：解析参数表达式、给出参数的关键取值（检查器传入）
 
 
 @dataclass
@@ -581,6 +582,8 @@ REGISTRY["number_line"] = Widget(
 # ---------- 函数图像（graph）：坐标轴、曲线、点、割线、切线 ----------
 # 函数写成白名单表达式字符串（见 expr.py），这里检查语法、点是否在定义域里、切线处左右导数是否相等。
 
+import math  # noqa: E402
+
 from . import expr as _expr  # noqa: E402
 
 GRAPH_LABEL_DIRS = ("u", "d", "l", "r", "ul", "ur", "dl", "dr")
@@ -643,28 +646,39 @@ def _is_index(v: object) -> bool:
 
 
 def _is_expr(v: object) -> bool:
+    """只查语法（不认识的名字先当参数，名字对不对由 validate 按 params 核对）。"""
     try:
-        _expr.parse(v)  # type: ignore[arg-type]
+        _expr.parse(v, _expr.ANY)  # type: ignore[arg-type]
     except _expr.ExprError:
         return False
     return True
 
 
+def _num_or_expr(v: object) -> bool:
+    return _num(v) or (isinstance(v, str) and _is_expr(v))
+
+
 _graph_plots = _graph_entries(
-    {"f": _is_expr, "role": _is_role, "label": _is_text, "domain": lambda v: _graph_range(v) is None},
+    {"f": lambda v: isinstance(v, str) and _is_expr(v), "role": _is_role, "label": _is_text,
+     "domain": lambda v: _graph_range(v) is None},
     ("f",), "一条曲线 {f: \"x^2\", role?, label?, domain?}")
 _graph_points = _graph_entries(
-    {"x": _num, "plot": _is_index, "label": _is_text, "role": _is_role, "label_dir": lambda v: v in GRAPH_LABEL_DIRS},
-    ("x",), "曲线上的一个点 {x, plot?, label?, role?, label_dir?}")
+    {"x": _num_or_expr, "plot": _is_index, "label": _is_text, "role": _is_role,
+     "label_dir": lambda v: v in GRAPH_LABEL_DIRS},
+    ("x",), "曲线上的一个点 {x（数或参数表达式）, plot?, label?, role?, label_dir?}")
 _graph_secants = _graph_entries(
     {"point": _is_index, "h": lambda v: _num(v) and v != 0, "label": _is_text, "role": _is_role,
      "label_dir": lambda v: v in GRAPH_LABEL_DIRS, "readout": lambda v: isinstance(v, bool), "readout_text": _is_text},
     ("point", "h"), "一条割线 {point, h（≠0）, label?, role?, readout?}")
 _graph_tangents = _graph_entries({"point": _is_index, "role": _is_role}, ("point",), "一条切线 {point, role?}")
 _graph_lines = _graph_entries(
-    {"x": _num, "through": lambda v: isinstance(v, list) and len(v) == 2 and all(_num(c) for c in v),
-     "slope": _num, "role": _is_role},
-    (), "一条直线 {x}（竖线）或 {through: [x, y], slope}")
+    {"x": _num_or_expr, "through": lambda v: isinstance(v, list) and len(v) == 2 and all(_num_or_expr(c) for c in v),
+     "slope": _num_or_expr, "role": _is_role},
+    (), "一条直线 {x}（竖线）或 {through: [x, y], slope}（都可以写参数表达式）")
+_graph_triangles = _graph_entries(
+    {"point": _is_index, "run": _num_or_expr, "role": _is_role, "labels": lambda v: isinstance(v, bool)},
+    ("point",), "一个斜率三角形 {point, run?（横走多少，默认 1）, role?, labels?}")
+GRAPH_EXPR_FIELDS = (("points", ("x",)), ("lines", ("x", "slope")), ("triangles", ("run",)))
 
 
 def _graph_list(definition: dict, key: str) -> list:
@@ -673,35 +687,115 @@ def _graph_list(definition: dict, key: str) -> list:
 
 
 def _expose_graph(definition: dict, data: dict) -> Exposed:
-    n = {k: len(_graph_list(definition, k)) for k in ("plots", "points", "secants", "tangents", "lines")}
+    n = {k: len(_graph_list(definition, k)) for k in ("plots", "points", "secants", "tangents", "lines", "triangles")}
     readouts = sum(1 for s in _graph_list(definition, "secants") if s.get("readout"))
     parts = {
         "axes": 1, "plot": n["plots"], "plot_label": n["plots"], "point": n["points"], "dot": n["points"],
         "secant": n["secants"], "qpoint": n["secants"], "slope": readouts, "tangent": n["tangents"], "line": n["lines"],
+        "triangle": n["triangles"],
     }
     return Exposed(parts=parts, items=sum(parts.values()) - n["points"])  # dot 和 point 是同一个点
 
 
-def _graph_fn(definition: dict, k: object):
+def _tree(value: object, env: dict | None = None):
+    """数或表达式 → 语法树，按 env 里的参数名解析（kx 拆成 k·x）；不合法返回 None（已经报过）。"""
+    if _num(value):
+        return ("num", float(value))
+    if not isinstance(value, str):
+        return None
+    try:
+        return _expr.parse(value, set(env or ()))
+    except _expr.ExprError:
+        return None
+
+
+def _graph_fn(definition: dict, k: object, env: dict | None = None):
     plots = _graph_list(definition, "plots")
-    if not _is_index(k) or k >= len(plots) or not _is_expr(plots[k].get("f")):
+    if not _is_index(k) or k >= len(plots):
         return None
-    return _expr.parse(plots[k]["f"])
+    return _tree(plots[k].get("f"), env)
 
 
-def _graph_point_xy(definition: dict, i: int):
-    """第 i 个点的 (语法树, x)；点或曲线不合法时返回 None（参数检查已经报过）。"""
+def _graph_point_xy(definition: dict, i: int, env: dict | None = None):
+    """第 i 个点的 (曲线语法树, 参数取 env 时的 x)；点或曲线不合法时返回 None（参数检查已经报过）。"""
     points = _graph_list(definition, "points")
-    if i >= len(points) or not _num(points[i].get("x")):
+    if i >= len(points):
         return None
-    tree = _graph_fn(definition, points[i].get("plot", 0))
-    return None if tree is None else (tree, float(points[i]["x"]))
+    xt = _tree(points[i].get("x"), env)
+    tree = _graph_fn(definition, points[i].get("plot", 0), env)
+    if xt is None or tree is None:
+        return None
+    try:
+        return tree, _expr.evaluate(xt, math.nan, env)
+    except KeyError:  # 用了没声明的参数：已经报过 SS402
+        return None
+
+
+def _safe(tree: tuple, x: float, env: dict | None) -> float:
+    try:
+        return _expr.evaluate(tree, x, env)
+    except KeyError:
+        return math.nan
+
+
+def _graph_check_exprs(ctx: WidgetContext, report: Report, path: str) -> bool:
+    """按声明的参数核对表达式（SS401–SS403）；全部合法返回 True。"""
+    ex, d, ok = ctx.ex, ctx.definition, True
+    if ex is None:
+        return True
+    for n, plot in enumerate(_graph_list(d, "plots")):
+        if isinstance(plot.get("f"), str):
+            ok &= ex.parse(plot["f"], f"{path}.plots[{n}].f", allow_x=True) is not None
+    for key, fields in GRAPH_EXPR_FIELDS:
+        for n, entry in enumerate(_graph_list(d, key)):
+            for field_ in fields:
+                if field_ in entry:
+                    ok &= ex.parse(entry[field_], f"{path}.{key}[{n}].{field_}") is not None
+            if key == "lines" and isinstance(entry.get("through"), list):
+                for c, v in enumerate(entry["through"]):
+                    ok &= ex.parse(v, f"{path}.lines[{n}].through[{c}]") is not None
+    return ok
+
+
+def _graph_check_states(ctx: WidgetContext, report: Report, path: str) -> None:
+    """参数取每组关键值时：点在横轴范围里、曲线在点处有定义，斜率三角形的另一端也是（SS411）。"""
+    ex, d = ctx.ex, ctx.definition
+    xr = d.get("x") if _graph_range(d.get("x")) is None else None
+    states = ex.states_for(ctx.obj_id) if ex is not None and ex.names else []
+    points = _graph_list(d, "points")
+    for env in states:
+        where = ex.describe(env)
+        for n in range(len(points)):
+            xy = _graph_point_xy(d, n, env)
+            if xy is None:
+                continue
+            tree, x = xy
+            if not math.isfinite(x) or (xr and not xr[0] - 1e-9 <= x <= xr[1] + 1e-9):
+                report.error("SS411", f"{path}.points[{n}].x", f"参数取 {where} 时，点的 x={x:g} 出了横轴范围 {xr}")
+            elif not math.isfinite(_safe(tree, x, env)):
+                report.error("SS411", f"{path}.points[{n}].x", f"参数取 {where} 时，曲线在 x={x:g} 处没有定义")
+        for n, tri in enumerate(_graph_list(d, "triangles")):
+            xy = _graph_point_xy(d, tri.get("point", 0), env) if _is_index(tri.get("point", 0)) else None
+            run = _tree(tri.get("run", 1), env)
+            if xy is None or run is None:
+                continue
+            tree, x = xy
+            x2 = x + _safe(run, math.nan, env)
+            if not math.isfinite(_safe(tree, x2, env)) or (xr and not xr[0] - 1e-9 <= x2 <= xr[1] + 1e-9):
+                report.error("SS411", f"{path}.triangles[{n}].run",
+                             f"参数取 {where} 时，三角形的另一端 x={x2:g} 出了横轴范围或不在曲线定义域里")
+        for n, ln in enumerate(_graph_list(d, "lines")):
+            for field_ in ("x", "slope"):
+                t = _tree(ln.get(field_), env) if field_ in ln else None
+                if t is not None and not math.isfinite(_safe(t, math.nan, env)):
+                    report.error("SS411", f"{path}.lines[{n}].{field_}", f"参数取 {where} 时没有定义")
 
 
 def _validate_graph(ctx: WidgetContext, report: Report, path: str) -> None:
-    import math
-
     d = ctx.definition
+    if not _graph_check_exprs(ctx, report, path):
+        return
+    env = ctx.ex.states[0] if ctx.ex is not None else None  # 参数的初值
     plots, points = _graph_list(d, "plots"), _graph_list(d, "points")
     xr = d.get("x") if _graph_range(d.get("x")) is None else None
     for n, p in enumerate(points):
@@ -709,31 +803,31 @@ def _validate_graph(ctx: WidgetContext, report: Report, path: str) -> None:
         if _is_index(k) and k >= len(plots):
             report.error("SS291", f"{path}.points[{n}].plot", f"只有 {len(plots)} 条曲线，没有第 {k} 条（从 0 数）")
             continue
-        xy = _graph_point_xy(d, n)
+        xy = _graph_point_xy(d, n, env)
         if xy is None:
             continue
         tree, x = xy
         if xr and not xr[0] <= x <= xr[1]:
             report.error("SS292", f"{path}.points[{n}].x", f"x={x:g} 不在横轴范围 {xr} 里")
-        if not math.isfinite(_expr.evaluate(tree, x)):
+        if not math.isfinite(_safe(tree, x, env)):
             report.error("SS292", f"{path}.points[{n}].x", f"{plots[k]['f']} 在 x={x:g} 处没有定义")
-    for key in ("secants", "tangents"):
+    for key in ("secants", "tangents", "triangles"):
         for n, s in enumerate(_graph_list(d, key)):
-            i = s.get("point")
+            i = s.get("point", 0)
             if _is_index(i) and i >= len(points):
                 report.error("SS291", f"{path}.{key}[{n}].point", f"只有 {len(points)} 个点，没有第 {i} 个（从 0 数）")
                 continue
-            xy = _graph_point_xy(d, i) if _is_index(i) else None
+            xy = _graph_point_xy(d, i, env) if _is_index(i) else None
             if xy is None:
                 continue
             tree, x = xy
             if key == "secants" and _num(s.get("h")):
-                _graph_check_h(tree, x, s["h"], report, f"{path}.secants[{n}].h")
+                _graph_check_h(tree, x, s["h"], report, f"{path}.secants[{n}].h", env)
             if key == "tangents":
                 e = 1e-6 * max(1.0, abs(x))
-                y = _expr.evaluate(tree, x)
-                right = (_expr.evaluate(tree, x + e) - y) / e
-                left = (y - _expr.evaluate(tree, x - e)) / e
+                y = _safe(tree, x, env)
+                right = (_safe(tree, x + e, env) - y) / e
+                left = (y - _safe(tree, x - e, env)) / e
                 if not (math.isfinite(left) and math.isfinite(right)) or abs(left - right) > 1e-3 * max(1.0, abs(left)):
                     report.error("SS293", f"{path}.tangents[{n}]",
                                  f"曲线在 x={x:g} 处左右导数不相等（约 {left:.3g} 和 {right:.3g}），没有切线；"
@@ -741,12 +835,11 @@ def _validate_graph(ctx: WidgetContext, report: Report, path: str) -> None:
     for n, ln in enumerate(_graph_list(d, "lines")):
         if ("x" in ln) == ("through" in ln or "slope" in ln) or ("through" in ln) != ("slope" in ln):
             report.error("SS294", f"{path}.lines[{n}]", "直线写 {x: c}（竖线），或 {through: [x, y], slope: k}")
+    _graph_check_states(ctx, report, path)
 
 
-def _graph_check_h(tree, x: float, h: float, report: Report, path: str) -> None:
-    import math
-
-    if not math.isfinite(_expr.evaluate(tree, x + h)):
+def _graph_check_h(tree, x: float, h: float, report: Report, path: str, env: dict | None = None) -> None:
+    if not math.isfinite(_safe(tree, x + h, env)):
         report.error("SS295", path, f"割线的第二个点 x={x + h:g} 不在曲线的定义域里")
 
 
@@ -768,11 +861,12 @@ def _graph_approach(args: dict, ctx: WidgetContext, report: Report, path: str) -
         report.error("SS296", f"{path}.args.h", "approach 需要 h：第二个点的目标偏移量，非零的数（h → 0 只能逼近，不能等于 0）")
         return
     point = secants[i].get("point")
-    xy = _graph_point_xy(ctx.definition, point) if _is_index(point) else None
+    env = ctx.ex.states[0] if ctx.ex is not None else None
+    xy = _graph_point_xy(ctx.definition, point, env) if _is_index(point) else None
     if xy is not None:
         if (h > 0) != (secants[i].get("h", h) > 0):
             report.warning("SS297", f"{path}.args.h", "h 换了符号：第二个点会穿过第一个点，割线会先乱转一下")
-        _graph_check_h(xy[0], xy[1], h, report, f"{path}.args.h")
+        _graph_check_h(xy[0], xy[1], h, report, f"{path}.args.h", env)
 
 
 REGISTRY["graph"] = Widget(
@@ -785,6 +879,7 @@ REGISTRY["graph"] = Widget(
         "secants": (False, _graph_secants),
         "tangents": (False, _graph_tangents),
         "lines": (False, _graph_lines),
+        "triangles": (False, _graph_triangles),
         "unit": (False, _graph_positive),
         "ticks": (False, _graph_ticks),
         "tick_labels": (False, _bool),
