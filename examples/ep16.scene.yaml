@@ -1,0 +1,199 @@
+# 洞察系列 #16 减去一个负数为什么是加（七年级）。单集。
+# 按脚本 insight/ep16-subtract-negative/script.yaml（第 1 轮）写。
+# 一个洞察：减法问"差多少"，数轴上从减数一格一格走到被减数；钩子问 3 − (−2) 为什么是 5、停三秒、说出"等于一"；
+# 5 − 2 从二数到五；3 − 2、3 − 1、3 − 0：减数越小差越多；预测暂停后从 −2 数到 3，五格；
+# 非例：1 是 3 + (−2)，从三往左两格；落到 3 − (−2) = 3 + 2 = 5。
+spec: "0.1"
+
+meta:
+  id: ep16
+  title: 减去一个负数为什么是加
+  line: insight
+  units: [J1]
+  episode: 16
+  grade: 七年级
+  author: Boxi Yu
+  license: CC-BY-4.0
+
+pedagogy:
+  insight: 减法问的是两个数差多少，也就是在数轴上从减数走到被减数要走几格；负二在零的左边，从负二走到三要走五格，所以三减负二等于五
+  misconception: 三减负二等于一：三减二是一，负号没什么用
+  non_example: 一其实是三加负二：从三往左走两格，到一；那是加一个负数，不是减一个负数
+  status: proof
+  landing: Landing
+
+style:
+  theme: paper
+  canvas: "16:9"
+  voice:
+    persona: peer-ms
+    speed: 1.0
+  segmented: true
+  step_hold: 1.0
+
+objects:
+  q:
+    type: text
+    text: '$3-(-2)=5\ ?$'
+    level: title
+    in: top
+  myth:
+    type: text
+    text: '[等于一？]{#m}'
+    role: "NO"
+    level: title
+    right_of: q
+    gap: lg
+  line:
+    widget: number_line
+    range: [-3, 6]
+    parts: 1
+    measures: ["1"]
+    role: A
+    in: stage
+  r0:
+    type: text
+    text: '[$5-2=$]{#l} [$3$]{#r}'
+    in: side
+  r1:
+    type: text
+    text: '$3-2=1$'
+    below: r0
+    gap: sm
+  r2:
+    type: text
+    text: '$3-1=2$'
+    below: r1
+    gap: sm
+  r3:
+    type: text
+    text: '[$3-0=3$]{#all}'
+    below: r2
+    gap: sm
+  r4q:
+    type: text
+    text: '[$3-(-2)=$]{#l} [$?$]{#q .NO}'
+    below: r3
+    gap: sm
+  r4:
+    type: text
+    text: '[$3-(-2)=$]{#l} [$5$]{#q .HL}'
+    below: r3
+    gap: sm
+  add:
+    type: text
+    text: '[$3+(-2)$]{#l} [$=1$]{#r .NO}'
+    level: title
+    in: footer
+  law:
+    type: text
+    text: '[$3-(-2)$]{#l} [$=3+2$]{#m} [$=5$]{#r .HL}'
+    level: title
+    in: footer
+  ex:
+    type: text
+    text: '$5-(-1)=5+1=6$'
+    level: title
+    right_of: law
+    gap: lg
+
+beats:
+  - id: Hook
+    pause: {type: predict, prompt: 三减负二为什么等于五？先猜一猜。, hold: 3, app_item: ep16-before-1}
+    say:
+      - {id: s1, pace: ask, text: "{@q}三减负二，为什么等于五？", en: "Three minus negative two: why is it five?"}
+      - {id: s2, pace: normal, text: "先猜一猜，想三秒钟。", en: "Take a guess. Think for three seconds."}
+    do:
+      - {at: s1@q, act: show, target: q}
+      - {with: prev, act: show, target: line}
+
+  - id: Myth
+    shows: misconception
+    say:
+      - {id: s1, pace: normal, text: "很多人会算成一，因为{@m}三减二是一，负号好像没什么用。", en: "Lots of people get one: three minus two is one, and the minus sign seems to do nothing."}
+    do:
+      - {at: s1@m, act: show, target: myth}
+
+  - id: Setup
+    say:
+      - {id: s1, pace: normal, text: "我们一起看。减法其实在问：这两个数相差多少。", en: "Let's look together. Subtraction is really asking: how far apart are these two numbers?"}
+      - {id: s2, pace: normal, text: "五减二，{@p}就是从二走到五，{@j}一格一格数，差三格。", en: "Five minus two: walk from two to five, counting one step at a time. Three steps."}
+      - {id: s3, pace: normal, text: "走了几格，答案就是几，{@r}所以五减二等于三。", en: "The number of steps is the answer, so five minus two is three."}
+    do:
+      - {at: s2@p, act: mark_point, target: line, args: {at: 2, role: B}}
+      - {with: prev, act: mark_point, target: line, args: {at: 5, role: A}}
+      - {at: s2@j, act: jump, target: line, args: {length: "1", count: 3, from: 2}, dur: fit}
+      - {at: s3@r, act: show, target: r0}
+      - {after: prev, act: mark, target: "r0#r"}
+
+  - id: Pattern
+    say:
+      - {id: s1, pace: normal, text: "{@a}三减二，从二走到三，差一格；{@b}三减一，从一走到三，差两格。", en: "Three minus two: from two to three, one step. Three minus one: from one to three, two steps."}
+      - {id: s2, pace: normal, text: "{@c}三减零，从零走到三，差三格。{@d}减去的数越小，差得就越多。", en: "Three minus zero: from zero to three, three steps. The smaller the number we subtract, the bigger the gap."}
+    do:
+      - {at: s1, act: unmark, target: "r0#r"}
+      - {with: prev, act: erase, target: line}
+      - {at: s1@a, act: jump, target: line, args: {length: "1", count: 1, from: 2}}
+      - {with: prev, act: show, target: r1}
+      - {at: s1@b, act: jump, target: line, args: {length: "1", count: 2, from: 1}}
+      - {with: prev, act: show, target: r2}
+      - {at: s2@c, act: jump, target: line, args: {length: "1", count: 3, from: 0}}
+      - {with: prev, act: show, target: r3}
+
+  - id: Predict
+    pause: {type: predict, prompt: 三减负二，从负二走到三，要走几格？, hold: 3, app_item: ep16-why-1}
+    say:
+      - {id: s1, pace: ask, text: "{@q}那三减负二，从负二走到三，要走几格？", en: "So three minus negative two: from negative two to three, how many steps?"}
+    do:
+      - {at: s1@q, act: erase, target: line}
+      - {with: prev, act: mark_point, target: line, args: {at: -2, role: B}}
+      - {with: prev, act: show, target: r4q}
+
+  - id: Count
+    say:
+      - {id: s1, pace: normal, text: "{@go}从负二出发，先走两格到零，{@z}再走三格才到三。", en: "Start at negative two: two steps to reach zero, then three more to reach three."}
+      - {id: s2, pace: normal, text: "我们一格一格数：一、二、三、四、五。", en: "Let's count them one by one: one, two, three, four, five."}
+      - {id: s3, pace: slow, text: "{@r}一共是五格，所以三减负二等于五。", en: "Five steps in all, so three minus negative two is five."}
+      - {id: s4, pace: normal, text: "负二在零的左边，离三更远，{@m}差距反而比三减零还大。", en: "Negative two is left of zero, further from three, so the gap is even bigger than three minus zero."}
+    do:
+      - {at: s1@go, act: highlight, target: line, args: {from: -2, to: 0, role: B}}
+      - {at: s1@z, act: highlight, target: line, args: {from: 0, to: 3, role: A, keep: true}}
+      - {at: s2, act: jump, target: line, args: {length: "1", count: 5, from: -2}, dur: fit}
+      - {at: s3@r, act: hide, target: r4q}
+      - {with: prev, act: show, target: r4}
+      - {at: s4, act: step}
+      - {at: s4@m, act: mark, target: "r3#all"}
+      - {with: prev, act: mark, target: "r4#q"}
+
+  - id: NonExample
+    shows: non_example
+    say:
+      - {id: s1, pace: normal, text: "那个一是从哪里来的？{@a}其实一是三加负二的答案。", en: "So where did the one come from? One is actually the answer to three plus negative two."}
+      - {id: s2, pace: normal, text: "{@l}加负二是从三往左走两格，{@p}停在一，问的是另一件事。", en: "Adding negative two means two steps left from three, stopping at one. That's a different question."}
+    do:
+      - {at: s1, act: unmark, target: "r3#all"}
+      - {with: prev, act: unmark, target: "r4#q"}
+      - {with: prev, act: erase, target: line}
+      - {at: s1@a, act: show, target: add}
+      - {at: s2@l, act: highlight, target: line, args: {from: 1, to: 3, role: "NO"}, dur: fit}
+      - {at: s2@p, act: mark_point, target: line, args: {at: 1, label: '1', role: "NO"}}
+
+  - id: Landing
+    shows: landing
+    say:
+      - {id: s1, pace: slow, text: "{@law}所以减去负二，就是加上二：三减负二等于三加二。", en: "So subtracting negative two is adding two: three minus negative two equals three plus two."}
+      - {id: s2, pace: normal, text: "减法看的是差距，{@h}减数越往零的左边走，差距就越大。", en: "Subtraction measures the gap: the further left of zero the number you subtract, the bigger the gap."}
+      - {id: s3, pace: normal, text: "比如五减负一，{@e}就是从负一走到五，六格，等于五加一。", en: "For example, five minus negative one is from negative one to five: six steps, the same as five plus one."}
+    do:
+      - {at: s1@law, act: hide, target: add}
+      - {with: prev, act: erase, target: line}
+      - {after: prev, act: show, target: law}
+      - {at: s2@h, act: highlight, target: line, args: {from: -2, to: 3, role: HL}}
+      - {at: s3@e, act: show, target: ex}
+
+  - id: Close
+    say:
+      - {id: s1, pace: normal, text: "负号可不是没有用，{@x}它把起点挪到了零的另一边。", en: "The minus sign isn't useless: it moves the starting point to the other side of zero."}
+      - {id: s2, pace: ask, text: "{@q}为什么解方程时，两边可以同时减去同一个数？", en: "Next: when solving an equation, why can we take the same number from both sides?"}
+    do:
+      - {at: s1@x, act: cross, target: "myth#m"}
