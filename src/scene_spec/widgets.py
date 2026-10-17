@@ -761,9 +761,9 @@ def _graph_check_states(ctx: WidgetContext, report: Report, path: str) -> None:
     """参数取每组关键值时：点在横轴范围里、曲线在点处有定义，斜率三角形的另一端也是（SS411）。"""
     ex, d = ctx.ex, ctx.definition
     xr = d.get("x") if _graph_range(d.get("x")) is None else None
-    states = ex.states if ex is not None and ex.names else []
+    states = ex.states_for(ctx.obj_id) if ex is not None and ex.names else []
     points = _graph_list(d, "points")
-    for env in states[1:] if len(states) > 1 else []:
+    for env in states:
         where = ex.describe(env)
         for n in range(len(points)):
             xy = _graph_point_xy(d, n, env)

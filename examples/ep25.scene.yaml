@@ -1,0 +1,120 @@
+# 洞察系列 #25 相似三角形与三角函数（参数演示：旁白是草稿，还没有合成音频，时间按字数估算）。
+# 30° 的直角三角形等比放大缩小：斜边沿着 y = x/√3 这条线，横边长 s 由参数决定；
+# 对边 ÷ 斜边 的读数始终是 1/2，面积读数却在变（边长放大 2 倍，面积变 4 倍）。
+spec: "0.1"
+
+meta:
+  id: ep25
+  title: sin30° 为什么永远是 1/2
+  line: insight
+  units: [J12, J13]
+  episode: 25
+  grade: 九年级
+  author: Boxi Yu
+  license: CC-BY-4.0
+
+pedagogy:
+  insight: 30° 的直角三角形不管放多大都相似，对边和斜边按同一倍数伸缩，比值 sin30° 永远是 1/2
+  misconception: 三角形越大，sin 越大
+  non_example: 边长放大 2 倍，面积变成 4 倍；面积不是比值，会跟着大小变
+  status: demo
+  landing: Landing
+
+style:
+  theme: paper
+  canvas: "16:9"
+  segmented: false
+
+params:
+  s: {value: 2, min: 0.5, max: 6}   # 横边（邻边）长
+
+objects:
+  g:
+    widget: graph
+    x: [-0.5, 6.5]
+    y: [-0.5, 4.0]
+    ticks: 1
+    plots:
+      - {f: "x/sqrt(3)", label: "30^\\circ", domain: [0, 6.4]}
+    points:
+      - {x: 0, role: C}
+    triangles:
+      - {point: 0, run: "s", role: C}
+    in: stage
+  ratio:
+    type: readout
+    label: "对边 ÷ 斜边 ="
+    value: "(s/sqrt(3))/(2s/sqrt(3))"
+    format: fraction
+    role: HL
+    level: title
+    in: side
+  area:
+    type: readout
+    label: "面积 ="
+    value: "s*s/sqrt(3)/2"
+    digits: 2
+    role: NO
+    below: ratio
+    gap: lg
+  wrong:
+    type: text
+    text: 越大 sin 越大？
+    role: NO
+    below: area
+    gap: lg
+  law:
+    type: text
+    text: '$\sin 30^\circ = \dfrac{1}{2}$，和三角形的大小无关'
+    role: HL
+    in: footer
+
+beats:
+  - id: Hook
+    shows: misconception
+    say:
+      - {pace: ask, text: "三十度的直角三角形，画得越大，sin 三十度是不是也越大？"}
+    do:
+      - {at: 0, act: show, target: g.axes}
+      - {after: prev, act: draw, target: g, args: {plot: 0}}
+      - {with: prev, act: show, target: g.plot_label}
+      - {after: prev, act: show, target: "g.triangle[0]"}
+      - {with: prev, act: show, target: "g.point[0]"}
+      - {after: prev, act: show, target: wrong}
+
+  - id: Predict
+    pause: {type: predict, prompt: 把三角形放大到 3 倍，对边 ÷ 斜边 会变吗？, hold: 2}
+    say:
+      - {pace: ask, text: "把它放大到三倍，对边除以斜边会变吗？先想三秒。"}
+    do:
+      - {at: 0, act: show, target: ratio}
+      - {with: prev, act: show, target: area}
+
+  - id: Scale
+    say:
+      - {pace: normal, text: "放大、缩小、再放大：对边和斜边一起伸缩，比值一直是二分之一。"}
+    do:
+      - {at: 0, act: tween, args: {s: 6}, dur: 3, ease: in_out}
+      - {after: prev, act: tween, args: {s: 1}, dur: 3, ease: in_out}
+      - {after: prev, act: tween, args: {s: 4}, dur: 2.5}
+
+  - id: NonExample
+    shows: non_example
+    say:
+      - {pace: normal, text: "可面积不一样：边长放大两倍，面积变成四倍。面积会变，比值不会。"}
+    do:
+      - {at: 0, act: tween, args: {s: 2}, dur: 1.5}
+      - {after: prev, act: mark, target: area}
+      - {after: prev, act: tween, args: {s: 4}, dur: 2.5}
+      - {after: prev, act: hold, dur: 1.0}
+
+  - id: Landing
+    shows: landing
+    say:
+      - {pace: slow, text: "所以 sin 三十度永远是二分之一，和三角形的大小无关。这是演示，道理是这些三角形都相似。"}
+    do:
+      - {at: 0, act: unmark, target: area}
+      - {with: prev, act: cross, target: wrong}
+      - {after: prev, act: mark, target: ratio}
+      - {after: prev, act: show, target: law}
+      - {after: prev, act: tween, args: {s: 3}, dur: 2.0}

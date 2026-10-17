@@ -14,7 +14,8 @@
 - SS408 ease 只用于 tween；
 - SS409 （警告）声明了参数但没有任何表达式用到它，补间它画面不会变；
 - SS410 readout 对象写法不对（缺 value、format 和 digits 冲突）；
-- SS411 参数取到某个关键值时，表达式没有定义或几何出了范围（按初值和每次补间的目标值逐个代入检查）。
+- SS411 参数取到某个关键值时，表达式没有定义或几何出了范围（按初值、每次补间的中点和终点逐个代入，
+  只看对象在画面上的那些时刻）。
 """
 
 from __future__ import annotations
@@ -51,21 +52,42 @@ def _number(v: object) -> bool:
     return isinstance(v, (int, float)) and not isinstance(v, bool) and math.isfinite(v)
 
 
-def states(doc: dict) -> list[dict[str, float]]:
-    """参数会经过的关键取值：初值、每次补间之后的值，以及相邻两组之间的中点（补间是单调的插值）。"""
+def states(doc: dict) -> list[tuple[dict[str, float], frozenset[str]]]:
+    """参数会经过的关键取值，连同那时在画面上的对象：[(参数取值, 可见对象)]。
+
+    按文件顺序走一遍动作：每个动作之后记一笔；tween 再多记补间的中点（补间是单调插值，中点代表中途）。
+    检查某个对象的表达式时只用它在画面上时的取值：例如 k 补间到 0 时截距读数 -b/k 没有定义，
+    但那时读数还没出现，就不算错。
+    """
+    from . import selectors
+
     env = initial(doc)
     known = set(env)
-    out = [dict(env)]
-    for _n, _i, action in tweens(doc):
-        args = action.get("args") or {}
-        nxt = dict(env)
-        for k, v in args.items():
-            if k in known and _number(v):
-                nxt[k] = float(v)
-        if nxt != env:
-            out.append({k: (env[k] + nxt[k]) / 2 for k in env})
-            out.append(dict(nxt))
-        env = nxt
+    visible: set[str] = set()
+    out = [(dict(env), frozenset())]
+    for beat in doc.get("beats", []):
+        for action in beat.get("do", []):
+            act = action.get("act")
+            if act == "tween":
+                nxt = dict(env)
+                for k, v in (action.get("args") or {}).items():
+                    if k in known and _number(v):
+                        nxt[k] = float(v)
+                if nxt != env:
+                    out.append(({k: (env[k] + nxt[k]) / 2 for k in env}, frozenset(visible)))
+                env = nxt
+            elif act in ("show", "hide") and isinstance(action.get("target"), str):
+                sel = selectors.parse(action["target"])
+                if sel is not None:
+                    if act == "show":
+                        visible.add(sel.obj)
+                    elif sel.span is None and sel.part is None and sel.index is None:
+                        visible.discard(sel.obj)
+            elif act == "transform" and isinstance(action.get("to"), str):
+                sel = selectors.parse(action["to"])
+                if sel is not None:
+                    visible.add(sel.obj)
+            out.append((dict(env), frozenset(visible)))
     return out
 
 
@@ -77,7 +99,15 @@ class ExprChecker:
         self.params = declared(doc)
         self.names = set(self.params)
         self.used: set[str] = set()
-        self.states = states(doc)
+        self.timeline = states(doc)
+        self.states = _unique([env for env, _vis in self.timeline])
+
+    def states_for(self, obj_id: str | None) -> list[dict[str, float]]:
+        """对象在画面上时参数的关键取值（对象从没出现过时，只看初值）。"""
+        if obj_id is None:
+            return self.states
+        envs = [env for env, vis in self.timeline if obj_id in vis]
+        return _unique(envs) if envs else self.states[:1]
 
     def parse(self, value: object, path: str, allow_x: bool = False) -> tuple | None:
         """数或表达式字符串 → 语法树；有问题时报错并返回 None。"""
@@ -101,13 +131,23 @@ class ExprChecker:
         self.used |= expr.free_names(tree)
         return tree
 
-    def values(self, tree: tuple, x: float = math.nan) -> list[tuple[dict[str, float], float]]:
-        """在每组关键取值下求值：[(参数取值, 结果)]。"""
-        return [(env, expr.evaluate(tree, x, env)) for env in self.states]
+    def values(self, tree: tuple, obj_id: str | None = None) -> list[tuple[dict[str, float], float]]:
+        """在对象可见时的每组关键取值下求值：[(参数取值, 结果)]。"""
+        return [(env, expr.evaluate(tree, math.nan, env)) for env in self.states_for(obj_id)]
 
     @staticmethod
     def describe(env: dict[str, float]) -> str:
         return "，".join(f"{k}={v:g}" for k, v in env.items()) or "（无参数）"
+
+
+def _unique(envs: list[dict[str, float]]) -> list[dict[str, float]]:
+    seen, out = set(), []
+    for env in envs:
+        key = tuple(sorted(env.items()))
+        if key not in seen:
+            seen.add(key)
+            out.append(env)
+    return out
 
 
 def check_declarations(doc: dict, report: Report) -> None:
@@ -145,7 +185,7 @@ def check_tween(action: dict, path: str, doc: dict, report: Report) -> None:
             report.error("SS407", apath, f"目标 {target:g} 超出参数 {name} 的范围 [{lo}, {hi}]")
 
 
-def check_readout(definition: dict, path: str, ex: ExprChecker, report: Report) -> None:
+def check_readout(obj_id: str, definition: dict, path: str, ex: ExprChecker, report: Report) -> None:
     if "value" not in definition:
         report.error("SS410", path, "readout 对象需要 value：要显示的值（数或表达式）")
         return
@@ -156,7 +196,7 @@ def check_readout(definition: dict, path: str, ex: ExprChecker, report: Report) 
     tree = ex.parse(definition["value"], f"{path}.value")
     if tree is None:
         return
-    for env, v in ex.values(tree):
+    for env, v in ex.values(tree, obj_id):
         if not math.isfinite(v):
             report.error("SS411", f"{path}.value", f"参数取 {ex.describe(env)} 时，{definition['value']!r} 没有定义")
             break

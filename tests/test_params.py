@@ -139,3 +139,22 @@ def test_states_catch_out_of_range_geometry():
     doc["objects"]["kval"]["value"] = "1/k"
     doc["beats"][2]["do"][2]["args"] = {"k": 0}
     assert "SS411" in codes(doc)
+
+
+def test_states_only_count_while_visible():
+    """截距读数 -b/k 在 k=0 时没有定义；但 k 补间到 0 时读数不在画面上，就不报。"""
+    doc = param_doc()
+    doc["params"]["b"] = 1
+    doc["objects"]["xint"] = {"type": "readout", "label": "交点", "value": "-b/k", "in": "side", "below": "kval"}
+    doc["beats"][2]["do"] = [
+        {"at": 0, "act": "show", "target": "g"},
+        {"after": "prev", "act": "tween", "args": {"k": 0}},
+        {"after": "prev", "act": "tween", "args": {"k": 2}},
+        {"after": "prev", "act": "show", "target": "xint"},
+        {"with": "prev", "act": "show", "target": "kval"},
+        {"after": "prev", "act": "tween", "args": {"b": -1, "t": 1}},
+    ]
+    report = check(doc)
+    assert report.ok, report.errors
+    doc["beats"][2]["do"].append({"after": "prev", "act": "tween", "args": {"k": 0}})
+    assert "SS411" in codes(doc)

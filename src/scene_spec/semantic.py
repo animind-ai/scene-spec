@@ -96,7 +96,7 @@ class _Checker:
                 if key in definition:
                     self.r.error("SS410", f"{path}.{key}", f"{key} 只用于 type: readout")
         if kind == "readout":
-            P.check_readout(definition, path, self.ex, self.r)
+            P.check_readout(obj_id, definition, path, self.ex, self.r)
         elif kind == "text":
             if "text" not in definition:
                 self.r.error("SS204", path, "text 对象需要 text")
