@@ -1,0 +1,107 @@
+# 洞察系列 #18 平方差：剪下来补上去（短场景，用来验证 dissect 的通用性；旁白只用来估时长，未合成）。
+# 大正方形 a×a 挖去小正方形 b×b，剩下的 L 形剪成两块，一块转 90° 补到旁边，拼成 (a+b)×(a−b) 的长方形。
+# 和 ep11 用的是同一个组件：折线切、直线切、绕顶点转、边对边吸附、拼合轮廓。
+spec: "0.1"
+
+meta:
+  id: ep18
+  title: 平方差：剪下来补上去
+  line: insight
+  units: [J2]
+  episode: 18
+  grade: 七年级
+  author: Boxi Yu
+  license: CC-BY-4.0
+
+pedagogy:
+  insight: 大正方形挖掉小正方形剩下 L 形，剪开把一块转过来补到旁边，拼成长 a+b、宽 a−b 的长方形，所以 a²−b²=(a+b)(a−b)
+  misconception: a²−b²=(a−b)²
+  non_example: a²+b² 是两个分开的正方形，没有挖去的缺口，拼不成一个长方形
+  status: proof
+  landing: Landing
+
+style:
+  theme: paper
+  canvas: "16:9"
+  voice:
+    persona: peer-ms
+    speed: 1.0
+  segmented: false
+  subtitles: soft
+
+objects:
+  sq:
+    widget: dissect
+    role: A
+    in: stage
+    view: [[-0.6, -0.9], [7.6, 5.6]]
+    shapes:
+      S:
+        rect: [5, 5]
+        edges: [{at: [[0, 0], [5, 0]], text: '$a$'}]
+    cuts:
+      hole: {piece: S, path: [[5, 3], [3, 3], [3, 5]], into: [L, B2]}  # 右上角挖去 b×b
+      c2: {piece: L, line: [[0, 3], [3, 3]], into: [Top, Bottom]}
+    pieces:
+      B2: {role: NO, label: '$b^2$'}
+      L: {label: '$a^2-b^2$'}
+      Top: {role: B}
+    guides:
+      long: {from: [0, 0], to: [7, 0], label: '$a+b$', role: HL, side: below, solid: true}
+      short: {from: [7, 0], to: [7, 3], label: '$a-b$', role: HL, side: right, solid: true}
+    merges:
+      R: {pieces: [Bottom, Top], label: '$(a+b)(a-b)$', role: HL}
+  wrong:
+    type: math
+    tex: 'a^2-b^2=(a-b)^2'
+    role: NO
+    in: side
+  law:
+    type: math
+    tex: 'a^2-b^2=(a+b)(a-b)'
+    role: HL
+    below: wrong
+    gap: xl
+
+beats:
+  - id: Hook
+    shows: misconception
+    say:
+      - {id: s1, pace: normal, text: "{@s}边长 a 的正方形，{@h}挖掉边长 b 的一角。"}
+      - {id: s2, pace: ask, text: "剩下的面积是 a 方减 b 方。{@w}它等于 a 减 b 的平方吗？"}
+    do:
+      - {at: s1@s, act: show, target: sq}
+      - {at: s1@h, act: cut, target: sq, args: {cut: hole}, dur: 1.0}
+      - {after: prev, act: hide, target: "sq#B2"}
+      - {at: s2@w, act: show, target: wrong}
+
+  - id: Predict
+    pause: {type: predict, prompt: 把 L 形剪开拼成一个长方形，长和宽是多少？, hold: 1}
+    say:
+      - {id: s1, pace: ask, text: "把这个 L 形剪开，拼成一个长方形，长和宽会是多少？"}
+
+  - id: Rearrange
+    say:
+      - {id: s1, pace: normal, text: "{@cut}沿着这条线剪开，{@turn}上面一块转过来，{@go}补到右边。"}
+      - {id: s2, pace: slow, text: "{@rect}拼成一个长方形。"}
+    do:
+      - {at: s1@cut, act: cut, target: sq, args: {cut: c2}, dur: 1.0}
+      - {at: s1@turn, act: snap, target: sq, args: {piece: Top, edge: [[0, 3], [3, 3]], to: Bottom, to_edge: [[5, 3], [5, 0]]}, dur: fit}
+      - {at: s2@rect, act: merge, target: sq, args: {name: R}}
+
+  - id: Landing
+    shows: landing
+    say:
+      - {id: s1, pace: normal, text: "{@l}长是 a 加 b，{@s}宽是 a 减 b，{@law}所以 a 方减 b 方等于 a 加 b 乘 a 减 b。"}
+    do:
+      - {at: s1@l, act: show, target: "sq#long"}
+      - {at: s1@s, act: show, target: "sq#short"}
+      - {at: s1@law, act: show, target: law}
+      - {after: prev, act: cross, target: wrong}
+
+  - id: NonExample
+    shows: non_example
+    say:
+      - {id: s1, pace: normal, text: "a 方加 b 方就不行：两个正方形是分开的，没有缺口可补。"}
+    do:
+      - {at: s1, act: mark, target: law}

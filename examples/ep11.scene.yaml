@@ -1,0 +1,177 @@
+# 洞察系列 #11 平行四边形面积：剪一刀，挪过去。
+# aha 问题：为什么是底×高，而不是底×斜边？
+# 核心变换：沿高剪下左边的三角形，平移到右边，拼成长方形；斜边被拼进了长方形里面，长度"不参与"。
+# 迷思：面积 = 底×斜边。非例：把平行四边形压扁，斜边不变而面积趋于 0。
+# 画面只用剖分组件 dissect：切法、块、参考线、拼合轮廓都在对象里声明，动作只点名字，不写算好的坐标。
+spec: "0.1"
+
+meta:
+  id: ep11
+  title: 平行四边形面积：剪一刀，挪过去
+  line: insight
+  units: [M5]
+  episode: 11
+  grade: 五年级
+  author: Boxi Yu
+  license: CC-BY-4.0
+
+pedagogy:
+  insight: 沿高剪下一个三角形平移到另一边，平行四边形就拼成了长方形；长是底 a，宽是高 h，所以面积是 a×h，斜边被拼进了里面
+  misconception: 面积 = 底×斜边
+  non_example: 把平行四边形压扁，底和斜边都不变，面积却越来越小、趋于 0，底×斜边却一点没变
+  status: proof
+  landing: Landing
+
+style:
+  theme: paper
+  canvas: "16:9"
+  voice:
+    persona: peer-ms
+    speed: 1.0
+  segmented: false
+  subtitles: soft
+
+objects:
+  para:
+    widget: dissect
+    role: A
+    in: stage
+    shapes:
+      P:
+        polygon: [[0, 0], [6, 0], [9, 3], [3, 3]]
+        edges:
+          - {at: [[0, 0], [6, 0]], text: '底 $a$'}
+          - {at: [[0, 0], [3, 3]], text: '斜边 $b$'}
+    cuts:
+      c1: {piece: P, line: [[3, 3], [3, 0]], into: [T, Q]}  # 切出的块按重心从左到右命名
+    pieces:
+      T: {role: B}
+    guides:
+      h: {from: [3, 3], to: [3, 0], label: '高 $h$', role: HL}
+      base: {from: [3, 0], to: [9, 0], label: '$a$', role: HL, side: below, solid: true}
+      seam: {from: [6, 0], to: [9, 3], label: '$b$', role: NO}
+    merges:
+      R: {pieces: [T, Q], role: HL}
+  flat:
+    widget: dissect
+    role: A
+    in: stage
+    shapes:  # 底都是 6，斜边都是 √18，高从 3 压到 1.5、0.5
+      F1:
+        polygon: [[0, 0], [6, 0], [9, 3], [3, 3]]
+        hidden: true
+        edges: [{at: [[0, 0], [3, 3]], text: '$b$'}]
+      F2:
+        polygon: [[0, 0], [6, 0], [9.969, 1.5], [3.969, 1.5]]
+        hidden: true
+        edges: [{at: [[0, 0], [3.969, 1.5]], text: '$b$'}]
+      F3:
+        polygon: [[0, 0], [6, 0], [10.213, 0.5], [4.213, 0.5]]
+        hidden: true
+        role: NO
+        edges:
+          - {at: [[0, 0], [4.213, 0.5]], text: '$b$'}
+          - {at: [[0, 0], [6, 0]], text: '$a$'}
+  wrong:
+    type: math
+    tex: 'S=a\times b'
+    role: NO
+    level: display
+    in: side
+  ask:
+    type: text
+    text: 能拼成什么？
+    role: HL
+    below: wrong
+    gap: xl
+  law:
+    type: math
+    tex: 'S=a\times h'
+    role: HL
+    level: display
+    below: wrong
+    gap: xl
+
+beats:
+  - id: Hook
+    shows: misconception
+    say:
+      - {id: s1, pace: normal, text: "{@p}这是一个平行四边形。{@a}底是 a，{@b}斜着的这条边是 b。"}
+      - {id: s2, pace: ask, text: "它的面积是多少？很多同学会想：长方形是长乘宽，{@w}那它就是底乘斜边，a 乘 b？"}
+      - {id: s3, pace: normal, text: "可是长方形的宽是竖着量的。{@h}平行四边形竖着量，是这条高 h。到底该乘谁？"}
+    do:
+      - {at: s1@p, act: show, target: para}
+      - {at: s2@w, act: show, target: wrong}
+      - {at: s3@h, act: show, target: "para#h"}
+
+  - id: Predict
+    pause: {type: predict, prompt: 沿着高剪一刀，把剪下来的三角形挪到另一边，能拼成什么？长和宽各是多少？, hold: 1}
+    say:
+      - {id: s1, pace: ask, text: "沿着这条高{@cut}剪一刀，把剪下来的三角形挪到另一边，能拼成什么？"}
+      - {id: s2, pace: ask, text: "拼出来的图形，长和宽各是多少？先想三秒。{@n}三，二，一。"}
+    do:
+      - {at: s1@cut, act: focus, target: "para#h"}
+      - {at: s2, act: show, target: ask}
+      - {at: s2@n, act: focus, target: ask}
+
+  - id: Cut
+    say:
+      - {id: s1, pace: normal, text: "{@cut}沿着高剪开，{@go}把左边的三角形平移到右边。"}
+      - {id: s2, pace: normal, text: "斜边对着斜边，{@fit}正好严丝合缝。"}
+      - {id: s3, pace: slow, text: "{@rect}拼成了一个长方形。没有多一块，也没有少一块，面积不变。"}
+    do:
+      - {at: s1, act: hide, target: ask}
+      - {with: prev, act: unfocus, target: para}
+      - {at: s1@cut, act: cut, target: para, args: {cut: c1}, dur: 1.2}
+      - {after: prev, act: shift, target: para, args: {piece: T, by: [-0.4, 0]}, dur: 0.4}
+      - {at: s1@go, act: snap, target: para, args: {piece: T, edge: [[0, 0], [3, 3]], to: Q, to_edge: [[6, 0], [9, 3]]}, dur: fit}
+      - {at: s2@fit, act: show, target: "para#seam"}
+      - {at: s3@rect, act: merge, target: para, args: {name: R}, dur: 0.8}
+
+  - id: Landing
+    shows: landing
+    say:
+      - {id: s1, pace: normal, text: "长方形的长，{@a}就是原来的底 a；{@h}宽，就是原来的高 h。"}
+      - {id: s2, pace: normal, text: "所以平行四边形的面积，{@law}等于底乘高，a 乘 h。"}
+      - {id: s3, pace: slow, text: "那斜边 b 呢？{@seam}它被拼进了长方形里面，根本没用上。"}
+    do:
+      - {at: s1@a, act: show, target: "para#base"}
+      - {at: s1@h, act: mark, target: "para#h"}
+      - {at: s2@law, act: show, target: law}
+      - {at: s3@seam, act: focus, target: "para#seam"}
+
+  - id: NonExample
+    shows: non_example
+    say:
+      - {id: s1, pace: normal, text: "再换个角度，看看底乘斜边为什么不行。"}
+      - {id: s2, pace: normal, text: "把平行四边形往下压：{@f1}底还是 a，{@f2}斜边还是 b，{@f3}它却越来越扁。"}
+      - {id: s3, pace: normal, text: "a 乘 b 一点没变，面积却越来越小，{@zero}压平了就是零。"}
+      - {id: s4, pace: slow, text: "{@x}所以面积和斜边无关，只看底和高。"}
+    do:
+      - {at: s1, act: hide, target: para}
+      - {at: s2@f1, act: show, target: "flat#F1"}
+      - {at: s2@f2, act: labels, target: flat, args: {piece: F1, show: false}}
+      - {with: prev, act: set, target: "flat#F1", args: {opacity: 0.3}}
+      - {with: prev, act: show, target: "flat#F2"}
+      - {at: s2@f3, act: labels, target: flat, args: {piece: F2, show: false}}
+      - {with: prev, act: set, target: "flat#F2", args: {opacity: 0.3}}
+      - {with: prev, act: show, target: "flat#F3"}
+      - {at: s3@zero, act: focus, target: "flat#F3"}
+      - {at: s4@x, act: cross, target: wrong}
+
+  - id: Close
+    say:
+      - {id: s1, pace: normal, text: "记住这一刀：{@sw}剪下三角形，挪过去，平行四边形就变成了长方形。"}
+      - {id: s2, pace: normal, text: "{@law}面积等于底乘高。"}
+      - {id: s3, pace: ask, text: "练一练：{@q}底是八厘米、高是五厘米，面积是多少？"}
+    do:
+      - {at: s1, act: hide, target: flat}
+      - {after: prev, act: unfocus, target: para}
+      - {with: prev, act: unmerge, target: para, args: {name: R}}
+      - {with: prev, act: hide, target: "para#seam"}
+      - {with: prev, act: shift, target: para, args: {piece: T, by: [-6, 0]}}
+      - {after: prev, act: show, target: para}
+      - {at: s1@sw, act: snap, target: para, args: {piece: T, edge: [[0, 0], [3, 3]], to: Q, to_edge: [[6, 0], [9, 3]]}, dur: 1.4}
+      - {after: prev, act: merge, target: para, args: {name: R}}
+      - {at: s2@law, act: underline, target: law}
+      - {at: s3@q, act: mark, target: law}
