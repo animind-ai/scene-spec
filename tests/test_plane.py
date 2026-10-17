@@ -60,3 +60,9 @@ def test_fixed_points_stay_put(example):
                  ("vector", {"name": "e", "v": [1, 0]}), ("warp", {"matrix": [[2, 0], [0, 1]]}), ("reset", None),
                  ("remove", None), ("point", {"name": "o", "at": [1, 1]}))
     assert result == []
+
+
+def test_shape_takes_a_label(example):
+    assert add(example, P, ("shape", {"name": "sq", "points": [[0, 0], [1, 0], [1, 1]], "label": "a^2"})) == []
+    assert "SS281" in add(example, P, ("shape", {"name": "sq2", "points": [[0, 0], [1, 0], [1, 1]], "label": 3}))
+    assert "SS281" in add(example, P, ("shape", {"name": "sq3", "points": [[0, 0], [1, 0], [1, 1]], "fill": "no"}))

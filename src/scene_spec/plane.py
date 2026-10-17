@@ -217,7 +217,10 @@ def register(registry: dict, Widget, Exposed, unknown_args) -> None:  # noqa: N8
         if not ok:
             report.error("SS281", f"{path}.args.points", "shape 需要 points：至少三个 [x, y]")
         role(args, report, path)
-        unknown_args(args, {"name", "points", "role"}, "shape", report, path)
+        label(args, report, path)
+        if "fill" in args and _bool(args["fill"]):
+            report.error("SS281", f"{path}.args.fill", "fill 应为 true / false（false 只描边）")
+        unknown_args(args, {"name", "points", "role", "label", "fill"}, "shape", report, path)
         if name and ok:
             ctx.exposed.state["items"][name] = arr = [tuple(p) for p in pts]
             inside(ctx, report, path, name, arr)
