@@ -508,7 +508,8 @@ def _expose_number_line(definition: dict, data: dict) -> Exposed:
     # jump / count：跳跃弧和计数（按 measures 里最多的整跳数预留）；rest：剩余段；point：点
     return Exposed(parts={"tick": n + 1, "label": n + 1, "unit": n, "frac": 1, "span": 1,
                           "jump": slots, "count": slots, "rest": 1, "point": NUMBER_LINE_POINTS,
-                          "strip": 1, "groups": 1})
+                          "strip": 1, "groups": 1, "arrows": 1, "turns": 1},
+                   state={"arrow": None})
 
 
 def _nl_value(args: dict, key: str, report: Report, path: str, ctx: WidgetContext, required: bool = True):
@@ -618,6 +619,58 @@ def _nl_no_args(args: dict, ctx: WidgetContext, report: Report, path: str) -> No
         report.error("SS281", f"{path}.args.{key}", f"这个动作不带参数（多了 {key}）")
 
 
+def _nl_needs_arrows(ctx: WidgetContext, report: Report, path: str) -> None:
+    if ctx.definition.get("arrows") is not True:
+        report.error("SS287", path, f"箭头动作要先在 {ctx.obj_id} 上写 arrows: true（给转半圈预留位置）")
+
+
+def _nl_arrow(args: dict, ctx: WidgetContext, report: Report, path: str) -> None:
+    """arrow：从 0 指到 to 的箭头；keep 时上一支留一个淡影。"""
+    _nl_needs_arrows(ctx, report, path)
+    v = _nl_value(args, "to", report, path, ctx)
+    if v == 0:
+        report.error("SS282", f"{path}.args.to", "箭头要指到一个不是 0 的数")
+    _nl_role(args, report, path)
+    _nl_flag(args, "keep", report, path)
+    _unknown_args(args, {"to", "role", "keep"}, "arrow", report, path)
+    ctx.exposed.state["arrow"] = v if v else None
+
+
+def _nl_stretch(args: dict, ctx: WidgetContext, report: Report, path: str) -> None:
+    """stretch：现在这支箭头拉长或缩短到 to（方向不变）。"""
+    state = ctx.exposed.state
+    v = _nl_value(args, "to", report, path, ctx)
+    _unknown_args(args, {"to"}, "stretch", report, path)
+    if state.get("arrow") is None:
+        report.error("SS261", path, "还没有箭头：先用 arrow 画一支")
+    elif v is not None:
+        if v == 0 or (v > 0) != (state["arrow"] > 0):
+            report.error("SS282", f"{path}.args.to", f"stretch 不改方向（现在指向 {state['arrow']}）；掉头用 turn")
+        else:
+            state["arrow"] = v
+
+
+def _nl_turn(args: dict, ctx: WidgetContext, report: Report, path: str) -> None:
+    """turn：现在这支箭头绕 0 转半圈（乘 −1），从轴的上方扫过；label 写在半圆顶上。"""
+    state = ctx.exposed.state
+    if "label" in args and _str(args["label"]):
+        report.error("SS281", f"{path}.args.label", "label 应为非空的 LaTeX 字符串")
+    _unknown_args(args, {"label"}, "turn", report, path)
+    v = state.get("arrow")
+    if v is None:
+        report.error("SS261", path, "还没有箭头：先用 arrow 画一支")
+        return
+    bounds = _nl_bounds(ctx.definition)
+    if bounds and not bounds[0] <= -v <= bounds[1]:
+        report.error("SS282", path, f"转过去指向 {-v}，不在数轴 {list(bounds)} 上")
+    state["arrow"] = -v
+
+
+def _nl_erase(args: dict, ctx: WidgetContext, report: Report, path: str) -> None:
+    _nl_no_args(args, ctx, report, path)
+    ctx.exposed.state["arrow"] = None
+
+
 REGISTRY["number_line"] = Widget(
     "number_line",
     params={
@@ -627,10 +680,12 @@ REGISTRY["number_line"] = Widget(
         "fractions": (False, _bool),
         "unit": (False, _positive_number),
         "bars": (False, _bool),
+        "arrows": (False, _bool),
     },
     expose=_expose_number_line,
     actions={"jump": _nl_jump, "remainder": _nl_no_args, "subdivide": _nl_subdivide, "highlight": _nl_highlight,
-             "mark_point": _nl_mark_point, "erase": _nl_no_args, "bar": _nl_bar, "fill": _nl_fill, "group": _nl_group},
+             "mark_point": _nl_mark_point, "erase": _nl_erase, "bar": _nl_bar, "fill": _nl_fill, "group": _nl_group,
+             "arrow": _nl_arrow, "stretch": _nl_stretch, "turn": _nl_turn},
 )
 
 # ---------- 格子正方形（area_grid）：分数乘法的交叠格；rect 模式切长方形 ----------
