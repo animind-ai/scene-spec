@@ -1,0 +1,219 @@
+# 洞察系列 #15 负负得正（七年级）。按脚本 insight/ep15-negative-times-negative/script.yaml（第 1 轮）写。
+# 钩子问 (−2)×(−3) 为什么是 +6、停三秒、说出"老师规定的"；乘负三的规律表一行行往下，数轴上每次往右跳三格；
+# 预测暂停问 (−1)×(−3)；规律延续得 3、6；分配律 (−2)(−3) + 2(−3) = 0 说明只能是正六；
+# 数轴上乘 −1 是翻到零的另一边，翻两次回到正的这边；非例：(−2)+(−3) = −5，负号不抵消。
+spec: "0.1"
+
+meta:
+  id: ep15
+  title: 负负得正
+  line: insight
+  units: [J1]
+  episode: 15
+  grade: 七年级
+  author: Boxi Yu
+  license: CC-BY-4.0
+
+pedagogy:
+  insight: 乘负三的表里，乘数每少一，结果就加三；顺着规律往下走，负二乘负三只能是正六，分配律也只允许这个答案
+  misconception: 负负得正是老师规定的，没有道理；两个负号会抵消，所以负二加负三是正五
+  non_example: 加法里没有负负得正：负二加负三是从负二再往左走三格，到负五
+  status: proof
+  landing: Landing
+
+style:
+  theme: paper
+  canvas: "16:9"
+  voice:
+    persona: peer-ms
+    speed: 1.0
+  segmented: true
+  step_hold: 1.0
+
+objects:
+  q:
+    type: text
+    text: '$(-2)\times(-3)=+6\ ?$'
+    level: title
+    in: top
+  myth:
+    type: text
+    text: '[老师规定的？]{#m}'
+    role: "NO"
+    below: q
+    gap: sm
+  line:
+    widget: number_line
+    range: [-6, 6]
+    parts: 1
+    measures: ["3", "2"]
+    role: A
+    in: stage
+  r2:
+    type: text
+    text: '$2\times(-3)=-6$'
+    in: side
+  r3:
+    type: text
+    text: '$1\times(-3)=-3$'
+    below: r2
+    gap: sm
+  r4:
+    type: text
+    text: '$0\times(-3)=0$'
+    below: r3
+    gap: sm
+  r5q:
+    type: text
+    text: '$(-1)\times(-3)=\ ?$'
+    below: r4
+    gap: sm
+  r5:
+    type: text
+    text: '$(-1)\times(-3)=3$'
+    below: r4
+    gap: sm
+  r6:
+    type: text
+    text: '[$(-2)\times(-3)=6$]{#r .HL}'
+    below: r5
+    gap: sm
+  law:
+    type: text
+    text: '[$(-2)\times(-3)$]{#a .HL} [$+$]{#p} [$2\times(-3)$]{#b} [$=0\times(-3)=0$]{#c}'
+    level: title
+    in: top
+  add:
+    type: text
+    text: '[$(-2)+(-3)=-5$]{#s .NO}'
+    level: title
+    in: footer
+  cancel:
+    type: text
+    text: '[两个负号抵消？]{#x}'
+    role: "NO"
+    right_of: add
+    gap: lg
+  q2:
+    type: text
+    text: '$(-1)\times(-1)\times(-1)=\ ?$'
+    level: title
+    in: top
+
+beats:
+  - id: Hook
+    pause: {type: predict, prompt: (−2)×(−3) 为什么是 +6？先猜一猜。, hold: 3, app_item: ep15-before-1}
+    say:
+      - {id: s1, pace: ask, text: "{@q}负二乘负三，为什么会是正六？", en: "Negative two times negative three: why is it positive six?"}
+      - {id: s2, pace: normal, text: "先猜一猜，想三秒钟。", en: "Take a guess. Think for three seconds."}
+    do:
+      - {at: s1@q, act: show, target: q}
+
+  - id: Myth
+    shows: misconception
+    say:
+      - {id: s1, pace: normal, text: "很多人说，{@m}负负得正是老师规定的，没有什么道理。", en: "Lots of people say it's just a rule the teacher made up, with no reason behind it."}
+    do:
+      - {at: s1@m, act: show, target: myth}
+
+  - id: Setup
+    say:
+      - {id: s1, pace: normal, text: "{@t}表格里的每一行，都是某个数乘负三。", en: "Let's look at a table together. Every row is some number times negative three."}
+      - {id: s2, pace: normal, text: "{@b}二乘负三是负六，{@c}一乘负三是负三，都在零的左边。", en: "Two times negative three is negative six, one times is negative three; both are left of zero."}
+    do:
+      - {at: s1@t, act: show, target: line}
+      - {at: s2@b, act: show, target: r2}
+      - {with: prev, act: mark_point, target: line, args: {at: -6}}
+      - {at: s2@c, act: show, target: r3}
+
+  - id: Pattern
+    say:
+      - {id: s1, pace: normal, text: "前面的数每少一，{@j}结果就在数轴上往右跳三格，也就是加了三。", en: "Each time the first number drops by one, the result jumps three to the right: it goes up by three."}
+      - {id: s2, pace: normal, text: "{@z}零乘负三是零，从负三到零，正好又加了三。", en: "Zero times negative three is zero. From negative three to zero, up by three again."}
+    do:
+      - {at: s1@j, act: jump, target: line, args: {length: "3", count: 1, from: -6, numbers: false}, dur: fit}
+      - {at: s2@z, act: show, target: r4}
+      - {with: prev, act: jump, target: line, args: {length: "3", count: 1, from: -3, keep: true, numbers: false}, dur: 0.8}
+
+  - id: Predict
+    pause: {type: predict, prompt: 下一行 (−1)×(−3) 会是几？, hold: 3, app_item: ep15-predict-1}
+    say:
+      - {id: s1, pace: ask, text: "{@q}你猜下一行的负一乘负三会是几？", en: "What do you guess the next row, negative one times negative three, is?"}
+    do:
+      - {at: s1@q, act: show, target: r5q}
+
+  - id: Continue
+    say:
+      - {id: s1, pace: slow, text: "{@r}规律不变，还是再加三，从零跳到正三。", en: "The pattern doesn't change: up by three again, from zero to positive three."}
+      - {id: s2, pace: slow, text: "再往下一行，{@s}负二乘负三，再加三，就是正六。", en: "One more row: negative two times negative three, up by three, is positive six."}
+    do:
+      - {at: s1@r, act: hide, target: r5q}
+      - {with: prev, act: show, target: r5}
+      - {with: prev, act: jump, target: line, args: {length: "3", count: 1, from: 0, keep: true, numbers: false}, dur: 0.8}
+      - {at: s2, act: step}
+      - {at: s2@s, act: show, target: r6}
+      - {with: prev, act: jump, target: line, args: {length: "3", count: 1, from: 3, keep: true, numbers: false}, dur: 0.8}
+      - {after: prev, act: mark_point, target: line, args: {at: 6}}
+
+  - id: Distribute
+    say:
+      - {id: s1, pace: normal, text: "用分配律验证：{@d}负二加二是零，零乘负三也是零。", en: "Here's another way to see it. Negative two plus two is zero, and zero times negative three is zero."}
+      - {id: s2, pace: normal, text: "所以{@k}负二乘负三加上负六要等于零，{@o}它只能是正六。", en: "So negative two times negative three, plus negative six, has to make zero. It can only be positive six."}
+    do:
+      - {at: s1, act: step}
+      - {at: s1@d, act: hide, target: q}
+      - {with: prev, act: hide, target: myth}
+      - {after: prev, act: show, target: law}
+      - {at: s2@k, act: mark, target: "law#b"}
+      - {at: s2@o, act: mark, target: "law#a"}
+
+  - id: Flip
+    say:
+      - {id: s1, pace: normal, text: "在数轴上看，{@f}乘负一，就是把它翻到零的另一边。", en: "On the number line, multiplying by negative one flips you to the other side of zero."}
+      - {id: s2, pace: normal, text: "{@o}翻一次到负的那边，{@b}再翻一次，就回到正的这边。", en: "Flip once and you're on the negative side. Flip again and you're back on the positive side."}
+      - {id: s3, pace: slow, text: "{@s}负二乘负三，就是正六被翻了两次，{@h}又回到正的这边。", en: "Negative two times negative three is positive six flipped twice, so it ends up back on the positive side."}
+    do:
+      - {at: s1, act: unmark, target: "law#a"}
+      - {with: prev, act: unmark, target: "law#b"}
+      - {with: prev, act: erase, target: line}
+      - {at: s1@f, act: highlight, target: line, args: {to: 2, role: A}, dur: 0.6}
+      - {at: s2@o, act: highlight, target: line, args: {from: -2, to: 0, role: B}, dur: 0.8}
+      - {at: s2@b, act: highlight, target: line, args: {to: 2, role: A}, dur: 0.8}
+      - {at: s3@s, act: highlight, target: line, args: {to: 6, role: A}, dur: 0.6}
+      - {after: prev, act: highlight, target: line, args: {from: -6, to: 0, role: B}, dur: 0.6}
+      - {at: s3@h, act: highlight, target: line, args: {to: 6, role: HL}, dur: 0.6}
+
+  - id: NonExample
+    shows: non_example
+    say:
+      - {id: s1, pace: normal, text: "加法可不一样。{@a}负二加负三，{@l}是从负二再往左走三格。", en: "Adding is different. Negative two plus negative three starts at negative two and goes three more to the left."}
+      - {id: s2, pace: normal, text: "{@f}到了负五，{@x}两个负号没有抵消，加法里没有负负得正。", en: "It lands on negative five. The two minus signs don't cancel; adding has no negative-times-negative rule."}
+    do:
+      - {at: s1, act: erase, target: line}
+      - {at: s1@a, act: mark_point, target: line, args: {at: -2, role: A}}
+      - {with: prev, act: show, target: add}
+      - {at: s1@l, act: highlight, target: line, args: {from: -5, to: -2, role: "NO"}, dur: 1.0}
+      - {at: s2@f, act: mark_point, target: line, args: {at: -5, role: "NO"}}
+      - {at: s2@x, act: show, target: cancel}
+      - {after: prev, act: cross, target: "cancel#x"}
+
+  - id: Landing
+    shows: landing
+    say:
+      - {id: s1, pace: slow, text: "{@p}表里的规律要延续，{@d}分配律也要成立，负负就只能得正。", en: "For the table's pattern to carry on and the distributive law to keep working, negative times negative has to be positive."}
+    do:
+      - {at: s1@p, act: mark, target: "r6#r"}
+      - {at: s1@d, act: mark, target: "law#a"}
+
+  - id: Close
+    say:
+      - {id: s1, pace: normal, text: "{@n}所以负负得正不是谁硬规定的，而是唯一说得通的答案。", en: "So it isn't an arbitrary rule. It's the only answer that makes sense."}
+      - {id: s2, pace: ask, text: "{@q}负一乘负一再乘负一是正还是负？", en: "So what about negative one times negative one times negative one: positive or negative?"}
+    do:
+      - {at: s1@n, act: hide, target: law}
+      - {after: prev, act: show, target: q}
+      - {with: prev, act: show, target: myth}
+      - {after: prev, act: cross, target: "myth#m"}
+      - {at: s2@q, act: hide, target: q}
+      - {with: prev, act: hide, target: myth}
+      - {after: prev, act: show, target: q2}
