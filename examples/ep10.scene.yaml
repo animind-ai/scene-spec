@@ -1,0 +1,173 @@
+# 洞察系列 #10 比例：放大镜下形状不变（六年级）。单集。
+# 按脚本 insight/ep10-ratio-scaling/script.yaml（第 1 轮）写。组件 area_grid 的 rect 模式（小方格拼的长方形）。
+# 钩子问照片放大为什么形状不变、停三秒、说出"什么都变两倍，面积也是"；3 × 2 的小照片，3 : 2；
+# 先按错误想法都加两格：5 × 4 变方了；预测暂停后都乘二：6 × 4，6 : 4 还是一倍半；
+# 非例：大照片切成 2 × 2 张小照片，面积四倍；落到 3 : 2 = (3×2) : (2×2) = 6 : 4。
+# 5 × 4 和 6 × 4 都盖在小照片上、中心对齐（over：格子一样大，像放大镜下看；主讲区放不下两张并排的同样格子大小），
+# 切开前先收起小照片。
+spec: "0.1"
+
+meta:
+  id: ep10
+  title: 比例：放大镜下形状不变
+  line: insight
+  units: [H4]
+  episode: 10
+  grade: 六年级
+  author: Boxi Yu
+  license: CC-BY-4.0
+
+pedagogy:
+  insight: 宽和高同时乘同一个数，宽是高的几倍就不变，比值不变，形状就不变；可面积是宽乘高，两条边各乘一次，放大两倍面积就是四倍
+  misconception: 放大两倍，什么都跟着变两倍，面积也只变两倍；宽和高同时加上同一个数，形状也不变
+  non_example: 宽和高都加两格，三比二变成五比四，照片变方了；边长放大两倍，面积不是两倍，是四倍
+  status: proof
+  landing: Landing
+
+style:
+  theme: paper
+  canvas: "16:9"
+  voice:
+    persona: friend-ps
+    speed: 1.0
+  segmented: true
+  step_hold: 1.0
+
+objects:
+  small:
+    widget: area_grid
+    cols: 3
+    rows: 2
+    rect: true
+    in: stage
+  wide:
+    widget: area_grid
+    cols: 5
+    rows: 4
+    rect: true
+    over: small
+  big:
+    widget: area_grid
+    cols: 6
+    rows: 4
+    rect: true
+    over: small
+  myth:
+    type: text
+    text: '[面积也变两倍？]{#m}'
+    role: "NO"
+    level: title
+    in: side
+  r1:
+    type: text
+    text: '$3:2$'
+    level: title
+    in: footer
+  r2:
+    type: text
+    text: '[$(3+2):(2+2)$]{#l} [$=5:4$]{#r .NO}'
+    level: title
+    in: footer
+  law:
+    type: text
+    text: '[$3:2$]{#a} [$=(3\times 2):(2\times 2)$]{#m} [$=6:4$]{#b .HL}'
+    level: title
+    in: footer
+  area:
+    type: text
+    text: '[$6\times 4=24$]{#a} [$=4\times 6$]{#b .HL}'
+    level: title
+    in: footer
+
+beats:
+  - id: Hook
+    pause: {type: predict, prompt: 照片放大以后，为什么形状没变？先猜一猜。, hold: 3, app_item: ep10-before-1}
+    say:
+      - {id: s1, pace: ask, text: "{@q}照片放大以后，为什么形状一点都没变？", en: "When a photo is enlarged, why doesn't its shape change at all?"}
+      - {id: s2, pace: normal, text: "先猜一猜，想三秒。", en: "Take a guess. Think for three seconds."}
+    do:
+      - {at: s1@q, act: show, target: small}
+
+  - id: Myth
+    shows: misconception
+    say:
+      - {id: s1, pace: normal, text: "很多人觉得，{@m}放大两倍，什么都跟着变两倍，面积也一样。", en: "Lots of people think that if you scale by two, everything doubles, the area too."}
+    do:
+      - {at: s1@m, act: show, target: myth}
+
+  - id: Setup
+    say:
+      - {id: s1, pace: normal, text: "我们一起看。{@w}这张小照片宽三格，高两格，一共六格。", en: "Let's look together. This small photo is three squares wide and two squares tall, six squares in all."}
+      - {id: s2, pace: normal, text: "{@r}宽和高的比是三比二，宽是高的一倍半。", en: "The ratio of width to height is three to two: the width is one and a half times the height."}
+    do:
+      - {at: s1@w, act: fill, target: small, args: {role: A}}
+      - {at: s2@r, act: show, target: r1}
+
+  - id: Wrong
+    shows: misconception
+    say:
+      - {id: s1, pace: normal, text: "要是宽和高都加上两格呢？{@g}宽变成五格，高变成四格。", en: "What if we add two squares to both? The width becomes five and the height four."}
+      - {id: s2, pace: normal, text: "五比四，宽只比高多一点点，{@x}照片变方了，人也被压扁了。", en: "Five to four: the width is only a little more than the height. The photo has gone squarer, as if squashed."}
+    do:
+      - {at: s1@g, act: show, target: wide}
+      - {with: prev, act: hide, target: r1}
+      - {after: prev, act: show, target: r2}
+      - {after: prev, act: split, target: wide, args: {cols: [5], rows: [4]}}
+      - {at: s2@x, act: fill, target: wide, args: {role: "NO"}}
+
+  - id: Predict
+    pause: {type: predict, prompt: 宽和高都乘二，形状会变吗？, hold: 3, app_item: ep10-why-1}
+    say:
+      - {id: s1, pace: ask, text: "{@q}那宽和高都乘二，形状会变吗？", en: "So if we multiply both the width and the height by two, will the shape change?"}
+    do:
+      - {at: s1, act: hide, target: wide}
+      - {with: prev, act: hide, target: r2}
+
+  - id: Scale
+    say:
+      - {id: s1, pace: normal, text: "宽三乘二是六，高二乘二是四，{@b}变成一张六乘四的大照片。", en: "Width three times two is six, height two times two is four: a big six by four photo."}
+      - {id: s2, pace: normal, text: "六比四，宽还是高的一倍半，{@l}形状和小照片一模一样。", en: "Six to four: the width is still one and a half times the height. Same shape as the small photo."}
+      - {id: s3, pace: normal, text: "大照片里的人，和小照片里的一样，不会变胖也不会变瘦。", en: "The people in the big photo look just like in the small one, no fatter and no thinner."}
+      - {id: s4, pace: normal, text: "前项和后项同时乘同一个数，{@m}宽是高的几倍就不会变。", en: "Multiply both terms by the same number, and the width stays the same multiple of the height."}
+    do:
+      - {at: s1@b, act: show, target: big}
+      - {after: prev, act: split, target: big, args: {cols: [6], rows: [4]}}
+      - {at: s2@l, act: show, target: law}
+      - {at: s3, act: step}
+      - {at: s4@m, act: mark, target: "law#m"}
+
+  - id: NonExample
+    shows: non_example
+    say:
+      - {id: s1, pace: normal, text: "那面积呢？也只变两倍吗？{@c}我们来数一数，小照片是六格。", en: "And the area? Does it just double too? Let's count: the small photo has six squares."}
+      - {id: s2, pace: normal, text: "大照片横着切一刀，{@v}竖着切一刀，{@p}正好分成四张小照片。", en: "Cut the big photo once across and once down, and it splits into exactly four small photos."}
+      - {id: s3, pace: slow, text: "{@f}边长放大两倍，面积却变成了四倍，不是两倍。", en: "The sides scaled by two, but the area became four times as big, not two."}
+    do:
+      - {at: s1, act: unmark, target: "law#m"}
+      - {at: s2, act: hide, target: small}
+      - {with: prev, act: split, target: big, args: {cols: [6], rows: [2, 2]}}
+      - {at: s2@v, act: split, target: big, args: {cols: [3, 3], rows: [2, 2]}}
+      - {at: s2@p, act: apart, target: big, args: {gap: 0.3}}
+      - {after: prev, act: fill, target: big, args: {col: 0, row: 0, role: A, label: true}}
+      - {after: prev, act: fill, target: big, args: {col: 1, row: 0, role: B, label: true}}
+      - {after: prev, act: fill, target: big, args: {col: 0, row: 1, role: C, label: true}}
+      - {after: prev, act: fill, target: big, args: {col: 1, row: 1, role: HL, label: true}}
+      - {at: s3@f, act: hide, target: law}
+      - {after: prev, act: show, target: area}
+
+  - id: Landing
+    shows: landing
+    say:
+      - {id: s1, pace: slow, text: "{@law}所以比值不变，是因为宽和高乘了同一个数。", en: "So the ratio stays the same because the width and height were multiplied by the same number."}
+      - {id: s2, pace: normal, text: "面积是宽乘高，{@j}宽乘一次二，高也乘一次二，一共乘了四。", en: "Area is width times height: the width is multiplied by two once, the height once more, four in all."}
+    do:
+      - {at: s1@law, act: hide, target: area}
+      - {after: prev, act: show, target: law}
+      - {at: s2@j, act: join, target: big}
+
+  - id: Close
+    say:
+      - {id: s1, pace: normal, text: "放大两倍，形状不变，{@x}面积可不是两倍，是四倍。", en: "Scale by two: the shape stays, but the area isn't doubled, it's four times as big."}
+      - {id: s2, pace: ask, text: "{@q}为什么减去一个负数，反而是加上它？", en: "Next: why does subtracting a negative number add?"}
+    do:
+      - {at: s1@x, act: cross, target: "myth#m"}
