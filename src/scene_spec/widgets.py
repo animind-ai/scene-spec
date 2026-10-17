@@ -1596,6 +1596,13 @@ from .plane import register as _register_plane  # noqa: E402
 _register_plane(REGISTRY, Widget, Exposed, _unknown_args)
 
 
+# ---------- 立体（solid）：轴测图、立方体剖成三个四棱锥、水平截面；检查在 solid.py ----------
+
+from .solid import register as _register_solid  # noqa: E402
+
+_register_solid(REGISTRY)
+
+
 def lookup(name: str) -> Widget | None:
     """按名字找组件，忽略 @版本。"""
     return REGISTRY.get(name.split("@", 1)[0])

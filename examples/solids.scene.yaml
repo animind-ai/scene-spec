@@ -1,0 +1,116 @@
+# 立体组件 solid 的示例（洞察 #14「圆锥为什么是圆柱的 1/3」要用的画面）：四种立体的轴测图、正方体剖成三个全等的四棱锥
+# （分开、合回去）、同一高度的水平截面一样大（祖暅原理）。不是一集成片，每个 beat 演一组动作，
+# 给 kit 的截图回归和 inspect 分镜用；成片的稿子在洞察 #14 自己的目录里。
+spec: "0.1"
+
+meta:
+  id: solids
+  title: 立体：组件示例
+  line: insight
+  units: [P6]
+  episode: 14
+  grade: 六年级
+  author: Boxi Yu
+  license: CC-BY-4.0
+
+pedagogy:
+  insight: 正方体能切成三个一样的四棱锥；同样高处截面一样大的立体，体积一样
+  misconception: 锥体是柱体的一半
+  non_example: 圆锥没法像正方体那样切成三块一样的
+  status: proof
+  landing: Landing
+
+style:
+  theme: paper
+  canvas: "16:9"
+  voice:
+    persona: friend-ps
+    speed: 1.0
+
+objects:
+  four:
+    widget: solid
+    in: stage
+    bodies:
+      C: {cube: 2, label: 正方体}
+      P: {pyramid: {base: 2, h: 2}, role: B, label: 四棱锥}
+      Y: {cylinder: {r: 1, h: 2}, role: C, label: 圆柱}
+      K: {cone: {r: 1, h: 2}, role: HL, label: 圆锥}
+  third:
+    type: text
+    text: '每个四棱锥 $=\dfrac{1}{3}$ 正方体'
+    level: title
+    in: top
+  cube:
+    widget: solid
+    in: stage
+    bodies:
+      C: {cube: 2, role: DIM}
+    splits:
+      s: {body: C, into: [P1, P2, P3], gap: 2}
+  same:
+    type: text
+    text: '$S_1=S_2$'
+    level: title
+    in: top
+  zu:
+    widget: solid
+    in: stage
+    bodies:
+      P: {pyramid: {base: 2, h: 2}, role: B}
+      K: {cone: {r: 1.128, h: 2}, role: A}
+    plane: {bodies: [P, K], z: 0.5, compare: right, labels: ['$S_1$', '$S_2$']}
+
+beats:
+  - id: Shapes
+    say:
+      - {id: s1, pace: normal, text: "正方体、四棱锥、{@y}圆柱、圆锥。", en: "A cube, a square pyramid, a cylinder, a cone."}
+      - {id: s2, pace: normal, text: "{@m}尖尖的这两个，叫锥体。", en: "The two pointed ones are called cones and pyramids."}
+    do:
+      - {at: s1, act: show, target: four}
+      - {at: s2@m, act: mark, target: four#P}
+      - {with: prev, act: mark, target: four#K}
+
+  - id: Split
+    shows: misconception
+    say:
+      - {id: s1, pace: normal, text: "一个正方体，{@c}可以切成三块，{@a}分开看看。", en: "One cube can be cut into three pieces. Pull them apart."}
+      - {id: s2, pace: normal, text: "{@f}每一块都是四棱锥，{@j}三块合起来，还是那个正方体。", en: "Each piece is a square pyramid; put the three together, and it's the cube again."}
+    do:
+      - {at: s1, act: hide, target: four}
+      - {after: prev, act: show, target: cube}
+      - {at: s1@c, act: split, target: cube, args: {split: s}}
+      - {at: s1@a, act: apart, target: cube, args: {split: s}}
+      - {at: s2@f, act: set, target: cube#P1, args: {role: HL}}
+      - {at: s2@j, act: join, target: cube, args: {split: s}}
+      - {with: prev, act: set, target: cube#P1, args: {role: A}}
+      - {after: prev, act: show, target: third}
+
+  - id: Predict
+    shows: non_example
+    pause: {type: predict, prompt: 圆锥能不能也这样切？, hold: 3}
+    say:
+      - {id: s1, pace: ask, text: "圆锥切不成三块，怎么办？", en: "A cone can't be cut like that. What now?"}
+
+  - id: Sweep
+    say:
+      - {id: s1, pace: normal, text: "{@p}一个四棱锥，一个圆锥，底面一样大，高也一样。", en: "A pyramid and a cone: same base area, same height."}
+      - {id: s2, pace: normal, text: "{@z}拿一个平面横着切，{@c}把两个截面拿出来比。", en: "Slice them with a flat plane, and take the two cross-sections out to compare."}
+    do:
+      - {at: s1, act: hide, target: cube}
+      - {with: prev, act: hide, target: third}
+      - {after: prev, act: show, target: zu}
+      - {at: s2@z, act: sweep, target: zu, args: {z: 0.5}}
+      - {at: s2@c, act: compare, target: zu}
+
+  - id: Landing
+    shows: landing
+    say:
+      - {id: s1, pace: slow, text: "{@u}平面往上走，{@d}往下走，两个截面始终一样大。", en: "Move the plane up, move it down: the two sections always match."}
+      - {id: s2, pace: slow, text: "{@s}每一层都一样大，体积就一样。", en: "Every layer the same size, so the volumes are the same."}
+    do:
+      - {at: s1@u, act: sweep, target: zu, args: {z: 1.5}}
+      - {at: s1@d, act: sweep, target: zu, args: {z: 0.25}}
+      - {at: s2@s, act: show, target: same}
+      - {with: prev, act: mark, target: 'zu.flat[0]'}
+      - {with: prev, act: mark, target: 'zu.flat[1]'}
