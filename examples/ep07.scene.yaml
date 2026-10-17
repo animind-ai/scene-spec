@@ -182,7 +182,7 @@ beats:
         # en: Now count with the same step: three, then two more.
     do:
       - {at: s1@six, act: subdivide, target: line, args: {parts: 6}, dur: 1.2}
-      - {after: prev, act: step}
+      - {at: s2, act: step}        # 子步：六等分刻度出来，先看一眼
       - {at: s2@a, act: jump, target: line, args: {length: "1/6", count: 3}, dur: fit}
       - {at: s3@b, act: jump, target: line, args: {length: "1/6", count: 2, from: "1/2", keep: true, role: B}, dur: fit}
       - {at: s4@c, act: highlight, target: line, args: {to: "1/2", role: A}, dur: 0.8}
@@ -196,8 +196,7 @@ beats:
         # en: Five sixths is to the right of one half. Add a stretch, move forward a stretch.
     do:
       - {at: s1@ans, act: mark_point, target: line, args: {at: "5/6"}}
-      - {after: prev, act: step}
-      - {after: prev, act: hold, dur: 1.5}
+      - {at: s2, act: step}        # 子步：一共五格 = 5/6
       - {at: s2@w, act: mark_point, target: line, args: {at: "2/5", role: "NO"}}
       - {at: s2@fwd, act: hide, target: "line.point[3]"}
 
@@ -219,7 +218,6 @@ beats:
       - {after: prev, act: fill, target: line, args: {cells: "0:3", role: A}}
       - {after: prev, act: fill, target: line, args: {cells: "3:5", role: B}}
       - {at: s3@add, act: show, target: "eq#ans"}
-      - {after: prev, act: step}
       - {after: prev, act: hold, dur: 1}
 
   - id: Close

@@ -198,8 +198,7 @@ beats:
       - {at: s1@left, act: highlight, target: line6, args: {from: "2/3", to: 1, role: B}, dur: 0.8}
       - {at: s2@h, act: hide, target: ask}
       - {after: prev, act: show, target: inone}
-      - {after: prev, act: step}
-      - {after: prev, act: hold, dur: 1.5}
+      - {at: s3, act: step}        # 子步：1 里面有 3/2 个
       - {at: s3@six, act: unfocus, target: line6}
       - {with: prev, act: hide, target: "line6.span[0]"}
 
@@ -213,7 +212,6 @@ beats:
       - {at: s1@c, act: jump, target: line6, args: {length: "2/3"}, dur: fit}
       - {at: s2@nine, act: mark, target: "line6.count[8]"}
       - {at: s2@big, act: cross, target: myth}
-      - {after: prev, act: step}
       - {after: prev, act: hold, dur: 1.5}
 
   - id: NonExample
@@ -250,11 +248,11 @@ beats:
       - {with: prev, act: unghost, target: line6}
       - {with: prev, act: erase, target: line6}
       - {with: prev, act: hide, target: q2}
-      - {after: prev, act: subdivide, target: line6, args: {parts: 3}, dur: 0.8}
-      - {after: prev, act: jump, target: line6, args: {length: "2/3"}, dur: 1.5}
+      - {after: prev, act: subdivide, target: line6, args: {parts: 3}, dur: 0.6}
+      - {after: prev, act: jump, target: line6, args: {length: "2/3"}, dur: 1.0}
       - {with: prev, act: hide, target: "eq#flip"}
       - {with: prev, act: hide, target: "eq#ans"}
-      - {after: prev, act: set, target: eq, args: {opacity: 1}}
+      - {with: prev, act: set, target: eq, args: {opacity: 1}}
       - {at: s1@so, act: show, target: "eq#flip"}
       - {after: prev, act: show, target: "eq#ans"}
       - {at: s2@rn, act: show, target: eq2}

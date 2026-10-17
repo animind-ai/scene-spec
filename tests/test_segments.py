@@ -84,6 +84,14 @@ def test_step_mid_sentence_warns(ep09):
     assert ("warning", "SS446") in codes(ep09)
 
 
+@pytest.mark.parametrize("anchor", [{"after": "prev"}, {"with": "prev"}])
+def test_step_after_previous_action_warns(ep09, anchor):
+    """挂在 after / with 上的定格落点取决于前面动作的时长，容易切进句子中间。"""
+    assert ("warning", "SS447") not in codes(ep09)  # 样片里的子步都写在句子开头
+    beat(ep09, "Count")["do"].append({**anchor, "act": "step"})
+    assert ("warning", "SS447") in codes(ep09)
+
+
 def test_step_without_segmented_warns(ep09):
     ep09["style"]["segmented"] = False
     found = codes(ep09)

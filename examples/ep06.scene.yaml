@@ -137,8 +137,7 @@ beats:
     do:
       - {at: s1@one, act: jump, target: line, args: {length: "1/4", count: 2}, dur: fit}
       - {at: s1@stop, act: show, target: "eq#b"}
-      - {after: prev, act: step}
-      - {after: prev, act: hold, dur: 1.5}
+      - {at: s2, act: step}        # 子步：落回 1/2 之后定住，再说"一步没动"
       - {at: s2@gone, act: hide, target: "line.point[1]"}
       - {after: prev, act: hold, dur: 1.5}
       - {at: s3, act: hide, target: "line.jump[0]"}
@@ -204,8 +203,7 @@ beats:
       - {with: prev, act: mark, target: "eq#b"}
       - {at: s3@num, act: show, target: "rule#num"}
       - {with: prev, act: jump, target: line, args: {length: "1/4", count: 2}, dur: fit}
-      - {after: prev, act: step}
-      - {after: prev, act: hold, dur: 1}
+      - {at: s4, act: step}        # 子步：分子、分母都对上了图
       - {at: s4@x3, act: show, target: "rule#x3"}
       - {with: prev, act: mark, target: "eq#c"}
       - {after: prev, act: hold, dur: 0.5}

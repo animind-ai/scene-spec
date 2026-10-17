@@ -171,7 +171,7 @@ beats:
     do:
       - {at: s1@one, act: highlight, target: line, args: {to: "1/2", role: B, keep: true}, dur: 1.0}
       - {at: s1@stop, act: mark_point, target: line, args: {at: "1/2"}}
-      - {after: prev, act: step}
+      - {at: s2, act: step}        # 子步：停在 1/2
       - {at: s2@small, act: cross, target: "line.point[0]"}
       - {at: s2@part, act: clear, target: line}
       - {with: prev, act: hide, target: "line.point[0]"}
@@ -205,7 +205,6 @@ beats:
       - {after: prev, act: show, target: sq_eq}
       - {at: s2@m, act: hide, target: square}
       - {with: prev, act: show, target: line}
-      - {after: prev, act: step}
       - {after: prev, act: hold, dur: 1}
 
   - id: NonExample
@@ -250,7 +249,6 @@ beats:
       - {at: s2@num, act: unfocus, target: square}
       - {with: prev, act: focus, target: "square.overlap[0]"}
       - {after: prev, act: show, target: "eq#ans"}
-      - {after: prev, act: step}
       - {after: prev, act: unfocus, target: square}
 
   - id: Close

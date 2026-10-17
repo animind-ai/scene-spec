@@ -104,6 +104,11 @@ def check(doc: dict, report: Report, stats: dict | None = None) -> None:
                 if segmented and isinstance(at, str) and ("@" in at or "+" in at):
                     report.warning("SS446", f"{path}.at",
                                    "定格会在书签或句中某一刻插入静音，把一句话切开；子步边界最好放在句子开头（at: s2）")
+                if segmented and ("after" in action or "with" in action):
+                    key = "after" if "after" in action else "with"
+                    report.warning("SS447", f"{path}.{key}",
+                                   "定格挂在 after / with 上，落点由前面动作的时长决定，常常切在句子中间（画面定住、旁白停一秒）；"
+                                   "写成 at: s2（下一句开头），这一段最后一句之后的定格可以删掉（段尾本来就是分段点）")
             elif act == "pin":
                 counts["pins"] += 1
                 if not _whole(sel):
