@@ -1,0 +1,216 @@
+# 洞察系列 #5 竖式乘法到底在干什么（数的世界入门系列第五集，三到四年级）。
+# 开场就是 #4 的片尾画面（切成两块的长方形、(5 + 3) × 4 = 5 × 4 + 3 × 4）；钩子问竖式为什么错一位、停三秒、
+# 说出"20 × 10 + 3 × 4 = 212"；23 × 14 的长方形画成大块，横竖各切一刀成四块 200、30、80、12；
+# 迷思只算了两个角；预测暂停问竖式下面那一排的 23 是几个 23；上面两块是十个 23（230），下面两块是 23 × 4（92）；
+# 非例：不错位只得 115，比 230 还少；落到 92 + 230 = 322。结尾只留一个小方块"1"，问题接到分数系列 #6。
+# 竖式放在右侧栏（这一集的长方形不用和 #6 逐帧接上，侧栏让主讲区变窄没关系）；开头那块小长方形不和侧栏同时出现。
+# 脚本：insight/ep05-long-multiplication/script.yaml（第 1 轮）。
+spec: "0.1"
+
+meta:
+  id: ep05
+  title: 竖式乘法到底在干什么
+  line: insight
+  units: [M1]
+  episode: 5
+  grade: 三到四年级
+  author: Boxi Yu
+  license: CC-BY-4.0
+
+pedagogy:
+  insight: 二十三乘十四的长方形切成四块；竖式的第二排是上面两块，那是十个二十三，所以要错一位
+  misconception: 二十三乘十四就是二十乘十加三乘四，得二百一十二（漏掉交叉的两块）
+  non_example: 第二排不错位，就成了九十二加二十三，只有一百一十五，比十个二十三还少
+  status: proof
+  landing: Equation
+
+style:
+  theme: paper
+  canvas: "16:9"
+  voice:
+    persona: friend-ps
+    speed: 1.0
+  segmented: true
+  step_hold: 1.0
+
+objects:
+  # 开场：#4 的片尾（同样的定义）
+  rect:
+    widget: area_grid
+    cols: 8
+    rows: 4
+    rect: true
+    in: stage
+  end_eq4:
+    type: text
+    text: '$(5+3)\times4=5\times4+3\times4$'
+    level: title
+    in: top
+  q:
+    type: text
+    text: '$23\times14$：竖式为什么错一位？'
+    level: title
+    in: top
+  myth:
+    type: text
+    text: '[$20\times10+3\times4=212$]{#m}？'
+    role: "NO"
+    level: title
+    in: footer
+  big:
+    widget: area_grid
+    cols: 23
+    rows: 14
+    rect: true
+    lines: false
+    in: stage
+    allow:
+      small: true      # 3 格宽的两块里 30、12 两个数比 label 下限小约一成：主讲区要让给顶部算式、底部说明和右侧竖式
+  work:
+    type: math
+    tex: '\begin{array}{r}23\\ \times\ 14\\ \hline 92\\ 23\phantom{0}\end{array}'
+    level: title
+    in: side
+  work2:
+    type: math
+    tex: '\begin{array}{r}23\\ \times\ 14\\ \hline 92\\ 23\phantom{0}\\ \hline 322\end{array}'
+    level: title
+    in: side
+  r1:
+    type: text
+    text: '[上面两块：$23\times10=230$]{#t .A}'
+    in: footer
+  r2:
+    type: text
+    text: '[下面两块：$23\times4=92$]{#b .B}'
+    right_of: r1
+    gap: lg
+  bad:
+    type: text
+    text: '不错位：[$92+23=115$]{#x}，比 $230$ 还少'
+    role: "NO"
+    in: footer
+  eq:
+    type: text
+    text: '[$23\times14$]{#l} [$=200+30+80+12$]{#m} [$=322$]{#r .HL}'
+    level: title
+    in: top
+  unit:
+    widget: area_grid
+    cols: 1
+    rows: 1
+    rect: true
+    in: stage
+  one:
+    type: text
+    text: '$1$'
+    level: title
+    below: unit
+    gap: sm
+
+beats:
+  - id: Hook
+    pause: {type: predict, prompt: 竖式里为什么要错一位？先猜一猜。, hold: 3, app_item: ep05-before-1}
+    say:
+      - {id: s1, pace: ask, text: "{@q}为什么二十三乘十四的竖式里，要错一位？", en: "Twenty-three times fourteen: why does long multiplication shift a row over?"}
+      - {id: s2, pace: normal, text: "先猜一猜，想三秒钟。", en: "Have a guess. Think for three seconds."}
+    do:
+      # 开场：#4 的片尾画面
+      - {at: s1, act: show, target: rect, dur: 0.01}
+      - {after: prev, act: split, target: rect, args: {cols: [5, 3]}, dur: 0.01}
+      - {after: prev, act: fill, target: rect, args: {col: 0, role: A, label: true}, dur: 0.01}
+      - {with: prev, act: fill, target: rect, args: {col: 1, role: B, label: true}, dur: 0.01}
+      - {with: prev, act: show, target: end_eq4, dur: 0.01}
+      - {at: s1@q, act: hide, target: end_eq4}
+      - {after: prev, act: show, target: q}
+
+  - id: Myth
+    shows: misconception
+    say:
+      - {id: s1, pace: normal, text: "{@m}有人算二十乘十加三乘四，得二百一十二。", en: "Some people work out twenty times ten plus three times four, and get two hundred and twelve."}
+    do:
+      - {at: s1@m, act: show, target: myth}
+
+  - id: Setup
+    say:
+      - {id: s1, pace: normal, text: "我们一起看。{@r}还是上一集的长方形。", en: "Let's look together. It's the rectangle from last time."}
+      - {id: s2, pace: normal, text: "这次宽二十三，高十四，{@b}格子太多，画成大块。", en: "This time it's twenty-three wide and fourteen tall. Too many squares, so we draw big blocks."}
+    do:
+      - {at: s1@r, act: unfill, target: rect}
+      - {at: s2@b, act: hide, target: rect}
+      - {after: prev, act: show, target: big}
+
+  - id: Cut
+    say:
+      - {id: s1, pace: normal, text: "宽在二十和三中间，{@c}先竖着切一刀。", en: "Across the width, between twenty and three, cut down once."}
+      - {id: s2, pace: normal, text: "高在十和四中间，{@r}再横着切一刀。", en: "Up the height, between ten and four, cut across once more."}
+      - {id: s3, pace: normal, text: "{@f}切成四块，二百、三十、八十，还有十二。", en: "That makes four blocks: two hundred, thirty, eighty, and twelve."}
+    do:
+      - {at: s1@c, act: split, target: big, args: {cols: [20, 3]}, dur: 0.8}
+      - {at: s2@r, act: split, target: big, args: {cols: [20, 3], rows: [10, 4]}, dur: 0.8}
+      - {at: s3@f, act: apart, target: big, args: {gap: 0.5}}
+      - {after: prev, act: fill, target: big, args: {col: 0, row: 0, role: A, label: true}}
+      - {after: prev, act: fill, target: big, args: {col: 1, row: 0, role: C, label: true}}
+      - {after: prev, act: fill, target: big, args: {col: 0, row: 1, role: C, label: true}}
+      - {after: prev, act: fill, target: big, args: {col: 1, row: 1, role: B, label: true}}
+
+  - id: Wrong
+    shows: misconception
+    say:
+      - {id: s1, pace: normal, text: "{@w}二十乘十加三乘四，只算了两个角。", en: "Twenty times ten plus three times four only counts two corners."}
+      - {id: s2, pace: normal, text: "{@x}中间交叉的两块，三十和八十，漏掉了。", en: "The two crossing blocks, thirty and eighty, got left out."}
+    do:
+      - {at: s2@x, act: cross, target: "myth#m"}
+
+  - id: Predict
+    pause: {type: predict, prompt: 竖式下面那一排的 23，其实是几个 23？, hold: 2.5, app_item: ep05-predict-1}
+    say:
+      - {id: s1, pace: ask, text: "{@q}竖式下面那一排的二十三，其实是几个二十三？", en: "The twenty-three in the lower row of the working: how many twenty-threes is it really?"}
+    do:
+      - {at: s1, act: hide, target: myth}
+      - {at: s1@q, act: show, target: work}
+
+  - id: Reveal
+    shows: non_example
+    say:
+      - {id: s1, pace: slow, text: "{@t}是十个二十三，就是上面两块，二百三十。", en: "It's ten twenty-threes: the top two blocks, two hundred and thirty."}
+      - {id: s2, pace: normal, text: "{@b}第一排二十三乘四，是下面两块，九十二。", en: "The first row, twenty-three times four, is the bottom two blocks, ninety-two."}
+      - {id: s3, pace: normal, text: "{@w}要是不错位，就成了九十二加二十三。", en: "Without the shift, it would be ninety-two plus twenty-three."}
+      - {id: s4, pace: normal, text: "{@x}才一百一十五，比十个二十三还少，不对。", en: "Only one hundred and fifteen, fewer than ten twenty-threes. That's wrong."}
+    do:
+      - {at: s1@t, act: show, target: r1}
+      - {at: s2, act: step}
+      - {at: s2@b, act: show, target: r2}
+      - {at: s3@w, act: hide, target: r1}
+      - {with: prev, act: hide, target: r2}
+      - {after: prev, act: show, target: bad}
+      - {at: s4@x, act: cross, target: "bad#x"}
+
+  - id: Equation
+    shows: landing
+    say:
+      - {id: s1, pace: normal, text: "{@e}九十二加上二百三十，一共三百二十二。", en: "Ninety-two plus two hundred and thirty makes three hundred and twenty-two."}
+      - {id: s2, pace: normal, text: "{@s}错一位，是因为那一排是十个二十三。", en: "The shift is there because that row is ten twenty-threes."}
+    do:
+      - {at: s1, act: hide, target: bad}
+      - {with: prev, act: hide, target: q}
+      - {at: s1@e, act: transform, from: work, to: work2}
+      - {with: prev, act: hide, target: work}
+      - {with: prev, act: show, target: eq}
+      - {at: s2@s, act: show, target: r1}
+      - {after: prev, act: mark, target: "r1#t"}
+
+  - id: LookBack
+    say:
+      - {id: s1, pace: normal, text: "这五集，我们把数排一排、转一转、切一切。", en: "In these five episodes, we lined numbers up, turned them, and cut them."}
+      - {id: s2, pace: normal, text: "看完和大人一起，在方格纸上切四块算一算。", en: "After watching, cut a rectangle into four blocks on squared paper with a grown-up and add them up."}
+      - {id: s3, pace: ask, text: "{@n}要是把一切成几份，会得到什么新的数？", en: "What if we cut one into equal parts? What new kind of number do we get?"}
+    do:
+      - {at: s1, act: unmark, target: "r1#t"}
+      # 收尾：只留一个小方块"1"，问题接到分数系列 #6
+      - {at: s3@n, act: hide, target: big}
+      - {with: prev, act: hide, target: work2}
+      - {with: prev, act: hide, target: eq}
+      - {with: prev, act: hide, target: r1}
+      - {after: prev, act: show, target: unit}
+      - {with: prev, act: show, target: one}
