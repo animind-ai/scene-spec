@@ -147,6 +147,11 @@ class _Checker:
             self.resolve(ref, f"{path}.align.{axis}", self_id=obj_id)
         if definition.get("pin"):
             self.referenced.add(obj_id)
+        for kind in ("cross", "overlap"):
+            targets = (definition.get("allow") or {}).get(kind)
+            for i, other in enumerate(targets if isinstance(targets, list) else []):
+                if other not in self.objects:
+                    self.r.error("SS343", f"{path}.allow.{kind}[{i}]", f"没有对象 {other!r}")
         if "at" in definition:
             self.stats["absolute_coords"] += 1
             if self.line == "insight":

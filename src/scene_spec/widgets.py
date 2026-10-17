@@ -51,7 +51,7 @@ class Widget:
 
 LAYOUT_KEYS = {
     "widget", "role", "in", "below", "above", "left_of", "right_of", "within", "over",
-    "gap", "align", "size", "pin", "at",
+    "gap", "align", "size", "pin", "at", "allow",
 }
 
 

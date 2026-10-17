@@ -366,6 +366,26 @@
             "top"
           ]
         },
+        "allow": {
+          "description": "有意为之的版式例外：kit 的字形级检查（inspect）不报。cross：线穿过文字；overlap：文字压住文字（true = 和任何对象，列表 = 只和这些对象，对称）；small：小字；clip：伸出画面。",
+          "type": "object",
+          "additionalProperties": false,
+          "minProperties": 1,
+          "properties": {
+            "cross": {
+              "$ref": "#/$defs/allowTargets"
+            },
+            "overlap": {
+              "$ref": "#/$defs/allowTargets"
+            },
+            "small": {
+              "const": true
+            },
+            "clip": {
+              "const": true
+            }
+          }
+        },
         "at": {
           "description": "绝对坐标逃生口：insight 线禁止，其余警告。",
           "type": "array",
@@ -376,6 +396,20 @@
           "maxItems": 2
         }
       }
+    },
+    "allowTargets": {
+      "oneOf": [
+        {
+          "const": true
+        },
+        {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/objectId"
+          }
+        }
+      ]
     },
     "objectDef": {
       "oneOf": [

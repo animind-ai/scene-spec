@@ -219,6 +219,22 @@ def test_absolute_coords_rejected_on_insight_line(insight):
     assert report.codes() == ["SS342"]
 
 
+def test_allow_layout_exceptions(example):
+    example["objects"]["answer"]["allow"] = {"cross": True, "overlap": ["table"], "small": True, "clip": True}
+    example["objects"]["table"]["allow"] = {"cross": ["answer"]}  # 组件对象也可以写
+    assert codes(example) == []
+
+
+def test_allow_unknown_target_rejected(example):
+    example["objects"]["answer"]["allow"] = {"cross": ["nope"]}
+    assert codes(example) == ["SS343"]
+
+
+def test_allow_bad_shape_is_structural(example):
+    example["objects"]["answer"]["allow"] = {"small": False}
+    assert "SS100" in codes(example)
+
+
 # ---------- 教学信息 ----------
 
 def test_insight_requires_full_card(insight):
