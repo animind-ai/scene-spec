@@ -1,0 +1,221 @@
+# 洞察系列 #24 抛物线的顶点在哪（九年级）。按脚本 insight/ep24-parabola-vertex/script.yaml（第 1 轮）写。
+# 钩子问 y = (x − 1)² 的顶点、停三秒、说出"顶点在 x = −1"；先照错误想法代 x = −1，得 y = 4，曲线右边还在往下走；
+# 平方 ≥ 0，括号等于零的地方才最低，顶点 (1, 0)；预测暂停：后面加 2；k 从 0 到 2 整条上移，a 从 1 到 2 收窄、顶点不动；
+# 非例：同一条曲线写成 x² − 2x + 3，照数字读成 (2, 3)，这个点在半山腰；配方（回访 #23）读出 (1, 2)；
+# 落到 y = a(x − h)² + k → 顶点 (h, k)。画面只用 graph 组件 + 场景参数（a、h、k）。
+spec: "0.1"
+
+meta:
+  id: ep24
+  title: 抛物线的顶点在哪
+  line: insight
+  units: [J9]
+  episode: 24
+  grade: 九年级
+  author: Boxi Yu
+  license: CC-BY-4.0
+
+pedagogy:
+  insight: 平方不会是负数，最小是零；y = a(x − h)² + k 里括号等于零的地方就是顶点，x = h，这时 y = k；a 只管开口宽窄，不动顶点
+  misconception: 看到 x − 1，就说顶点在 x = −1
+  non_example: y = x² − 2x + 3 照数字读成 (2, 3)，这个点在曲线上却在半山腰；配方成 (x − 1)² + 2 才看出顶点 (1, 2)
+  status: proof
+  landing: Landing
+
+style:
+  theme: paper
+  canvas: "16:9"
+  voice:
+    persona: teacher-hs
+    speed: 1.0
+  segmented: true
+  step_hold: 1.0
+
+params:
+  a: {value: 1, min: 0.25, max: 3}   # 开口
+  h: 1                                # 顶点横坐标
+  k: {value: 0, min: -1, max: 3}     # 顶点纵坐标
+
+objects:
+  g:
+    widget: graph
+    x: [-2.5, 4.5]
+    y: [-1.0, 6.5]
+    plots:
+      - {f: "a*(x-h)^2+k"}
+      - {f: "(x-1)^2"}   # 不画：只给开场两个点定位，参数变时它们不跟着动
+    points:
+      - {x: -1, plot: 1, role: "NO", label: "(-1,4)", label_dir: l}
+      - {x: 1, plot: 1, role: HL, label: "(1,0)", label_dir: d}
+      - {x: "h", role: HL, label: "(1,2)", label_dir: d}
+      - {x: 2, role: "NO", label: "(2,3)", label_dir: r}
+    in: stage
+  f1:
+    type: math
+    tex: 'y=(x-1)^2'
+    role: A
+    level: title
+    in: side
+  wrong:
+    type: text
+    text: '[顶点在 $x=-1$？]{#m}'
+    role: "NO"
+    below: f1
+    gap: lg
+  calc:
+    type: math
+    tex: '(-1-1)^2=4'
+    role: "NO"
+    below: wrong
+    gap: md
+  sq:
+    type: math
+    tex: '(x-1)^2\ge 0'
+    role: B
+    below: calc
+    gap: md
+  f2:
+    type: math
+    tex: 'y=(x-1)^2+2'
+    role: A
+    level: title
+    in: side
+  ask:
+    type: text
+    text: 顶点跑到哪？
+    role: HL
+    below: f2
+    gap: lg
+  f3:
+    type: math
+    tex: 'y=2(x-1)^2+2'
+    role: A
+    below: f2
+    gap: lg
+  f4:
+    type: math
+    tex: 'y=x^2-2x+3'
+    role: A
+    level: title
+    in: side
+  wrong2:
+    type: text
+    text: '[顶点 $(2,3)$？]{#m}'
+    role: "NO"
+    below: f4
+    gap: lg
+  comp:
+    type: math
+    tex: '=(x-1)^2+2'
+    role: B
+    below: wrong2
+    gap: md
+  law:
+    type: text
+    text: '$y=a(x-h)^2+k$　→　顶点 $(h,k)$'
+    role: HL
+    in: footer
+  nq:
+    type: text
+    text: '$x$ 换成 $x+2$，为什么左移？'
+    role: HL
+    level: title
+    in: side
+
+beats:
+  - id: Hook
+    pause: {type: predict, prompt: y = (x − 1)² 的顶点在哪里？先猜一猜。, hold: 3, app_item: ep24-before-1}
+    say:
+      - {id: s1, pace: ask, text: "{@f}抛物线 y 等于 x 减一的平方的顶点在哪里？", en: "y equals x minus one, squared. Where is the vertex of this parabola?"}
+      - {id: s2, pace: normal, text: "先猜一猜，想三秒。", en: "Take a guess. Think for three seconds."}
+    do:
+      - {at: s1, act: show, target: g.axes}
+      - {at: s1@f, act: show, target: f1}
+
+  - id: Myth
+    shows: misconception
+    say:
+      - {id: s1, pace: normal, text: "很多人看到减一，{@w}就说顶点在 x 等于负一。", en: "Lots of people see the minus one and say the vertex is at x equals minus one."}
+    do:
+      - {at: s1@w, act: show, target: wrong}
+
+  - id: Setup
+    say:
+      - {id: s1, pace: normal, text: "我们先代进去看看，{@x}x 等于负一时，括号里是负二，{@y}y 等于四。", en: "Let's try it. At x equals minus one, the bracket is minus two, so y is four."}
+      - {id: s2, pace: normal, text: "这可不是最低点，曲线在它右边还一路往下走，越走越低。", en: "That's not the lowest point. The curve keeps going down to its right, lower and lower."}
+      - {id: s3, pace: normal, text: "{@sq}平方不会是负数，最小就是零，所以要括号里等于零才行。", en: "A square is never negative. Its smallest value is zero, so we need the bracket to be zero."}
+      - {id: s4, pace: normal, text: "x 减一等于零，就是 x 等于一，{@v}顶点是横坐标一、纵坐标零。", en: "x minus one equals zero means x equals one, so the vertex is at one, zero."}
+    do:
+      - {at: s1@x, act: draw, target: g, args: {plot: 0}}
+      - {with: prev, act: show, target: "g.point[0]"}
+      - {at: s1@y, act: show, target: calc}
+      - {at: s3@sq, act: show, target: sq}
+      - {at: s4@v, act: show, target: "g.point[1]"}
+      - {with: prev, act: cross, target: "wrong#m"}
+
+  - id: Predict
+    pause: {type: predict, prompt: y = (x − 1)² + 2 的顶点会跑到哪里？, hold: 3, app_item: ep24-why-1}
+    say:
+      - {id: s1, pace: ask, text: "{@ask}那在后面再加上二，顶点会跑到哪里去？", en: "Now add two at the end. Where will the vertex go?"}
+    do:
+      - {at: s1, act: hide, target: f1}
+      - {with: prev, act: hide, target: wrong}
+      - {with: prev, act: hide, target: calc}
+      - {with: prev, act: hide, target: sq}
+      - {with: prev, act: hide, target: "g.point[0]"}
+      - {after: prev, act: show, target: f2}
+      - {at: s1@ask, act: show, target: ask}
+
+  - id: Move
+    say:
+      - {id: s1, pace: normal, text: "加二，就是每个 y 都多二，{@up}整条曲线往上抬两格。", en: "Adding two raises every y by two, so the whole curve lifts up two units."}
+      - {id: s2, pace: normal, text: "最低点还在括号等于零的地方，{@v}横坐标还是一，纵坐标变成二。", en: "The lowest point is still where the bracket is zero: x is still one, and y is now two."}
+      - {id: s3, pace: normal, text: "{@a}要是前面再乘二，每一点离顶点的高度都翻倍，{@n}曲线变窄。", en: "And if we multiply by two in front, every point's height above the vertex doubles, and the curve gets narrower."}
+      - {id: s4, pace: normal, text: "括号等于零的地方，乘二还是零，所以顶点不动。", en: "Where the bracket is zero, times two is still zero, so the vertex stays put."}
+    do:
+      - {at: s1, act: hide, target: ask}
+      - {with: prev, act: hide, target: "g.point[1]"}
+      - {at: s1@up, act: tween, args: {k: 2}, dur: fit}
+      - {at: s2@v, act: show, target: "g.point[2]"}
+      - {at: s3@a, act: show, target: f3}
+      - {at: s3@n, act: tween, args: {a: 2}, dur: fit}
+
+  - id: NonExample
+    shows: non_example
+    say:
+      - {id: s1, pace: ask, text: "{@f}要是式子写成 x 方减二 x 加三，顶点在哪？", en: "What if the formula is written as x squared minus two x plus three? Where is the vertex?"}
+      - {id: s2, pace: normal, text: "照数字去读，{@w}会以为横坐标二、纵坐标三，{@p}可那个点只在半山腰。", en: "Reading off the numbers, you'd guess x is two and y is three. But that point is only halfway up the side."}
+      - {id: s3, pace: normal, text: "还记得配方吗？{@c}它正是 x 减一的平方加二，{@v}顶点还是横坐标一、纵坐标二。", en: "Remember completing the square? It's exactly x minus one squared plus two, so the vertex is still x one, y two."}
+    do:
+      - {at: s1, act: hide, target: f2}
+      - {with: prev, act: hide, target: "g.point[2]"}
+      - {with: prev, act: hide, target: f3}
+      - {with: prev, act: tween, args: {a: 1}, dur: 1.2}
+      - {at: s1@f, act: show, target: f4}
+      - {at: s2@w, act: show, target: wrong2}
+      - {at: s2@p, act: show, target: "g.point[3]"}
+      - {at: s3@c, act: show, target: comp}
+      - {with: prev, act: cross, target: "wrong2#m"}
+      - {at: s3@v, act: show, target: "g.point[2]"}
+
+  - id: Landing
+    shows: landing
+    say:
+      - {id: s1, pace: slow, text: "所以 y 等于 a 乘 x 减 h 的平方加 k，{@law}顶点的坐标就是 h 和 k。", en: "So for y equals a times x minus h squared plus k, the vertex is h, k."}
+      - {id: s2, pace: normal, text: "h 是让括号等于零的那个 x，k 是这时候的 y 值。", en: "h is the x that makes the bracket zero, and k is the y at that moment."}
+      - {id: s3, pace: normal, text: "{@a}a 只管开口的宽窄，{@back}不会挪动顶点的位置。", en: "The a only changes how wide it opens. It never moves the vertex."}
+    do:
+      - {at: s1, act: hide, target: "g.point[3]"}
+      - {at: s1@law, act: show, target: law}
+      - {at: s3@a, act: tween, args: {a: 0.5}, dur: fit}
+      - {at: s3@back, act: tween, args: {a: 1}, dur: fit}
+
+  - id: Close
+    say:
+      - {id: s1, pace: normal, text: "看到减一，顶点却在正一，因为括号只有在那里才等于零。", en: "See minus one, find the vertex at plus one: that's the only place the bracket is zero."}
+      - {id: s2, pace: ask, text: "{@q}那为什么把 x 换成 x 加二，图像反而往左移？", en: "Then why does replacing x with x plus two move the graph to the left?"}
+    do:
+      - {at: s2@q, act: hide, target: f4}
+      - {with: prev, act: hide, target: wrong2}
+      - {with: prev, act: hide, target: comp}
+      - {after: prev, act: show, target: nq}
