@@ -263,6 +263,12 @@
         "segmented": {
           "type": "boolean"
         },
+        "step_hold": {
+          "description": "segmented 为真时，每个子步（step 动作）结束定格的秒数，默认 1.0",
+          "type": "number",
+          "minimum": 0,
+          "maximum": 10
+        },
         "subtitles": {
           "enum": [
             "soft",
@@ -582,6 +588,11 @@
           ]
         }
       ],
+      "allOf": [
+        {
+          "$ref": "#/$defs/segmentArgs"
+        }
+      ],
       "properties": {
         "at": {
           "$ref": "#/$defs/timeRef"
@@ -707,6 +718,57 @@
           }
         }
       }
+    },
+    "segmentArgs": {
+      "description": "分段相关动作的参数：ghost 残影、unghost、step 子步定格、pin 常驻。其他动作不受影响。",
+      "allOf": [
+        {
+          "if": {
+            "required": ["act"],
+            "properties": {"act": {"const": "ghost"}}
+          },
+          "then": {
+            "properties": {
+              "args": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "place": {"enum": ["stay", "above", "below", "left_of", "right_of"]},
+                  "gap": {"enum": ["xs", "sm", "md", "lg", "xl"]},
+                  "scale": {"type": "number", "minimum": 0.3, "maximum": 1},
+                  "opacity": {"type": "number", "minimum": 0.1, "maximum": 0.6}
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "required": ["act"],
+            "properties": {"act": {"const": "step"}}
+          },
+          "then": {
+            "properties": {
+              "args": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "hold": {"type": "number", "minimum": 0, "maximum": 10}
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "required": ["act"],
+            "properties": {"act": {"enum": ["unghost", "pin"]}}
+          },
+          "then": {
+            "not": {"required": ["args"]}
+          }
+        }
+      ]
     }
   }
 }

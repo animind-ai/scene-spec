@@ -2,7 +2,10 @@
 # 钩子先让观众预测"6÷2/3 比 6 大还是小"，戳破"除法一定让数变小"；中段在一条数轴上反复做同一个动作——
 # 把每个 1 重新等分、几份一跳地数"里面有几个除数"：先 2/3（变大），再 3/2（比 1 大的除数，变小），
 # 最后 4/5 跳不完整（非例：剩下的两份要按"一跳"读成 1/2，不能按单位 1 读成 2/5）。
-# 结尾把"颠倒相乘"和"通分后分子相除"并排比较。小学集默认分段播放。
+# 结尾把"颠倒相乘"和"通分后分子相除"并排比较。
+# 小学集默认分段播放：核心变形（分份 → 一跳 → 数出九跳 → 算式 → 落地）每个子步结束定格（step），
+# 换下一个除数时把上一个除数的数轴留成淡色残影（ghost）在上方对照；落地的规则公式常驻（pin），后面不再收掉。
+# 字幕走软字幕（kit 导出 .vtt / .srt 并封装进 mp4，可关），不烧进画面。
 spec: "0.1"
 
 meta:
@@ -29,6 +32,7 @@ style:
     persona: friend-ps
     speed: 1.0
   segmented: true
+  step_hold: 1.0
   subtitles: soft
 
 objects:
@@ -89,7 +93,7 @@ objects:
 beats:
   - id: Hook
     shows: misconception
-    pause: {type: predict, prompt: 6÷2/3 比 6 大还是小？先猜一猜。, hold: 0.5}
+    pause: {type: predict, prompt: 6÷2/3 比 6 大还是小？先猜一猜。, hold: 0.5, app_item: ep09-predict-1}
     say:
       - {id: s1, pace: normal, text: "{@q}六除以三分之二，比六大，还是比六小？"}
       - {id: s2, pace: normal, text: "很多人觉得，{@m}除法让数变小。"}
@@ -107,6 +111,7 @@ beats:
       - {at: s1, act: unfocus, target: ask}
       - {at: s1@l, act: show, target: line}
       - {at: s1@q, act: highlight, target: line, args: {to: 6}}
+      - {at: s2, act: step}        # 子步 1 结束：问题摆出来了
       - {at: s2@cut, act: subdivide, target: line, args: {parts: 3}, dur: 1.2}
       - {at: s2@two, act: highlight, target: line, args: {to: "2/3"}}
 
@@ -121,8 +126,10 @@ beats:
       - {with: prev, act: hide, target: "eq1#d2"}
       - {with: prev, act: hide, target: "eq1#ans"}
       - {at: s1@c, act: jump, target: line, args: {length: "2/3"}, dur: fit}
+      - {at: s2, act: step}        # 子步 2 结束：九跳数完，定住让学生自己看一眼
       - {at: s2@nine, act: mark, target: "line.count[8]"}
       - {with: prev, act: cross, target: myth}
+      - {at: s3, act: step}        # 子步 3 结束：九比六大
       - {at: s3@x, act: set, target: eq1, args: {opacity: 1}}
       - {with: prev, act: show, target: "eq1#x3"}
       - {at: s3@d, act: show, target: "eq1#d2"}
@@ -139,11 +146,13 @@ beats:
       - {with: prev, act: mark, target: "eq1#x3"}
       - {at: s1@j, act: focus, target: "line.jump[0]"}
       - {with: prev, act: mark, target: "eq1#d2"}
+      - {at: s2, act: step}        # 子步 4 结束：乘三、除以二各自对上了图
       - {at: s2@f, act: transform, from: "eq1#x3", to: "law#flip"}
       - {with: prev, act: unfocus, target: line}
       - {with: prev, act: set, target: law, args: {opacity: 1}}
       - {with: prev, act: transform, from: "eq1#d2", to: "law#flip"}
       - {after: prev, act: underline, target: "law#flip"}
+      - {after: prev, act: pin, target: law}   # 规则落地：之后一直留在画面上
 
   - id: Halves
     say:
@@ -155,7 +164,7 @@ beats:
       - {at: s1, act: hide, target: ask}
       - {with: prev, act: hide, target: myth}
       - {with: prev, act: hide, target: eq1}
-      - {with: prev, act: hide, target: law}
+      - {with: prev, act: ghost, target: line, args: {place: above, gap: xl, scale: 0.75}}   # 三分之二的九跳留在上方
       - {with: prev, act: erase, target: line}
       - {at: s1@q, act: hide, target: "eq2#x2"}
       - {with: prev, act: hide, target: "eq2#d3"}
@@ -164,6 +173,7 @@ beats:
       - {at: s2@cut, act: subdivide, target: line, args: {parts: 2}, dur: 1.2}
       - {at: s2@len, act: highlight, target: line, args: {to: "3/2"}}
       - {at: s3@c, act: jump, target: line, args: {length: "3/2"}, dur: fit}
+      - {at: s4, act: step}
       - {at: s4@four, act: mark, target: "line.count[3]"}
       - {after: prev, act: show, target: "eq2#x2"}
       - {after: prev, act: show, target: "eq2#d3"}
@@ -178,6 +188,8 @@ beats:
       - {id: s4, pace: slow, text: "{@no}不对，两份只是半跳，{@ans}答案是七又二分之一。"}
     do:
       - {at: s1, act: hide, target: eq2}
+      - {with: prev, act: unghost, target: line}
+      - {with: prev, act: ghost, target: line, args: {place: above, gap: xl, scale: 0.75}}   # 换成二分之三的四跳
       - {with: prev, act: erase, target: line}
       - {at: s1@q, act: hide, target: "eq3#bad"}
       - {with: prev, act: hide, target: "eq3#ans"}
@@ -185,6 +197,7 @@ beats:
       - {at: s1@cut, act: subdivide, target: line, args: {parts: 5}, dur: 1.2}
       - {at: s1@len, act: highlight, target: line, args: {to: "4/5"}}
       - {at: s2@c, act: jump, target: line, args: {length: "4/5"}, dur: fit}
+      - {at: s3, act: step}        # 七跳之后停一下：剩下的两份怎么读？
       - {at: s3@r, act: remainder, target: line, dur: 1.2}
       - {at: s3@bad, act: show, target: "eq3#bad"}
       - {at: s4@no, act: cross, target: "eq3#bad"}
@@ -197,6 +210,7 @@ beats:
       - {id: s2, pace: normal, text: "{@b}或者先通分，六是五分之三十，{@d}三十除以四。"}
     do:
       - {at: s1, act: hide, target: eq3}
+      - {with: prev, act: unghost, target: line}
       - {with: prev, act: unmark, target: "line.rest[0]"}
       - {at: s1@a, act: show, target: "two[0]"}
       - {at: s2@b, act: show, target: "two[1]"}

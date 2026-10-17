@@ -109,7 +109,8 @@ style:
     persona: teacher-hs     # voice 仓库里的人设，含声音和语气说明
     speed: 1.25
   segmented: false          # true：小学默认分段播放（每个 beat 结束定格，播放器自动暂停）
-  subtitles: soft           # soft 软字幕 | none
+  step_hold: 1.0            # 分段时每个子步（step）结束定格几秒，见 §7.6
+  subtitles: soft           # soft 软字幕（默认，导出 .vtt/.srt 并封装进 mp4，可关）| none
   min_font: 28              # 布局求解时字号下限（1080p 下的像素）
 ```
 
@@ -289,6 +290,7 @@ pin: top                        # 钉住：之后每一帧都在（题卡）
 | `set` | 改角色、透明度等属性 |
 | `camera` | 放大、平移（导数放大、局部特写），参数见下 |
 | `hold` | 停住 N 秒（"aha"处留白） |
+| `step` / `ghost` / `unghost` / `pin` | 子步定格、残影、常驻公式，见 §7.6 |
 | 原语动作 | 由 `primitives` 提供，例如 `derive`、`extend`（差分表）、`cut`、`slide`（面积模型）、`flip`（数轴） |
 
 **镜头 `camera`**：整幅画面一起放大、平移，对象本身不动（布局、引用的坐标都不变）。
@@ -343,6 +345,55 @@ beat 可以带标注，供检查器和后续数据分析使用：
 - id: GeneralTerm
   shows: landing             # 图落到公式
 ```
+
+### 7.6 分段播放、残影和常驻公式
+
+小学集默认分段（规划 §3.2、《K12 数学学习路径科学分析》单集模板）：核心变形拆成 3–5 个子步，每步结束**定格**；上一步留下**淡色残影**；关键公式落地后**常驻**。四个内置动作：
+
+```yaml
+style: {segmented: true, step_hold: 1.0, subtitles: soft}
+...
+    do:
+      - {at: s2, act: step}                       # 子步结束：分段时在这里定格 step_hold 秒
+      - {at: s1, act: ghost, target: line, args: {place: above, gap: xl, scale: 0.75}}
+      - {with: prev, act: erase, target: line}    # 残影留在上方，原对象接着变
+      - {at: s1, act: unghost, target: line}      # 收掉 line 的残影
+      - {after: prev, act: pin, target: law}      # 规则公式从此常驻
+```
+
+| 动作 | 作用 | 参数 |
+|---|---|---|
+| `step` | 子步结束。`style.segmented: true` 时画面在这一刻定住 `hold` 秒，旁白在同一时刻插入等长静音，之后的动作、句子、书签全部顺延；不分段时不定格，只把位置写进 `chapters.json`（hold 为 0） | `hold`：0–10 秒，默认取 `style.step_hold`（默认 1.0）。不写 `target`、`dur` |
+| `ghost` | 给目标**此刻**的样子留一个淡色副本：全部改成 `DIM` 色、整体不透明度 0.3，画在所有对象后面；之后原对象怎么变，残影不动 | `place`：`stay`（原地，默认）/ `above` / `below` / `left_of` / `right_of`；`gap`：间距档位；`scale`：0.3–1；`opacity`：0.1–0.6 |
+| `unghost` | 收掉目标留下的所有残影。目标被 `hide` 时残影也一起收掉 | 无 |
+| `pin` | 目标从此常驻：之后不能 `hide` / `move`（包括它的片段）；`clear` 只清它 pin 之后加的装饰，pin 时已有的下划线、圈跟着常驻；布局求解器把它当固定占位，后出现的对象让开它 | 无 |
+
+- **和强调状态分开**：`focus` 是描边框 + 其余元素调到 0.45 不透明度（颜色不变），`mark` 是淡金底色；残影是**灰色**（DIM 角色）、更淡、在最底层，学生不会把它当成"现在要看的东西"。mark 的底色不进残影。
+- **定格放在句子开头**（`at: s2`）：句子之间本来就有停顿，插入静音不切断句子；写在书签或偏移上会警告。
+- **残影只留上一步**：同时超过 2 个残影警告；旧的先 `unghost`。
+- `ghost` 不自动定格、`step` 不自动留残影，两者正交；常见写法是同一时刻各写一个。
+- 对象属性 `pin: top` 是"一开始就钉在顶上"（题卡）；动作 `pin` 是"从这一刻起留在原地"。
+- 播放器：`chapters.json` 的 `stops` 列出所有子步定格（`time`..`resume`，连续播放时可以跳过这段定格）、预测 / 想一想暂停（带 `prompt` 和 `app_item`）和分段点（beat 末尾）。首看按分段点暂停，复看连续播放。
+- 字幕：`subtitles: soft`（默认）时 kit 导出 `.vtt` / `.srt` 并封装成 mp4 的 mov_text 软字幕轨，不烧进画面；文字是 `say` 的原文（去掉书签，公式转 Unicode），时刻跟着定格顺延。`none` 不出字幕。
+
+| 代码 | 问题 |
+|---|---|
+| SS440 | `ghost` / `unghost` 的 target 不是整个对象 |
+| SS441 | （警告）`place: stay` 时写了 `gap` / `scale` |
+| SS442 | （警告）`ghost` 的对象这时可能还没显示 |
+| SS443 | `unghost` 的对象没有残影 |
+| SS444 | `step` 写了 `target` 或 `dur` |
+| SS445 | （警告）用了 `step` 但 `style.segmented` 不是 true |
+| SS446 | （警告）分段时 `step` 写在书签或句中偏移上，会把一句话切开 |
+| SS447 | `pin` 的 target 不是整个对象 |
+| SS448 | 常驻的对象（`pin` 过，或 `pin: top`）又被 `hide` / `move` |
+| SS449 | （警告）对象已经常驻，又 `pin` 一次 |
+| SS450 | `pin` 时对象还没显示 |
+| SS451 | （警告）写了 `style.step_hold` 但没有分段 |
+| SS452 | （警告）同时在画面上的残影超过 2 个 |
+| SS453 | （警告）一个 beat 里子步超过 5 个 |
+
+参数类型（`place` 枚举、`scale` / `opacity` / `hold` 范围、`pin` / `unghost` 不带参数）由 JSON Schema 检查（SS100）。
 
 ---
 
