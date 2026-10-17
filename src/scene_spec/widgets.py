@@ -1006,6 +1006,128 @@ REGISTRY["dot_array"] = Widget(
     validate=_validate_dot_array,
 )
 
+# ---------- 积木条形图（block_bars）：平均数削峰填谷 ----------
+# kit 的 mx/bars.py：每列几块方块。按动作顺序推演每列现在几块：transfer 从一列顶上拿到另一列，add 在空位上长出新列；
+# 每列都不能高过 room，列数不能多过 cols。
+
+
+def _heights(value: object) -> str | None:
+    ok = isinstance(value, list) and value and not any(_nonneg_int(v) for v in value)
+    return None if ok else "应为非负整数的列表：每列几块，从左往右"
+
+
+def _bb_room(definition: dict) -> int | None:
+    room, heights = definition.get("room"), definition.get("heights")
+    if isinstance(room, int) and not isinstance(room, bool):
+        return room
+    if _heights(heights) is None:
+        return max(heights)
+    return None
+
+
+def _expose_block_bars(definition: dict, data: dict) -> Exposed:
+    heights = definition.get("heights")
+    cols = list(heights) if _heights(heights) is None else None
+    total = definition.get("cols", len(cols) if cols else 0)
+    return Exposed(parts={"bars": 1, "line": 1}, state={"cols": cols, "slots": total})
+
+
+def _validate_block_bars(ctx: WidgetContext, report: Report, path: str) -> None:
+    d = ctx.definition
+    heights, room = d.get("heights"), _bb_room(d)
+    if _heights(heights) is not None:
+        return
+    if isinstance(room, int) and max(heights) > room:
+        report.error("SS262", f"{path}.room", f"最高的一列有 {max(heights)} 块，放不进 room {room}")
+    slots = d.get("cols")
+    if isinstance(slots, int) and slots < len(heights):
+        report.error("SS262", f"{path}.cols", f"heights 有 {len(heights)} 列，cols 不能比它少")
+    labels = d.get("labels")
+    if labels is not None and (_str_list(labels) or (isinstance(slots, int) and len(labels) > slots)):
+        report.error("SS281", f"{path}.labels", "labels 应为字符串列表，最多 cols 个")
+
+
+def _bb_col(args: dict, key: str, ctx: WidgetContext, report: Report, path: str) -> int | None:
+    v, cols = args.get(key), ctx.exposed.state["cols"]
+    n = len(cols) if cols is not None else None
+    if not isinstance(v, int) or isinstance(v, bool) or (n is not None and not 0 <= v < n):
+        report.error("SS281", f"{path}.args.{key}", f"{key} 应为列号，从 0 数（现在有 {n} 列）")
+        return None
+    return v
+
+
+def _bb_move(args: dict, ctx: WidgetContext, report: Report, path: str) -> None:
+    for key in ("from", "to"):
+        if key not in args:
+            report.error("SS281", f"{path}.args", f"transfer 需要 {key}（列号，从 0 数）")
+    src, dst = _bb_col(args, "from", ctx, report, path), _bb_col(args, "to", ctx, report, path)
+    count = args.get("count", 1)
+    if _positive_int(count):
+        report.error("SS281", f"{path}.args.count", "count 应为正整数（挪几块，默认 1）")
+        count = None
+    _unknown_args(args, {"from", "to", "count"}, "transfer", report, path)
+    cols, room = ctx.exposed.state["cols"], _bb_room(ctx.definition)
+    if cols is None or src is None or dst is None or count is None:
+        return
+    if src == dst:
+        report.error("SS281", f"{path}.args", "from 和 to 是同一列")
+    elif cols[src] < count:
+        report.error("SS261", path, f"第 {src} 列现在只有 {cols[src]} 块，挪不出 {count} 块")
+    else:
+        cols[src] -= count
+        cols[dst] += count
+        if isinstance(room, int) and cols[dst] > room:
+            report.error("SS262", path, f"挪完第 {dst} 列有 {cols[dst]} 块，高过 room {room}")
+
+
+def _bb_add(args: dict, ctx: WidgetContext, report: Report, path: str) -> None:
+    h = args.get("height")
+    if _positive_int(h):
+        report.error("SS281", f"{path}.args.height", "add 需要 height（新的一列几块，正整数）")
+    _role_arg(args, report, path)
+    if "label" in args and not isinstance(args["label"], str):
+        report.error("SS281", f"{path}.args.label", "label 应为字符串（新列底下的名字）")
+    _unknown_args(args, {"height", "role", "label"}, "add", report, path)
+    state, room = ctx.exposed.state, _bb_room(ctx.definition)
+    if state["cols"] is None:
+        return
+    if len(state["cols"]) >= state["slots"]:
+        report.error("SS262", path, f"已经有 {len(state['cols'])} 列，没有空位了；在 {ctx.obj_id} 上写 cols: {len(state['cols']) + 1}")
+        return
+    if isinstance(h, int) and not isinstance(h, bool):
+        state["cols"].append(h)
+        if isinstance(room, int) and h > room:
+            report.error("SS262", path, f"新的一列 {h} 块，高过 room {room}")
+
+
+def _bb_level(args: dict, ctx: WidgetContext, report: Report, path: str) -> None:
+    at, room = args.get("at"), _bb_room(ctx.definition)
+    if not isinstance(at, (int, float)) or isinstance(at, bool) or at < 0 or (isinstance(room, int) and at > room):
+        report.error("SS281", f"{path}.args.at", f"level 需要 at：横线画在几块高（0 到 room {room}）")
+    if "label" in args and not isinstance(args["label"], str):
+        report.error("SS281", f"{path}.args.label", "label 应为字符串（可以混排 $公式$）")
+    _role_arg(args, report, path)
+    _unknown_args(args, {"at", "label", "role"}, "level", report, path)
+
+
+def _bb_recolor(args: dict, ctx: WidgetContext, report: Report, path: str) -> None:
+    if "role" not in args:
+        report.error("SS281", f"{path}.args", "recolor 需要 role")
+    _role_arg(args, report, path)
+    if "col" in args:
+        _bb_col(args, "col", ctx, report, path)
+    _unknown_args(args, {"role", "col"}, "recolor", report, path)
+
+
+REGISTRY["block_bars"] = Widget(
+    "block_bars",
+    params={"heights": (True, _heights), "room": (False, _positive_int), "cols": (False, _positive_int),
+            "labels": (False, _str_list), "numbers": (False, _bool)},
+    expose=_expose_block_bars,
+    actions={"transfer": _bb_move, "add": _bb_add, "level": _bb_level, "unlevel": _no_args, "recolor": _bb_recolor},
+    validate=_validate_block_bars,
+)
+
 # ---------- 函数图像（graph）：坐标轴、曲线、点、割线、切线 ----------
 # 函数写成白名单表达式字符串（见 expr.py），这里检查语法、点是否在定义域里、切线处左右导数是否相等。
 
