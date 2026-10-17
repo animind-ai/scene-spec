@@ -14,15 +14,15 @@ from __future__ import annotations
 import re
 
 from . import params as P
-from . import selectors, widgets
+from . import segments, selectors, widgets
 from .report import Report
 from .textmarks import parse_object_text, parse_say_text
 
 BUILTIN_ACTS = {
     "show", "hide", "transform", "move", "focus", "unfocus", "mark", "unmark",
     "underline", "circle", "cross", "clear", "set", "camera", "hold", "tween",
-}
-NEEDS_TARGET = BUILTIN_ACTS - {"transform", "camera", "hold", "tween"}
+} | segments.ACTS
+NEEDS_TARGET = BUILTIN_ACTS - {"transform", "camera", "hold", "tween"} - segments.NO_TARGET
 READOUT_KEYS = ("value", "label", "digits", "format")
 KNOWN_THEMES = {"paper", "chalk", "jade", "xuan", "blueprint", "riso"}
 LAYOUT_REFS = ("below", "above", "left_of", "right_of", "within", "over")
@@ -411,6 +411,7 @@ class _Checker:
         self.check_beats()
         self.check_pedagogy()
         self.check_misc()
+        segments.check(self.doc, self.r, self.stats)
         self.r.stats.update(self.stats)
 
 
