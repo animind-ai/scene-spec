@@ -147,10 +147,10 @@ objects:
 
 beats:
   - id: Hook
-    pause: {type: predict, prompt: 抛物线上一点的切线，到底是哪一条直线？先想一想。, hold: 3, app_item: ep30-before-1}
+    pause: {type: predict, prompt: 这一点的切线，到底是哪一条直线？, hold: 3, app_item: ep30-before-1}
     say:
-      - {id: s1, pace: ask, text: "抛物线上{@g}一点的切线，到底是哪一条直线？", en: "The tangent at a point on a parabola: which line is it, exactly?"}
-      - {id: s2, pace: normal, text: "先想一想，三秒。", en: "Think about it for three seconds."}
+      - {id: s1, pace: normal, text: "夜里骑车过弯，{@g}车灯照出去的那条直线，就是弯路在这一点的切线。", en: "Riding a bike round a bend at night, the straight beam of your headlight is the tangent to the road at that point."}
+      - {id: s2, pace: ask, text: "你会把这一点的切线画成哪一条直线？", en: "Which line would you draw as the tangent at this point?"}
     do:
       # 开场：一下子摆出 #29 的片尾画面
       - {at: s1, act: show, target: odd, dur: 0.01}
@@ -173,7 +173,7 @@ beats:
   - id: Myth
     shows: misconception
     say:
-      - {id: s1, pace: normal, text: "很多人会说，{@w}切线就是只碰曲线一个点的直线。", en: "Lots of people say a tangent is a line that touches the curve at just one point."}
+      - {id: s1, pace: normal, text: "同伴随口一说：{@w}只碰曲线一个点的直线，就是切线。", en: "Your friend says offhand: a line that touches the curve at just one point is the tangent."}
     do:
       - {at: s1@w, act: show, target: wrong}
 
