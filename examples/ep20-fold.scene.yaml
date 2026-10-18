@@ -1,4 +1,5 @@
-# 洞察系列 #20 √2 为什么不是分数（八年级），三角形折叠版。按脚本 insight/ep20-sqrt2-irrational/script-fold.yaml 写；
+# 第 2 版（三角形折叠），2026-10-18 用户反馈「我没能理解」，换成 ep20.scene.yaml 的"找尺子"版；留档。
+# 洞察系列 #20 √2 为什么不是分数（八年级），三角形折叠版。按脚本 insight/ep20-sqrt2-irrational/archive/script-v2-fold.yaml 写；
 # 正方形版（Tennenbaum）是 ep20.scene.yaml，两版并排出片给用户选。
 # 一个洞察（几何无穷递降）：假设 √2 = a/b、b 最小，a² = b² + b²：直角边 b、斜边 a 的等腰直角三角形；沿上面那个角的平分线
 # 把左边的直角边折到斜边上（dissect 的 fold），斜边剩 a − b，右下角切出直角边 a − b、斜边 2b − a 的小等腰直角三角形；
