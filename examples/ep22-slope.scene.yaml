@@ -121,12 +121,30 @@ objects:
     level: title
     in: side
 
+i18n:
+  en:
+    meta: {title: "Slope: How Steep Is a Line?"}
+    objects:
+      wrong_x: {text: '[k = x-axis crossing?]{#m}'}
+      wrong_len: {text: '[k = length of line?]{#m}'}
+      kval: {label: "Slope $k$ ="}
+      ask: {text: "What if k is 2?"}
+      wrong_x2: {text: '[k = crossing?]{#m}'}
+      bval: {label: "Intercept $b$ ="}
+      xint: {label: "$x$ crossing ="}
+      ratio: {label: "Up ÷ across ="}
+      law: {text: 'Slope $k$ = up ÷ across = $\dfrac{\Delta y}{\Delta x}$'}
+      nq: {text: "Parabola's lowest point?"}
+    beats:
+      Hook: {pause: {prompt: "In y = kx + b, what does k control?"}}
+      Predict: {pause: {prompt: "Turn k from 0.5 up to 2. How does the line turn, and what does the little triangle become?"}}
+
 beats:
   - id: Hook
     pause: {type: predict, prompt: y = kx + b 里的 k 管的是什么？, hold: 3, app_item: ep22-before-1}
     say:
-      - {id: s1, pace: normal, text: "老师在黑板上{@line}画了一条直线，写下它的式子。", en: "The teacher draws a straight line on the board and writes its equation."}
-      - {id: s2, pace: ask, text: "她只问了一句：式子里这个 k，管的是什么？", en: "She asks just one thing: what does this k in the equation control?"}
+      - {id: s1, pace: normal, text: "老师在黑板上{@line}画了一条直线，写下它的式子。", en: "The teacher draws {@line}a straight line on the board and writes its equation."}
+      - {id: s2, pace: ask, text: "她只问了一句：式子里这个 k，管的是什么？", en: "She asks just one thing. In the equation, what does this k control?"}
       - {id: s3, pace: normal, text: "你会怎么回答？先想好。", en: "How would you answer? Decide first."}
     do:
       - {at: s1, act: show, target: g.axes}
@@ -136,17 +154,17 @@ beats:
   - id: Myth
     shows: misconception
     say:
-      - {id: s1, pace: normal, text: "底下吵成一片：{@w1}有人说 k 是和 x 轴的交点，{@w2}有人说是直线的长度。", en: "The class erupts: some say k is where the line meets the x-axis, others say it's how long the line is."}
+      - {id: s1, pace: normal, text: "底下吵成一片：{@w1}有人说 k 是和 x 轴的交点，{@w2}有人说是直线的长度。", en: "The class erupts: {@w1}some say k is where the line meets the x-axis, {@w2}others say it's how long the line is."}
     do:
       - {at: s1@w1, act: show, target: wrong_x}
       - {at: s1@w2, act: show, target: wrong_len}
 
   - id: Setup
     say:
-      - {id: s1, pace: normal, text: "我们一起来看，{@k}现在 k 是零点五，b 是一。", en: "Let's look together. Right now k is a half and b is one."}
-      - {id: s2, pace: normal, text: "在直线上{@p}取一点，{@run}向右横走一格，再竖着走回直线。", en: "Pick a point on the line, step one unit to the right, then go straight up back to the line."}
-      - {id: s3, pace: normal, text: "竖着走的零点五格，{@up}正好就是 k。", en: "We went up half a unit: exactly k."}
-      - {id: s4, pace: normal, text: "把小三角形{@l}滑到左边，再{@r}滑到右边，竖走的格数一点没变。", en: "Slide the little triangle to the left, then to the right. The rise doesn't change at all."}
+      - {id: s1, pace: normal, text: "我们一起来看，{@k}现在 k 是零点五，b 是一。", en: "Let's look together. Right now {@k}k is a half and b is one."}
+      - {id: s2, pace: normal, text: "在直线上{@p}取一点，{@run}向右横走一格，再竖着走回直线。", en: "Pick {@p}a point on the line, {@run}step one unit to the right, then go straight up back to the line."}
+      - {id: s3, pace: normal, text: "竖着走的零点五格，{@up}正好就是 k。", en: "We went up half a unit, {@up}and that is exactly k."}
+      - {id: s4, pace: normal, text: "把小三角形{@l}滑到左边，再{@r}滑到右边，竖走的格数一点没变。", en: "Slide the little triangle {@l}to the left, then {@r}to the right. The rise doesn't change at all."}
     do:
       - {at: s1, act: hide, target: wrong_x}
       - {with: prev, act: hide, target: wrong_len}
@@ -161,16 +179,16 @@ beats:
   - id: Predict
     pause: {type: predict, prompt: 把 k 从 0.5 调到 2，直线会怎么转？小三角形会变成什么样？, hold: 3, app_item: ep22-why-1}
     say:
-      - {id: s1, pace: ask, text: "{@ask}如果把 k 调到二，直线会怎么转，小三角形会变成什么样？", en: "If we turn k up to two, how will the line turn, and what will the little triangle look like?"}
+      - {id: s1, pace: ask, text: "{@ask}如果把 k 调到二，直线会怎么转，小三角形会变成什么样？", en: "{@ask}If we turn k up to two, how will the line turn, and what will the little triangle look like?"}
     do:
       - {at: s1, act: tween, args: {t: 0}, dur: 1.0}
       - {at: s1@ask, act: show, target: ask}
 
   - id: Steep
     say:
-      - {id: s1, pace: normal, text: "{@go}k 变大，直线变陡；{@two}k 等于二，横走一格，竖走两格。", en: "As k grows, the line gets steeper. At k equals two: one across, two up."}
-      - {id: s2, pace: normal, text: "{@neg}k 变成负一，竖着要往下走一格，直线向下倾斜。", en: "Make k minus one: now you go one unit down, and the line tilts downward."}
-      - {id: s3, pace: normal, text: "{@flat}k 等于零，竖着不用走，{@back}直线是水平的。", en: "At k equals zero, you don't go up at all: the line is flat."}
+      - {id: s1, pace: normal, text: "{@go}k 变大，直线变陡；{@two}k 等于二，横走一格，竖走两格。", en: "{@go}As k grows, the line gets steeper. {@two}At k equals two: one across, two up."}
+      - {id: s2, pace: normal, text: "{@neg}k 变成负一，竖着要往下走一格，直线向下倾斜。", en: "{@neg}Make k minus one: now you go one unit down, and the line tilts downward."}
+      - {id: s3, pace: normal, text: "{@flat}k 等于零，竖着不用走，{@back}直线是水平的。", en: "{@flat}At k equals zero, you don't go up at all: {@back}the line is flat."}
     do:
       - {at: s1, act: hide, target: ask}
       - {at: s1@go, act: tween, args: {k: 2}, dur: fit, ease: in_out}
@@ -183,10 +201,10 @@ beats:
   - id: NonExample
     shows: non_example
     say:
-      - {id: s1, pace: ask, text: "{@w}那 k 是不是直线和 x 轴的交点呢？", en: "So is k where the line crosses the x-axis?"}
-      - {id: s2, pace: normal, text: "{@b}k 一直等于二，只改 b 的话，{@move}整条直线往下平移，和 x 轴交点的位置一直在变。", en: "Keep k at two and change only b. The whole line slides down, and the crossing point keeps moving."}
-      - {id: s3, pace: normal, text: "{@same}但是小三角形没有变化，横走一格还是竖走两格。", en: "But the little triangle doesn't change: still one across, two up."}
-      - {id: s4, pace: normal, text: "交点变了，k 没变，{@x}所以 k 不是交点，{@len}和直线画多长也无关。", en: "The crossing point changed and k didn't, so k isn't the intercept, and it has nothing to do with how long the line is drawn."}
+      - {id: s1, pace: ask, text: "{@w}那 k 是不是直线和 x 轴的交点呢？", en: "{@w}So is k where the line crosses the x-axis?"}
+      - {id: s2, pace: normal, text: "{@b}k 一直等于二，只改 b 的话，{@move}整条直线往下平移，和 x 轴交点的位置一直在变。", en: "{@b}Keep k at two and change only b. {@move}The whole line slides down, and the crossing point keeps moving."}
+      - {id: s3, pace: normal, text: "{@same}但是小三角形没有变化，横走一格还是竖走两格。", en: "{@same}But the little triangle doesn't change: still one across, two up."}
+      - {id: s4, pace: normal, text: "交点变了，k 没变，{@x}所以 k 不是交点，{@len}和直线画多长也无关。", en: "The crossing point changed and k didn't, so {@x}k isn't the intercept, and {@len}it has nothing to do with how long the line is drawn."}
     do:
       - {at: s1@w, act: show, target: wrong_x2}
       - {at: s2@b, act: show, target: bval}
@@ -200,10 +218,10 @@ beats:
   - id: Landing
     shows: landing
     say:
-      - {id: s1, pace: normal, text: "还记得放大照片吗？{@big}宽和高同时乘二，比值不变。", en: "Remember enlarging a photo? Multiply width and height both by two, and the ratio stays the same."}
-      - {id: s2, pace: normal, text: "横走两格，竖走四格；{@half}横走半格，竖走一格，{@ratio}比值都是二。", en: "Two across, four up. Half across, one up. The ratio is two every time."}
-      - {id: s3, pace: normal, text: "{@dy}因为 x 多走一段，y 就多走 k 倍这么长。", en: "Because whenever x moves some distance, y moves k times that distance."}
-      - {id: s4, pace: slow, text: "所以 k 就是竖着走的格数除以横着走的格数，{@law}这个比，叫做斜率。", en: "So k is rise divided by run. That ratio is called the slope."}
+      - {id: s1, pace: normal, text: "还记得放大照片吗？{@big}宽和高同时乘二，比值不变。", en: "Remember enlarging a photo? {@big}Multiply width and height both by two, and the ratio stays the same."}
+      - {id: s2, pace: normal, text: "横走两格，竖走四格；{@half}横走半格，竖走一格，{@ratio}比值都是二。", en: "Two across, four up. {@half}Half across, one up. The ratio is {@ratio}two every time."}
+      - {id: s3, pace: normal, text: "{@dy}因为 x 多走一段，y 就多走 k 倍这么长。", en: "{@dy}Because whenever x moves some distance, y moves k times that distance."}
+      - {id: s4, pace: slow, text: "所以 k 就是竖着走的格数除以横着走的格数，{@law}这个比，叫做斜率。", en: "So k is rise divided by run. {@law}That ratio is called the slope."}
     do:
       - {at: s1, act: hide, target: bval}
       - {with: prev, act: hide, target: xint}
@@ -217,8 +235,8 @@ beats:
 
   - id: Close
     say:
-      - {id: s1, pace: normal, text: "{@w}k 不是交点，也不是长度，{@x}它是一个比，管直线有多陡。", en: "k isn't the intercept or the length. It's a ratio, and it tells you how steep the line is."}
-      - {id: s2, pace: ask, text: "{@q}下次换成抛物线，它最低的那个点藏在式子的哪里？", en: "Next: for a parabola, where in the formula is its lowest point hiding?"}
+      - {id: s1, pace: normal, text: "{@w}k 不是交点，也不是长度，{@x}它是一个比，管直线有多陡。", en: "{@w}k isn't the intercept or the length. {@x}It's a ratio, and it tells you how steep the line is."}
+      - {id: s2, pace: ask, text: "{@q}下次换成抛物线，它最低的那个点藏在式子的哪里？", en: "{@q}Next: for a parabola, where in the formula is its lowest point hiding?"}
     do:
       - {at: s1, act: hide, target: ratio}
       - {with: prev, act: hide, target: dy}

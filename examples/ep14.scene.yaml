@@ -127,11 +127,35 @@ objects:
     level: title
     in: footer
 
+i18n:
+  en:
+    meta: {title: "Why Is a Cone One Third of a Cylinder?"}
+    objects:
+      myth: {text: '[Just a rule?]{#m}'}
+      myth13: {text: '[Too curved to compute?]{#m}'}
+      c64:
+        guides:
+          hgt: {label: 'height $r$'}
+          len: {label: 'length $\pi r$'}
+      myth14: {text: '[Half?]{#m}'}
+      cup: {text: '[How much fits?]{#g}'}
+      four:
+        bodies:
+          C: {label: Cube}
+          P: {label: Pyramid}
+          Y: {label: Cylinder}
+          K: {label: Cone}
+      third: {text: 'Each pyramid [$=\dfrac{1}{3}$]{#t .HL} of the cube'}
+      law4: {text: '[Cone volume]{#v} [$=\dfrac{1}{3}\times$]{#t .HL} [base area $\times$ height]{#r}'}
+    beats:
+      Hook: {pause: {prompt: "A cone cup with the same base and height as a cylinder cup: how much of the cylinder does it hold?"}}
+      Predict: {pause: {prompt: "A cone can't be cut into three. Is it one third too?"}}
+
 beats:
   - id: Hook
     pause: {type: predict, prompt: 同底同高的圆锥杯，能装圆柱杯的多少？, hold: 3, app_item: ep14-before-1}
     say:
-      - {id: s1, pace: ask, text: "冰淇淋店的圆锥杯和圆柱杯{@g}一样高、口一样大，圆锥杯能装多少？", en: "At the ice-cream shop, a cone cup and a cylinder cup are just as tall and just as wide at the top. How much does the cone cup hold?"}
+      - {id: s1, pace: ask, text: "冰淇淋店的圆锥杯和圆柱杯{@g}一样高、口一样大，圆锥杯能装多少？", en: "At the ice-cream shop, a cone cup and a cylinder cup are {@g}just as tall and just as wide at the top. How much does the cone cup hold?"}
       - {id: s2, pace: normal, text: "动手算之前，先凭感觉说个数。", en: "Before working anything out, name a number on gut feeling."}
     do:
       # 开场：一下子摆出 #13 的片尾画面
@@ -151,7 +175,7 @@ beats:
   - id: Myth
     shows: misconception
     say:
-      - {id: s1, pace: normal, text: "{@m}尖尖的圆锥看上去少了一半，好像就该装一半。", en: "The pointed cone looks like it's missing half, so it seems it should hold half."}
+      - {id: s1, pace: normal, text: "{@m}尖尖的圆锥看上去少了一半，好像就该装一半。", en: "{@m}The pointed cone looks like it's missing half, so it seems it should hold half."}
     do:
       - {at: s1, act: hide, target: law}
       - {with: prev, act: hide, target: law2}
@@ -160,8 +184,8 @@ beats:
 
   - id: Setup
     say:
-      - {id: s1, pace: normal, text: "我们一起看。{@s}圆的东西不好切，先看方的。", en: "Let's look together. Round things are hard to cut, so start with square ones."}
-      - {id: s2, pace: normal, text: "尖尖的四棱锥和圆锥叫锥体，{@m}正方体和圆柱叫柱体。", en: "The pointed pyramid and cone are called pyramids and cones; the cube and cylinder are prisms and cylinders."}
+      - {id: s1, pace: normal, text: "我们一起看。{@s}圆的东西不好切，先看方的。", en: "Let's look together. Round things are hard to cut, {@s}so start with square ones."}
+      - {id: s2, pace: normal, text: "尖尖的四棱锥和圆锥叫锥体，{@m}正方体和圆柱叫柱体。", en: "The pyramid and the cone come to a point; {@m}the cube and the cylinder go straight up."}
     do:
       - {at: s1@s, act: hide, target: c64}
       - {with: prev, act: hide, target: law3}
@@ -173,9 +197,9 @@ beats:
 
   - id: Split
     say:
-      - {id: s1, pace: normal, text: "一个正方体，{@c}可以切成三块，{@a}我们把它们分开看看。", en: "A cube can be cut into three pieces. Let's pull them apart."}
-      - {id: s2, pace: normal, text: "{@f}每一块都是四棱锥，底面是正方体的一个面，高是棱长。", en: "Each piece is a square pyramid: its base is one face of the cube, its height is one edge."}
-      - {id: s3, pace: slow, text: "{@j}三块一模一样，合起来正好是正方体，{@t}每块是三分之一。", en: "The three are identical and fit back into the cube exactly, so each is one third."}
+      - {id: s1, pace: normal, text: "一个正方体，{@c}可以切成三块，{@a}我们把它们分开看看。", en: "A cube {@c}can be cut into three pieces. {@a}Let's pull them apart."}
+      - {id: s2, pace: normal, text: "{@f}每一块都是四棱锥，底面是正方体的一个面，高是棱长。", en: "{@f}Each piece is a square pyramid: its base is one face of the cube, its height is one edge."}
+      - {id: s3, pace: slow, text: "{@j}三块一模一样，合起来正好是正方体，{@t}每块是三分之一。", en: "{@j}The three are identical and fit back into the cube exactly, so {@t}each is one third."}
     do:
       - {at: s1, act: hide, target: four}
       - {after: prev, act: show, target: cube}
@@ -189,7 +213,7 @@ beats:
   - id: NonExample
     shows: non_example
     say:
-      - {id: s1, pace: normal, text: "要是锥体是一半，两块就该拼满，{@x}可明明要三块才行。", en: "If a pyramid were half, two would fill it, but it clearly takes three."}
+      - {id: s1, pace: normal, text: "要是锥体是一半，两块就该拼满，{@x}可明明要三块才行。", en: "If a pyramid were half, two would fill it, but {@x}it clearly takes three."}
     do:
       - {at: s1, act: step}
       - {at: s1@x, act: focus, target: "myth14#m"}
@@ -198,14 +222,14 @@ beats:
   - id: Predict
     pause: {type: predict, prompt: 圆锥没法切成三块，它也是三分之一吗？, hold: 3, app_item: ep14-why-2}
     say:
-      - {id: s1, pace: ask, text: "{@q}圆锥没法这样切成三块，它也是三分之一吗？", en: "A cone can't be cut into three like that. Is it one third too?"}
+      - {id: s1, pace: ask, text: "{@q}圆锥没法这样切成三块，它也是三分之一吗？", en: "{@q}A cone can't be cut into three like that. Is it one third too?"}
 
   - id: Sweep
     say:
-      - {id: s1, pace: normal, text: "{@p}拿一个四棱锥和一个圆锥，底面一样大，高也一样。", en: "Take a square pyramid and a cone with the same base area and the same height."}
-      - {id: s2, pace: normal, text: "{@z}用一个平面横着切，{@c}把两个截面拿出来比一比。", en: "Slice them with a flat plane and take the two cross-sections out to compare."}
-      - {id: s3, pace: normal, text: "{@u}平面往上走，{@d}再往下走，两个截面一直一样大。", en: "Move the plane up, then down: the two sections stay the same size."}
-      - {id: s4, pace: slow, text: "每一层都一样大，{@s}一层层叠起来，体积也就一样。", en: "Every layer is the same size, so stacked up, the volumes are the same."}
+      - {id: s1, pace: normal, text: "{@p}拿一个四棱锥和一个圆锥，底面一样大，高也一样。", en: "{@p}Take a square pyramid and a cone with the same base area and the same height."}
+      - {id: s2, pace: normal, text: "{@z}用一个平面横着切，{@c}把两个截面拿出来比一比。", en: "{@z}Slice them with a flat plane and {@c}take the two cross-sections out to compare."}
+      - {id: s3, pace: normal, text: "{@u}平面往上走，{@d}再往下走，两个截面一直一样大。", en: "{@u}Move the plane up, {@d}then down: the two sections stay the same size."}
+      - {id: s4, pace: slow, text: "每一层都一样大，{@s}一层层叠起来，体积也就一样。", en: "Every layer is the same size, so {@s}stacked up, the volumes are the same."}
       - {id: s5, pace: normal, text: "圆柱和正方体也一样，底面一样大，每一层都一样大。", en: "The same goes for the cylinder and the prism: same base, same size at every layer."}
     do:
       - {at: s1@p, act: hide, target: cube}
@@ -222,7 +246,7 @@ beats:
   - id: Landing
     shows: landing
     say:
-      - {id: s1, pace: slow, text: "{@law}所以圆锥也是同底同高的圆柱的三分之一。", en: "So a cone is also one third of the cylinder with the same base and height."}
+      - {id: s1, pace: slow, text: "{@law}所以圆锥也是同底同高的圆柱的三分之一。", en: "{@law}So a cone is also one third of the cylinder with the same base and height."}
       - {id: s2, pace: normal, text: "这是演示，不是证明：每层一样大体积就一样，叫祖暅原理，我们先用着。", en: "This is a demonstration, not a proof: equal layers mean equal volume. That's Zu Geng's principle, and we're borrowing it here."}
       - {id: s3, pace: normal, text: "倒沙子倒三次正好满，也只是演示，切成三块才看得出为什么。", en: "Pouring sand three times to fill it is only a demonstration too; cutting into three shows why."}
     do:
@@ -232,7 +256,7 @@ beats:
 
   - id: Close
     say:
-      - {id: s1, pace: normal, text: "锥体不是柱体的一半，{@x}要三个才能装满一个柱体。", en: "A cone isn't half a cylinder. It takes three to fill one."}
-      - {id: s2, pace: ask, text: "{@q}负二乘负三，为什么会是正六？", en: "Next: negative two times negative three, why is it positive six?"}
+      - {id: s1, pace: normal, text: "锥体不是柱体的一半，{@x}要三个才能装满一个柱体。", en: "A cone isn't half a cylinder. {@x}It takes three to fill one."}
+      - {id: s2, pace: ask, text: "{@q}负二乘负三，为什么会是正六？", en: "{@q}Next: negative two times negative three, why is it positive six?"}
     do:
       - {at: s1@x, act: cross, target: "myth14#m"}

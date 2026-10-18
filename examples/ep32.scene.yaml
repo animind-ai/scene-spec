@@ -62,14 +62,21 @@ objects:
     level: title
     in: side
 
+i18n:
+  en:
+    meta: {title: "Adding Vectors: Tip to Tail"}
+    beats:
+      Hook: {pause: {prompt: "Four km east, then three km north. How far from home?"}}
+      Predict: {pause: {prompt: "How long is the sum arrow?"}}
+
 beats:
   # 开场情境：平面当地图，原点旁的第一格里一座小房子是家，一格一公里；路线用虚线画，Setup 第一句收起，换成正式的向量 a、b。
   # plane 的标签只排公式（中文排不出），所以家画成房子形状、路线标 km
   - id: Hook
     pause: {type: predict, prompt: 往东走 4 公里、再往北走 3 公里，离家多远？, hold: 3, app_item: ep32-before-1}
     say:
-      - {id: s1, pace: ask, text: "{@h}你从家出门，{@e}往东走四公里，{@n}再往北走三公里，现在离家多远？", en: "You leave home, walk four kilometres east, then three kilometres north. How far are you from home now?"}
-      - {id: s2, pace: normal, text: "{@q}先别急着算，在心里估一估。", en: "Don't work it out yet. Just estimate it in your head."}
+      - {id: s1, pace: ask, text: "{@h}你从家出门，{@e}往东走四公里，{@n}再往北走三公里，现在离家多远？", en: "{@h}You leave home, {@e}walk four kilometres east, {@n}then three kilometres north. How far are you from home now?"}
+      - {id: s2, pace: normal, text: "{@q}先别急着算，在心里估一估。", en: "{@q}Don't work it out yet. Just estimate it in your head."}
     do:
       - {at: s1@h, act: show, target: plane}
       - {after: prev, act: shape, target: plane, args: {name: home, points: [[0.08, 0.08], [0.52, 0.08], [0.52, 0.36], [0.3, 0.6], [0.08, 0.36]], role: C}}
@@ -80,15 +87,15 @@ beats:
   - id: Myth
     shows: misconception
     say:
-      - {id: s1, pace: normal, text: "路一共走了七公里，{@m}离家好像也该是七公里。", en: "You walked seven kilometres in all, so it seems you should be seven kilometres from home."}
+      - {id: s1, pace: normal, text: "路一共走了七公里，{@m}离家好像也该是七公里。", en: "You walked seven kilometres in all, so {@m}it seems you should be seven kilometres from home."}
     do:
       - {at: s1@m, act: show, target: myth}
 
   - id: Setup
     say:
       - {id: s1, pace: normal, text: "我们一起看。向量就是一支箭头，只管多长、朝哪边。", en: "Let's look together. A vector is an arrow that only cares how long it is and which way it points."}
-      - {id: s2, pace: normal, text: "{@a}向量 a 向右四格，{@b}向量 b 向上三格。", en: "Vector a goes four squares right, vector b goes three squares up."}
-      - {id: s3, pace: normal, text: "{@m}把箭头平移到别处，长度方向都没变，还是同一个向量。", en: "Slide an arrow somewhere else: same length, same direction, still the same vector."}
+      - {id: s2, pace: normal, text: "{@a}向量 a 向右四格，{@b}向量 b 向上三格。", en: "{@a}Vector a goes four squares right, {@b}vector b goes three squares up."}
+      - {id: s3, pace: normal, text: "{@m}把箭头平移到别处，长度方向都没变，还是同一个向量。", en: "{@m}Slide an arrow somewhere else: same length, same direction, still the same vector."}
     do:
       - {at: s1, act: remove, target: plane, args: {name: [w1, w2, home]}}
       - {at: s2@a, act: vector, target: plane, args: {name: a, v: [4, 0], label: '\vec a'}}
@@ -97,8 +104,8 @@ beats:
 
   - id: TipToTail
     say:
-      - {id: s1, pace: normal, text: "a 加 b 的意思是：{@a}先走 a，{@b}再接着走 b。", en: "a plus b means: walk along a, then carry on along b."}
-      - {id: s2, pace: normal, text: "{@s}从起点直接指到终点，这一支就是 a 加 b。", en: "The arrow straight from the start to the end is a plus b."}
+      - {id: s1, pace: normal, text: "a 加 b 的意思是：{@a}先走 a，{@b}再接着走 b。", en: "a plus b means: {@a}walk along a, {@b}then carry on along b."}
+      - {id: s2, pace: normal, text: "{@s}从起点直接指到终点，这一支就是 a 加 b。", en: "{@s}The arrow straight from the start to the end is a plus b."}
     do:
       - {at: s1@a, act: mark, target: plane.items}
       - {at: s2@s, act: unmark, target: plane.items}
@@ -111,8 +118,8 @@ beats:
 
   - id: Answer
     say:
-      - {id: s1, pace: normal, text: "三支箭头围成直角三角形，{@g}直角边是四和三。", en: "The three arrows make a right triangle with legs four and three."}
-      - {id: s2, pace: normal, text: "{@p}由勾股定理，斜边是五，{@n}不是七：拐弯走了冤枉路。", en: "By Pythagoras, the long side is five, not seven: the corner made the walk longer."}
+      - {id: s1, pace: normal, text: "三支箭头围成直角三角形，{@g}直角边是四和三。", en: "The three arrows make a right triangle with {@g}legs four and three."}
+      - {id: s2, pace: normal, text: "{@p}由勾股定理，斜边是五，{@n}不是七：拐弯走了冤枉路。", en: "{@p}By Pythagoras, the long side is five, {@n}not seven: the corner made the walk longer."}
     do:
       - {at: s1@g, act: mark, target: plane.items}
       - {at: s2@p, act: unmark, target: plane.items}
@@ -121,10 +128,10 @@ beats:
 
   - id: Parallelogram
     say:
-      - {id: s1, pace: normal, text: "{@c}换两支斜着的箭头，{@a}a 是三、一，{@b}b 是一、二。", en: "Now two slanted arrows: a is three, one and b is one, two."}
-      - {id: s2, pace: normal, text: "{@w}先走 a 再走 b，把 b 接到 a 的头上。", en: "Walk a, then b: put b on the tip of a."}
-      - {id: s3, pace: normal, text: "{@w}先走 b 再走 a，终点还是同一个点。", en: "Walk b, then a: you end at the very same point."}
-      - {id: s4, pace: slow, text: "两条路围成平行四边形，{@d}对角线就是 a 加 b。", en: "The two paths make a parallelogram, and its diagonal is a plus b."}
+      - {id: s1, pace: normal, text: "{@c}换两支斜着的箭头，{@a}a 是三、一，{@b}b 是一、二。", en: "{@c}Now two slanted arrows: {@a}a is three, one and {@b}b is one, two."}
+      - {id: s2, pace: normal, text: "{@w}先走 a 再走 b，把 b 接到 a 的头上。", en: "{@w}Walk a, then b: put b on the tip of a."}
+      - {id: s3, pace: normal, text: "{@w}先走 b 再走 a，终点还是同一个点。", en: "{@w}Walk b, then a: you end at the very same point."}
+      - {id: s4, pace: slow, text: "两条路围成平行四边形，{@d}对角线就是 a 加 b。", en: "The two paths make a parallelogram, and {@d}its diagonal is a plus b."}
       - {id: s5, pace: normal, text: "所以平行四边形法则，就是两次首尾相接拼在一起。", en: "So the parallelogram rule is just tip-to-tail done twice, side by side."}
     do:
       - {at: s1@c, act: remove, target: plane}
@@ -140,8 +147,8 @@ beats:
   - id: NonExample
     shows: non_example
     say:
-      - {id: s1, pace: normal, text: "{@c}长度什么时候才能直接相加？{@s}方向相同的时候。", en: "When do lengths simply add? When the arrows point the same way."}
-      - {id: s2, pace: normal, text: "{@a}向右三格{@b}再向右两格，一共五格，路一点也不拐弯。", en: "Three right, then two right: five in all, no corner at all."}
+      - {id: s1, pace: normal, text: "{@c}长度什么时候才能直接相加？{@s}方向相同的时候。", en: "{@c}When do lengths simply add? {@s}When the arrows point the same way."}
+      - {id: s2, pace: normal, text: "{@a}向右三格{@b}再向右两格，一共五格，路一点也不拐弯。", en: "{@a}Three right, {@b}then two right: five in all, no corner at all."}
     do:
       - {at: s1@c, act: remove, target: plane}
       - {at: s2@a, act: vector, target: plane, args: {name: c, v: [3, 0], at: [0, 3.5], label: '3'}}
@@ -150,8 +157,8 @@ beats:
   - id: Landing
     shows: landing
     say:
-      - {id: s1, pace: slow, text: "{@c}在坐标里，首尾相接就是{@x}横的加横的、竖的加竖的。", en: "In coordinates, tip-to-tail means across plus across, and up plus up."}
-      - {id: s2, pace: normal, text: "{@a}三加一是四，一加二是三，{@e}正好指到四、三。", en: "Three plus one is four, one plus two is three: it lands right on four, three."}
+      - {id: s1, pace: slow, text: "{@c}在坐标里，首尾相接就是{@x}横的加横的、竖的加竖的。", en: "{@c}In coordinates, tip-to-tail means {@x}across plus across, and up plus up."}
+      - {id: s2, pace: normal, text: "{@a}三加一是四，一加二是三，{@e}正好指到四、三。", en: "{@a}Three plus one is four, one plus two is three: {@e}it lands right on four, three."}
     do:
       - {at: s1@c, act: remove, target: plane}
       - {after: prev, act: vector, target: plane, args: {name: a2, v: [3, 1], label: '\vec a', side: r}}

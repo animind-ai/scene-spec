@@ -69,11 +69,26 @@ objects:
     level: title
     in: footer
 
+i18n:
+  en:
+    meta: {title: "The Mean Levels the Peaks and Fills the Valleys"}
+    objects:
+      bars: {labels: [Lin, Zhou, Chen, Wu]}
+      myth: {text: "[Must be one of them?]{#m}"}
+      per: {text: "[Cranes per person?]{#g}"}
+      law: {text: "[Mean]{#m} [$=$]{#e} [Total]{#t .HL} [$\\div$]{#d} [Count]{#c .HL}"}
+    beats:
+      Hook: {pause: {prompt: "How many cranes per person on average? Whose number is it?"}}
+      Predict: {pause: {prompt: "Shave the tall ones, fill the short ones: can they end up the same height?"}}
+      Wrong: {do: {0: {args: {label: '$3$?'}}}}
+      Level: {do: {3: {args: {label: 'mean $4$'}}}}
+      NonExample: {do: {2: {args: {label: Zheng}}, 3: {args: {label: 'mean $5$'}}}}
+
 beats:
   - id: Hook
     pause: {type: predict, prompt: 平均每人几只，这个数代表谁？, hold: 3, app_item: ep35-before-1}
     say:
-      - {id: s1, pace: ask, text: "{@g}折纸鹤比赛要报一个“平均每人几只”，这个数代表谁呢？", en: "The paper-crane contest wants one number: cranes per person, on average. Whose number is that?"}
+      - {id: s1, pace: ask, text: "{@g}折纸鹤比赛要报一个“平均每人几只”，这个数代表谁呢？", en: "{@g}The paper-crane contest wants one number: cranes per person, on average. Whose number is that?"}
       - {id: s2, pace: ask, text: "停一下，你心里有答案吗？", en: "Pause here. Do you have an answer?"}
     do:
       - {at: s1, act: show, target: bars}
@@ -82,7 +97,7 @@ beats:
   - id: Myth
     shows: misconception
     say:
-      - {id: s1, pace: normal, text: "组长觉得，{@m}平均数总得和某个人折的一样多吧。", en: "The team leader reckons the mean must be what one of them actually folded."}
+      - {id: s1, pace: normal, text: "组长觉得，{@m}平均数总得和某个人折的一样多吧。", en: "The team leader reckons {@m}the mean must be what one of them actually folded."}
     do:
       - {at: s1@m, act: hide, target: per}
       - {with: prev, act: show, target: myth}
@@ -95,8 +110,8 @@ beats:
   - id: Wrong
     shows: misconception
     say:
-      - {id: s1, pace: normal, text: "要是平均数是其中一个，就挑三试试，{@l}在三块高的地方画一条线。", en: "If the mean were one of them, let's try three and draw a line three blocks high."}
-      - {id: s2, pace: normal, text: "线上面多出来五块，线下面只缺一块，{@x}根本对不上。", en: "Above the line there are five extra blocks, below it only one is missing. They don't match."}
+      - {id: s1, pace: normal, text: "要是平均数是其中一个，就挑三试试，{@l}在三块高的地方画一条线。", en: "If the mean were one of them, let's try three and draw {@l}a line three blocks high."}
+      - {id: s2, pace: normal, text: "线上面多出来五块，线下面只缺一块，{@x}根本对不上。", en: "Above the line there are five extra blocks, below it only one is missing. {@x}They don't match."}
     do:
       - {at: s1@l, act: level, target: bars, args: {at: 3, label: '$3$？', role: "NO"}}
       - {at: s2@x, act: focus, target: "bars.line"}
@@ -105,13 +120,13 @@ beats:
   - id: Predict
     pause: {type: predict, prompt: 把高的削下来，填到矮的上面，最后能一样高吗？, hold: 3, app_item: ep35-why-1}
     say:
-      - {id: s1, pace: ask, text: "{@q}把高的削下来，填到矮的上面，最后能一样高吗？", en: "If we shave the tall ones and fill the short ones, can they all end up the same height?"}
+      - {id: s1, pace: ask, text: "{@q}把高的削下来，填到矮的上面，最后能一样高吗？", en: "{@q}If we shave the tall ones and fill the short ones, can they all end up the same height?"}
 
   - id: Level
     say:
-      - {id: s1, pace: normal, text: "小林多出的一块，{@go}挪给小周。", en: "Lin's extra block goes to Zhou."}
-      - {id: s2, pace: normal, text: "小陈多出的两块，{@a}一块给小周，{@b}一块给小吴。", en: "Chen's two extra blocks: one to Zhou, one to Wu."}
-      - {id: s3, pace: slow, text: "{@l}四列一样高了，都是四块。", en: "Now all four bars are the same: four blocks each."}
+      - {id: s1, pace: normal, text: "小林多出的一块，{@go}挪给小周。", en: "Lin's extra block {@go}goes to Zhou."}
+      - {id: s2, pace: normal, text: "小陈多出的两块，{@a}一块给小周，{@b}一块给小吴。", en: "Chen's two extra blocks: {@a}one to Zhou, {@b}one to Wu."}
+      - {id: s3, pace: slow, text: "{@l}四列一样高了，都是四块。", en: "{@l}Now all four bars are the same: four blocks each."}
       - {id: s4, pace: normal, text: "积木一块没多，一块没少，只是匀了一匀。", en: "Not one block was added or lost. We just evened them out."}
     do:
       - {at: s1@go, act: transfer, target: bars, args: {from: 0, to: 1}, dur: fit}
@@ -122,8 +137,8 @@ beats:
 
   - id: Reveal
     say:
-      - {id: s1, pace: normal, text: "{@e}一共十六块，平均分给四个人，{@r}每人正好四块。", en: "Sixteen blocks in all, shared among four people: exactly four each."}
-      - {id: s2, pace: normal, text: "平均数，就是削峰填谷以后，{@m}大家一样高的那个高度。", en: "The mean is the height everyone reaches after we level the peaks and fill the valleys."}
+      - {id: s1, pace: normal, text: "{@e}一共十六块，平均分给四个人，{@r}每人正好四块。", en: "{@e}Sixteen blocks in all, shared among four people: {@r}exactly four each."}
+      - {id: s2, pace: normal, text: "平均数，就是削峰填谷以后，{@m}大家一样高的那个高度。", en: "The mean is, after we level the peaks and fill the valleys, {@m}the height everyone reaches."}
     do:
       - {at: s1@e, act: show, target: avg}
       - {at: s1@r, act: mark, target: "avg#res"}
@@ -132,10 +147,10 @@ beats:
   - id: NonExample
     shows: non_example
     say:
-      - {id: s1, pace: normal, text: "要是又来了一个小郑，{@z}一个人就折了九只呢？", en: "What if a fifth classmate, Zheng, folded nine cranes all alone?"}
-      - {id: s2, pace: normal, text: "{@six}这时平均数变成五，原来的四个人，{@u}全都在线下面。", en: "Now the mean becomes five, and all four original people are below the line."}
-      - {id: s3, pace: normal, text: "{@go}从他那里削下四块，分给四个人，大家正好都是五块。", en: "Shave four blocks off his bar and share them out: everyone has exactly five."}
-      - {id: s4, pace: normal, text: "一个特别大的数，{@x}一个人就能把平均数拉走。", en: "One very large number can pull the mean away all by itself."}
+      - {id: s1, pace: normal, text: "要是又来了一个小郑，{@z}一个人就折了九只呢？", en: "What if a fifth classmate, Zheng, {@z}folded nine cranes all alone?"}
+      - {id: s2, pace: normal, text: "{@six}这时平均数变成五，原来的四个人，{@u}全都在线下面。", en: "{@six}Now the mean becomes five, and {@u}all four original people are below the line."}
+      - {id: s3, pace: normal, text: "{@go}从他那里削下四块，分给四个人，大家正好都是五块。", en: "{@go}Shave four blocks off his bar and share them out: everyone has exactly five."}
+      - {id: s4, pace: normal, text: "一个特别大的数，{@x}一个人就能把平均数拉走。", en: "One very large number can {@x}pull the mean away all by itself."}
     do:
       - {at: s1, act: unmark, target: "avg#res"}
       - {with: prev, act: unmark, target: "bars.line"}
@@ -154,8 +169,8 @@ beats:
   - id: Landing
     shows: landing
     say:
-      - {id: s1, pace: slow, text: "{@law}所以平均数，等于总数除以个数。", en: "So the mean is the total divided by how many there are."}
-      - {id: s2, pace: normal, text: "{@t}总数就是积木的块数，{@c}个数就是有几列。", en: "The total is the number of blocks, and the count is the number of bars."}
+      - {id: s1, pace: slow, text: "{@law}所以平均数，等于总数除以个数。", en: "{@law}So the mean is the total divided by how many there are."}
+      - {id: s2, pace: normal, text: "{@t}总数就是积木的块数，{@c}个数就是有几列。", en: "{@t}The total is the number of blocks, and {@c}the count is the number of bars."}
     do:
       - {at: s1, act: unmark, target: "avg2#res"}
       - {at: s1@law, act: hide, target: avg2}
@@ -165,8 +180,8 @@ beats:
 
   - id: Close
     say:
-      - {id: s1, pace: normal, text: "四不在原来的数里，平均数不一定出现过，{@x}它是匀出来的高度。", en: "Four isn't in the original list. The mean need not appear there; it's the height you get by evening out."}
-      - {id: s2, pace: ask, text: "{@q}为什么两个数同时乘同一个数，比值不会变？", en: "Next: why does a ratio stay the same when both numbers are multiplied by the same thing?"}
+      - {id: s1, pace: normal, text: "四不在原来的数里，平均数不一定出现过，{@x}它是匀出来的高度。", en: "Four isn't in the original list. The mean need not appear there; it's {@x}the height you get by evening out."}
+      - {id: s2, pace: ask, text: "{@q}为什么两个数同时乘同一个数，比值不会变？", en: "{@q}Next: why does a ratio stay the same when both numbers are multiplied by the same thing?"}
     do:
       - {at: s1, act: unmark, target: "law#t"}
       - {with: prev, act: unmark, target: "law#c"}

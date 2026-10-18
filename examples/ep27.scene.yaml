@@ -100,12 +100,24 @@ objects:
     level: title
     in: side
 
+i18n:
+  en:
+    meta: {title: "Exponentials and Logs: One Graph, Two Readings"}
+    objects:
+      wrong: {text: '[$\log(2+4)=\log 2+\log 4$?]{#m}'}
+      wrong2: {text: '[$\log(2+4)=\log 2+\log 4$?]{#m}'}
+      ask: {text: "And 1, 2, 3 on x?"}
+      nq: {text: "Height of the dot?"}
+    beats:
+      Hook: {pause: {prompt: "What question is log base 2 of 8 asking? Think about it."}}
+      Predict: {pause: {prompt: "2 × 4 = 8. How are 1, 2, 3 related on the x-axis?"}}
+
 beats:
   - id: Hook
     pause: {type: predict, prompt: log₂ 8 在回答什么问题？先琢磨一下。, hold: 3, app_item: ep27-before-1}
     say:
       - {id: s1, pace: normal, text: "计算器上有个对数键，按一下，跳出来一个数。", en: "A calculator has a log key. Press it and a number pops up."}
-      - {id: s2, pace: ask, text: "{@q}比如以二为底八的对数，它在回答什么问题？", en: "Take log base two of eight: what question is it answering?"}
+      - {id: s2, pace: ask, text: "{@q}比如以二为底八的对数，它在回答什么问题？", en: "{@q}Take log base two of eight: what question is it answering?"}
       - {id: s3, pace: normal, text: "先自己琢磨一下。", en: "Mull it over yourself first."}
     do:
       - {at: s1, act: show, target: g.axes}
@@ -114,16 +126,16 @@ beats:
   - id: Myth
     shows: misconception
     say:
-      - {id: s1, pace: normal, text: "草稿纸上还有人写：{@w}二加四的对数，等于二的对数加四的对数。", en: "And on someone's scrap paper: the log of two plus four equals the log of two plus the log of four."}
+      - {id: s1, pace: normal, text: "草稿纸上还有人写：{@w}二加四的对数，等于二的对数加四的对数。", en: "And on someone's scrap paper: {@w}the log of two plus four equals the log of two plus the log of four."}
     do:
       - {at: s1@w, act: show, target: wrong}
 
   - id: Setup
     say:
-      - {id: s1, pace: normal, text: "先看 {@c}y 等于二的 x 次方，{@d}x 每往右走一格，y 就翻一倍。", en: "Start with y equals two to the x. Each step right, y doubles."}
-      - {id: s2, pace: normal, text: "顺着读，{@f}x 等于三，y 就是八，这是指数。", en: "Read it forwards: x is three, so y is eight. That's a power."}
-      - {id: s3, pace: normal, text: "倒过来读，{@b}已知 y 等于八，问 x 是几，这就是对数。", en: "Read it backwards: given y is eight, what is x? That's a log."}
-      - {id: s4, pace: normal, text: "所以以二为底八的对数是三，{@law}它问的是二要乘几次才到八。", en: "So log base two of eight is three. It asks how many times you multiply by two to get eight."}
+      - {id: s1, pace: normal, text: "先看 {@c}y 等于二的 x 次方，{@d}x 每往右走一格，y 就翻一倍。", en: "Start with {@c}y equals two to the x. {@d}Each step right, y doubles."}
+      - {id: s2, pace: normal, text: "顺着读，{@f}x 等于三，y 就是八，这是指数。", en: "Read it forwards: {@f}x is three, so y is eight. That's a power."}
+      - {id: s3, pace: normal, text: "倒过来读，{@b}已知 y 等于八，问 x 是几，这就是对数。", en: "Read it backwards: {@b}given y is eight, what is x? That's a log."}
+      - {id: s4, pace: normal, text: "所以以二为底八的对数是三，{@law}它问的是二要乘几次才到八。", en: "So log base two of eight is three. {@law}It asks how many times you multiply by two to get eight."}
     do:
       - {at: s1, act: hide, target: wrong}
       - {at: s1@c, act: draw, target: g, args: {plot: 0}}
@@ -143,15 +155,15 @@ beats:
   - id: Predict
     pause: {type: predict, prompt: 2 × 4 = 8，在横轴上 1、2、3 是什么关系？, hold: 3, app_item: ep27-why-2}
     say:
-      - {id: s1, pace: ask, text: "{@m}二乘四等于八，在横轴上，这三个数又是什么关系？", en: "Two times four is eight. On the x-axis, how are these three numbers related?"}
+      - {id: s1, pace: ask, text: "{@m}二乘四等于八，在横轴上，这三个数又是什么关系？", en: "{@m}Two times four is eight. On the x-axis, how are these three numbers related?"}
     do:
       - {at: s1@m, act: show, target: ask}
 
   - id: Multiply
     say:
-      - {id: s1, pace: normal, text: "{@a}二在一格，四在两格，八在三格，{@sum}而一加二正好等于三。", en: "Two is at one step, four at two steps, eight at three. One plus two is exactly three."}
-      - {id: s2, pace: normal, text: "纵轴上乘起来，横轴上就加起来，{@p}对数把乘法变成了加法。", en: "Multiplying up the y-axis means adding along the x-axis. Logs turn multiplication into addition."}
-      - {id: s3, pace: normal, text: "把横竖对调，{@yx}沿着 y 等于 x 翻过去，{@log}就是对数函数的图像。", en: "Swap across and up, flipping over the line y equals x, and you get the graph of the log function."}
+      - {id: s1, pace: normal, text: "{@a}二在一格，四在两格，八在三格，{@sum}而一加二正好等于三。", en: "{@a}Two is at one step, four at two steps, eight at three. {@sum}One plus two is exactly three."}
+      - {id: s2, pace: normal, text: "纵轴上乘起来，横轴上就加起来，{@p}对数把乘法变成了加法。", en: "Multiplying up the y-axis means adding along the x-axis. {@p}Logs turn multiplication into addition."}
+      - {id: s3, pace: normal, text: "把横竖对调，{@yx}沿着 y 等于 x 翻过去，{@log}就是对数函数的图像。", en: "Swap across and up, {@yx}flipping over the line y equals x, and {@log}you get the graph of the log function."}
     do:
       - {at: s1, act: hide, target: ask}
       - {at: s1@sum, act: show, target: mul}
@@ -164,9 +176,9 @@ beats:
   - id: NonExample
     shows: non_example
     say:
-      - {id: s1, pace: ask, text: "{@w}那二加四的对数，是不是一加二，也等于三？", en: "So is the log of two plus four also one plus two, which is three?"}
-      - {id: s2, pace: normal, text: "二加四是六，{@six}在曲线上找六，{@x}横轴只走了两格半多一点。", en: "Two plus four is six. Find six on the curve: x has only gone a bit past two and a half."}
-      - {id: s3, pace: normal, text: "三格对应的是八，不是六，{@no}所以和的对数不等于对数的和。", en: "Three steps give eight, not six. So the log of a sum is not the sum of the logs."}
+      - {id: s1, pace: ask, text: "{@w}那二加四的对数，是不是一加二，也等于三？", en: "{@w}So is the log of two plus four also one plus two, which is three?"}
+      - {id: s2, pace: normal, text: "二加四是六，{@six}在曲线上找六，{@x}横轴只走了两格半多一点。", en: "Two plus four is six. {@six}Find six on the curve: {@x}x has only gone a bit past two and a half."}
+      - {id: s3, pace: normal, text: "三格对应的是八，不是六，{@no}所以和的对数不等于对数的和。", en: "Three steps give eight, not six. {@no}So the log of a sum is not the sum of the logs."}
     do:
       - {at: s1@w, act: show, target: wrong2}
       - {at: s2@six, act: show, target: "g.line[3]"}
@@ -177,9 +189,9 @@ beats:
   - id: Landing
     shows: landing
     say:
-      - {id: s1, pace: slow, text: "所以对数问的是，{@m}底数要乘几次才能得到这个数。", en: "So a log asks: how many times must the base be multiplied to reach this number?"}
+      - {id: s1, pace: slow, text: "所以对数问的是，{@m}底数要乘几次才能得到这个数。", en: "So a log asks: {@m}how many times must the base be multiplied to reach this number?"}
       - {id: s2, pace: normal, text: "指数和对数是同一张图，一个顺着读，一个倒着读。", en: "Powers and logs are the same graph, one read forwards, one read backwards."}
-      - {id: s3, pace: normal, text: "{@p}乘积的对数等于对数的和，因为多乘一次，就是多走一格。", en: "The log of a product is the sum of the logs, because one more multiplication is one more step."}
+      - {id: s3, pace: normal, text: "{@p}乘积的对数等于对数的和，因为多乘一次，就是多走一格。", en: "{@p}The log of a product is the sum of the logs, because one more multiplication is one more step."}
     do:
       - {at: s1, act: hide, target: "g.line[3]"}
       - {with: prev, act: hide, target: "g.line[4]"}
@@ -191,7 +203,7 @@ beats:
   - id: Close
     say:
       - {id: s1, pace: normal, text: "下次再看到对数，先问一句，它在问的是乘几次。", en: "Next time you see a log, first ask: how many multiplications is it asking about?"}
-      - {id: s2, pace: ask, text: "{@q}要是一个点绕着圆匀速转圈，它的高度画出来，会是什么形状？", en: "Next: if a point goes round a circle at a steady speed, what shape does its height trace out?"}
+      - {id: s2, pace: ask, text: "{@q}要是一个点绕着圆匀速转圈，它的高度画出来，会是什么形状？", en: "{@q}Next: if a point goes round a circle at a steady speed, what shape does its height trace out?"}
     do:
       - {at: s1, act: unmark, target: prod}
       - {at: s2@q, act: hide, target: q}

@@ -104,11 +104,21 @@ objects:
     right_of: law
     gap: lg
 
+i18n:
+  en:
+    meta: {title: "Why Subtracting a Negative Means Adding"}
+    objects:
+      myth: {text: '[Equals one?]{#m}'}
+      temp: {text: '[Up $5$ degrees]{#g}'}
+    beats:
+      Hook: {pause: {prompt: "Why does three minus negative two equal five?"}}
+      Predict: {pause: {prompt: "Three minus negative two: how many steps from negative two to three?"}}
+
 beats:
   - id: Hook
     pause: {type: predict, prompt: 三减负二为什么等于五？, hold: 3, app_item: ep16-before-1}
     say:
-      - {id: s1, pace: normal, text: "{@q}早上零下二度，中午三度，{@g}气温升了五度，算式是三减负二。", en: "It was minus two degrees this morning and three at noon: the temperature rose five degrees, and the sum is three minus negative two."}
+      - {id: s1, pace: normal, text: "{@q}早上零下二度，中午三度，{@g}气温升了五度，算式是三减负二。", en: "{@q}It was minus two degrees this morning and three at noon: {@g}the temperature rose five degrees, and the sum is three minus negative two."}
       - {id: s2, pace: normal, text: "可它为什么等于五？给自己三秒钟。", en: "But why is that five? Give yourself three seconds."}
     do:
       - {at: s1@q, act: show, target: q}
@@ -118,7 +128,7 @@ beats:
   - id: Myth
     shows: misconception
     say:
-      - {id: s1, pace: normal, text: "小宇却算成了一：{@m}三减二是一，负号好像没什么用。", en: "Xiaoyu works it out as one: three minus two is one, and the minus sign seems to do nothing."}
+      - {id: s1, pace: normal, text: "小宇却算成了一：{@m}三减二是一，负号好像没什么用。", en: "Xiaoyu works it out as one: {@m}three minus two is one, and the minus sign seems to do nothing."}
     do:
       - {at: s1@m, act: hide, target: temp}
       - {with: prev, act: show, target: myth}
@@ -126,8 +136,8 @@ beats:
   - id: Setup
     say:
       - {id: s1, pace: normal, text: "我们一起看。减法其实在问：这两个数相差多少。", en: "Let's look together. Subtraction is really asking: how far apart are these two numbers?"}
-      - {id: s2, pace: normal, text: "五减二，{@p}就是从二走到五，{@j}数一数，一共差三格。", en: "Five minus two: walk from two to five, counting one step at a time. Three steps."}
-      - {id: s3, pace: normal, text: "走了几格，答案就是几，{@r}所以五减二等于三。", en: "The number of steps is the answer, so five minus two is three."}
+      - {id: s2, pace: normal, text: "五减二，{@p}就是从二走到五，{@j}数一数，一共差三格。", en: "Five minus two: {@p}walk from two to five, {@j}counting one step at a time. Three steps."}
+      - {id: s3, pace: normal, text: "走了几格，答案就是几，{@r}所以五减二等于三。", en: "The number of steps is the answer, {@r}so five minus two is three."}
     do:
       - {at: s2@p, act: mark_point, target: line, args: {at: 2, role: B}}
       - {with: prev, act: mark_point, target: line, args: {at: 5, role: A}}
@@ -137,8 +147,8 @@ beats:
 
   - id: Pattern
     say:
-      - {id: s1, pace: normal, text: "{@a}三减二，从二走到三，差一格；{@b}三减一，从一走到三，差两格。", en: "Three minus two: from two to three, one step. Three minus one: from one to three, two steps."}
-      - {id: s2, pace: normal, text: "{@c}三减零，从零走到三，差三格。{@d}减去的数越小，差得就越多。", en: "Three minus zero: from zero to three, three steps. The smaller the number we subtract, the bigger the gap."}
+      - {id: s1, pace: normal, text: "{@a}三减二，从二走到三，差一格；{@b}三减一，从一走到三，差两格。", en: "{@a}Three minus two: from two to three, one step. {@b}Three minus one: from one to three, two steps."}
+      - {id: s2, pace: normal, text: "{@c}三减零，从零走到三，差三格。{@d}减去的数越小，差得就越多。", en: "{@c}Three minus zero: from zero to three, three steps. {@d}The smaller the number we subtract, the bigger the gap."}
     do:
       - {at: s1, act: unmark, target: "r0#r"}
       - {with: prev, act: erase, target: line}
@@ -152,7 +162,7 @@ beats:
   - id: Predict
     pause: {type: predict, prompt: 三减负二，从负二走到三，要走几格？, hold: 3, app_item: ep16-why-1}
     say:
-      - {id: s1, pace: ask, text: "{@q}那三减负二，从负二走到三，要走几格？", en: "So three minus negative two: from negative two to three, how many steps?"}
+      - {id: s1, pace: ask, text: "{@q}那三减负二，从负二走到三，要走几格？", en: "{@q}So three minus negative two: from negative two to three, how many steps?"}
     do:
       - {at: s1@q, act: erase, target: line}
       - {with: prev, act: mark_point, target: line, args: {at: -2, role: B}}
@@ -160,10 +170,10 @@ beats:
 
   - id: Count
     say:
-      - {id: s1, pace: normal, text: "{@go}从负二出发先走两格到零，{@z}再走三格才到三。", en: "Start at negative two: two steps to reach zero, then three more to reach three."}
+      - {id: s1, pace: normal, text: "{@go}从负二出发先走两格到零，{@z}再走三格才到三。", en: "{@go}Start at negative two: two steps to reach zero, {@z}then three more to reach three."}
       - {id: s2, pace: normal, text: "我们一格一格数：一、二、三、四、五。", en: "Let's count them one by one: one, two, three, four, five."}
-      - {id: s3, pace: slow, text: "{@r}一共是五格，所以三减负二等于五。", en: "Five steps in all, so three minus negative two is five."}
-      - {id: s4, pace: normal, text: "负二在零的左边，离三更远，{@m}差距反而比三减零还大。", en: "Negative two is left of zero, further from three, so the gap is even bigger than three minus zero."}
+      - {id: s3, pace: slow, text: "{@r}一共是五格，所以三减负二等于五。", en: "{@r}Five steps in all, so three minus negative two is five."}
+      - {id: s4, pace: normal, text: "负二在零的左边，离三更远，{@m}差距反而比三减零还大。", en: "Negative two is left of zero, further from three, so {@m}the gap is even bigger than three minus zero."}
     do:
       - {at: s1@go, act: highlight, target: line, args: {from: -2, to: 0, role: B}}
       - {at: s1@z, act: highlight, target: line, args: {from: 0, to: 3, role: A, keep: true}}
@@ -177,8 +187,8 @@ beats:
   - id: NonExample
     shows: non_example
     say:
-      - {id: s1, pace: normal, text: "那个一是从哪里来的？{@a}其实一是三加负二的答案。", en: "So where did the one come from? One is actually the answer to three plus negative two."}
-      - {id: s2, pace: normal, text: "{@l}加负二是从三往左走两格，{@p}停在一，问的是另一个问题。", en: "Adding negative two means two steps left from three, stopping at one. That's a different question."}
+      - {id: s1, pace: normal, text: "那个一是从哪里来的？{@a}其实一是三加负二的答案。", en: "So where did the one come from? {@a}One is actually the answer to three plus negative two."}
+      - {id: s2, pace: normal, text: "{@l}加负二是从三往左走两格，{@p}停在一，问的是另一个问题。", en: "{@l}Adding negative two means two steps left from three, {@p}stopping at one. That's a different question."}
     do:
       - {at: s1, act: unmark, target: "r3#all"}
       - {with: prev, act: unmark, target: "r4#q"}
@@ -190,9 +200,9 @@ beats:
   - id: Landing
     shows: landing
     say:
-      - {id: s1, pace: slow, text: "{@law}所以减去负二，就是加上二：三减负二等于三加二。", en: "So subtracting negative two is adding two: three minus negative two equals three plus two."}
-      - {id: s2, pace: normal, text: "减法看的是差距，{@h}减数越往零的左边走，差距就越大。", en: "Subtraction measures the gap: the further left of zero the number you subtract, the bigger the gap."}
-      - {id: s3, pace: normal, text: "比如五减负一，{@e}就是从负一走到五，六格，等于五加一。", en: "For example, five minus negative one is from negative one to five: six steps, the same as five plus one."}
+      - {id: s1, pace: slow, text: "{@law}所以减去负二，就是加上二：三减负二等于三加二。", en: "{@law}So subtracting negative two is adding two: three minus negative two equals three plus two."}
+      - {id: s2, pace: normal, text: "减法看的是差距，{@h}减数越往零的左边走，差距就越大。", en: "Subtraction measures the gap: {@h}the further left of zero the number you subtract, the bigger the gap."}
+      - {id: s3, pace: normal, text: "比如五减负一，{@e}就是从负一走到五，六格，等于五加一。", en: "For example, five minus negative one {@e}is from negative one to five: six steps, the same as five plus one."}
     do:
       - {at: s1@law, act: hide, target: add}
       - {with: prev, act: erase, target: line}
@@ -202,7 +212,7 @@ beats:
 
   - id: Close
     say:
-      - {id: s1, pace: normal, text: "负号可不是没有用，{@x}它把起点挪到了零的另一边。", en: "The minus sign isn't useless: it moves the starting point to the other side of zero."}
-      - {id: s2, pace: ask, text: "{@q}为什么解方程时，两边可以同时减去同一个数？", en: "Next: when solving an equation, why can we take the same number from both sides?"}
+      - {id: s1, pace: normal, text: "负号可不是没有用，{@x}它把起点挪到了零的另一边。", en: "The minus sign isn't useless: {@x}it moves the starting point to the other side of zero."}
+      - {id: s2, pace: ask, text: "{@q}为什么解方程时，两边可以同时减去同一个数？", en: "{@q}Next: when solving an equation, why can we take the same number from both sides?"}
     do:
       - {at: s1@x, act: cross, target: "myth#m"}

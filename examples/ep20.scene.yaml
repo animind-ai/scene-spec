@@ -132,12 +132,23 @@ objects:
     below: f4a
     gap: sm
 
+i18n:
+  en:
+    meta: {title: "Why √2 Is Not a Fraction"}
+    objects:
+      myth: {text: '[Measure finer and a fraction fits?]{#m}'}
+      fmin: {text: '[$b$ smallest]{#min}'}
+      paper: {guides: {diag: {label: 'Crease $\sqrt{2}$'}}}
+    beats:
+      Hook: {pause: {prompt: "The crease is root two long. Can it be written exactly as a fraction?"}}
+      Predict: {pause: {prompt: "Are this small triangle's sides still whole numbers?"}}
+
 beats:
   - id: Hook
     pause: {type: predict, prompt: 折痕长根号二，它能正好写成一个分数吗？, hold: 3, app_item: ep20-before-1}
     say:
-      - {id: s1, pace: normal, text: "{@p}边长为一的正方形纸，{@f}沿对角线对折，{@c}折痕长根号二。", en: "A square sheet of paper with side one: fold it along the diagonal. The crease is root two long."}
-      - {id: s2, pace: ask, text: "{@q}先别急，心里站个队：它能正好写成一个分数吗？", en: "Don't rush; pick a side in your head: can it be written exactly as a fraction?"}
+      - {id: s1, pace: normal, text: "{@p}边长为一的正方形纸，{@f}沿对角线对折，{@c}折痕长根号二。", en: "{@p}A square sheet of paper with side one: {@f}fold it along the diagonal. {@c}The crease is root two long."}
+      - {id: s2, pace: ask, text: "{@q}先别急，心里站个队：它能正好写成一个分数吗？", en: "{@q}Don't rush; pick a side in your head: can it be written exactly as a fraction?"}
     do:
       - {at: s1@p, act: show, target: paper}
       - {with: prev, act: show, target: "paper#one"}
@@ -148,16 +159,16 @@ beats:
   - id: Myth
     shows: misconception
     say:
-      - {id: s1, pace: normal, text: "同桌拿尺子一量，一点四一四，{@m}说量得再细点，总能凑出一个分数。", en: "Your deskmate measures it with a ruler, gets one point four one four, and says: measure finely enough and some fraction will fit."}
+      - {id: s1, pace: normal, text: "同桌拿尺子一量，一点四一四，{@m}说量得再细点，总能凑出一个分数。", en: "Your deskmate measures it with a ruler, gets one point four one four, and says: {@m}measure finely enough and some fraction will fit."}
     do:
       - {at: s1@m, act: show, target: myth}
 
   - id: Setup
     say:
-      - {id: s1, pace: normal, text: "我们先假设，{@f}根号二等于 a 比 b，a 和 b 都是正整数。", en: "First suppose root two equals a over b, with a and b whole numbers."}
-      - {id: s2, pace: normal, text: "这样的分数要是有，{@m}就取分母 b 最小的那一个。", en: "If such fractions exist, take the one whose denominator b is smallest."}
-      - {id: s3, pace: normal, text: "{@s}两边平方，a 方等于 b 方加 b 方。", en: "Square both sides: a squared equals b squared plus b squared."}
-      - {id: s4, pace: normal, text: "按勾股定理，{@t}这就是一个等腰直角三角形，两条直角边是 b，斜边是 a。", en: "By Pythagoras, that's an isosceles right triangle: both legs b, hypotenuse a."}
+      - {id: s1, pace: normal, text: "我们先假设，{@f}根号二等于 a 比 b，a 和 b 都是正整数。", en: "First suppose {@f}root two equals a over b, with a and b whole numbers."}
+      - {id: s2, pace: normal, text: "这样的分数要是有，{@m}就取分母 b 最小的那一个。", en: "If such fractions exist, {@m}take the one whose denominator b is smallest."}
+      - {id: s3, pace: normal, text: "{@s}两边平方，a 方等于 b 方加 b 方。", en: "{@s}Square both sides: a squared equals b squared plus b squared."}
+      - {id: s4, pace: normal, text: "按勾股定理，{@t}这就是一个等腰直角三角形，两条直角边是 b，斜边是 a。", en: "By Pythagoras, {@t}that's an isosceles right triangle: both legs b, hypotenuse a."}
     do:
       - {at: s1@f, act: show, target: f1}
       - {at: s2@m, act: show, target: fmin}
@@ -169,9 +180,9 @@ beats:
 
   - id: Fold
     say:
-      - {id: s1, pace: normal, text: "{@f}沿着上面这个角的平分线折一下，让左边的直角边贴到斜边上。", en: "Fold along the bisector of the top angle, so the left leg lies flat on the hypotenuse."}
-      - {id: s2, pace: normal, text: "折过去的这条边长 b，斜边长 a，{@r}所以斜边上还剩一段 a 减 b。", en: "The folded leg is b long and the hypotenuse is a, so a piece a minus b is left over."}
-      - {id: s3, pace: normal, text: "原来的直角落在了斜边上，{@c}所以右下角切出了一个小三角形。", en: "The right angle now sits on the hypotenuse, and it cuts off a small triangle in the bottom right."}
+      - {id: s1, pace: normal, text: "{@f}沿着上面这个角的平分线折一下，让左边的直角边贴到斜边上。", en: "{@f}Fold along the bisector of the top angle, so the left leg lies flat on the hypotenuse."}
+      - {id: s2, pace: normal, text: "折过去的这条边长 b，斜边长 a，{@r}所以斜边上还剩一段 a 减 b。", en: "The folded leg is b long and the hypotenuse is a, so {@r}a piece a minus b is left over."}
+      - {id: s3, pace: normal, text: "原来的直角落在了斜边上，{@c}所以右下角切出了一个小三角形。", en: "The right angle now sits on the hypotenuse, and {@c}it cuts off a small triangle in the bottom right."}
     do:
       - {at: s1@f, act: fold, target: tri, args: {cut: f1, flap: flap, back: C}, dur: 2.0}
       - {at: s2@r, act: show, target: "tri#eb"}
@@ -184,11 +195,11 @@ beats:
 
   - id: Count
     say:
-      - {id: s1, pace: normal, text: "它的右下角也是四十五度，所以两条直角边一样长，{@e}都是 a 减 b。", en: "Its bottom-right angle is also forty-five degrees, so its two legs are equal: both a minus b."}
-      - {id: s2, pace: normal, text: "{@l}底边左边那段折上去就是这条边，也是 a 减 b，{@h}剩下的斜边是二 b 减 a。", en: "The left part of the bottom edge folded up into that leg, so it's a minus b too, and the rest, the small hypotenuse, is two b minus a."}
-      - {id: s3, pace: normal, text: "再看大小：一小于根号二小于二，{@i}所以 b 小于 a 小于二 b。", en: "Now sizes: one is less than root two, which is less than two, so b is less than a, which is less than two b."}
-      - {id: s4, pace: normal, text: "于是 a 减 b 和二 b 减 a 都是正整数，{@p}而且 a 减 b 比 b 小。", en: "So a minus b and two b minus a are both positive whole numbers, and a minus b is smaller than b."}
-      - {id: s5, pace: normal, text: "又是一个整数边的等腰直角三角形，直角边却比 b 还小，{@x}这就矛盾了。", en: "Again an isosceles right triangle with whole-number sides, but with legs shorter than b. That's a contradiction."}
+      - {id: s1, pace: normal, text: "它的右下角也是四十五度，所以两条直角边一样长，{@e}都是 a 减 b。", en: "Its bottom-right angle is also forty-five degrees, so its two legs are equal: {@e}both a minus b."}
+      - {id: s2, pace: normal, text: "{@l}底边左边那段折上去就是这条边，也是 a 减 b，{@h}剩下的斜边是二 b 减 a。", en: "{@l}The left part of the bottom edge folded up into that leg, so it's a minus b too, and {@h}the rest, the small hypotenuse, is two b minus a."}
+      - {id: s3, pace: normal, text: "再看大小：一小于根号二小于二，{@i}所以 b 小于 a 小于二 b。", en: "Now sizes: one is less than root two, which is less than two, so {@i}b is less than a, which is less than two b."}
+      - {id: s4, pace: normal, text: "于是 a 减 b 和二 b 减 a 都是正整数，{@p}而且 a 减 b 比 b 小。", en: "So a minus b and two b minus a are both positive whole numbers, and {@p}a minus b is smaller than b."}
+      - {id: s5, pace: normal, text: "又是一个整数边的等腰直角三角形，直角边却比 b 还小，{@x}这就矛盾了。", en: "Again an isosceles right triangle with whole-number sides, but with legs shorter than b. {@x}That's a contradiction."}
     do:
       - {at: s1@e, act: show, target: "tri#ed"}
       - {at: s2@l, act: show, target: "tri#cd"}
@@ -199,7 +210,7 @@ beats:
 
   - id: Again
     say:
-      - {id: s1, pace: normal, text: "{@f}在小三角形里还能再折一次，{@e}一个比一个小，正整数却不能一直变小。", en: "We can fold the small one again, smaller and smaller, but whole numbers can't keep shrinking."}
+      - {id: s1, pace: normal, text: "{@f}在小三角形里还能再折一次，{@e}一个比一个小，正整数却不能一直变小。", en: "{@f}We can fold the small one again, {@e}smaller and smaller, but whole numbers can't keep shrinking."}
     do:
       - {at: s1, act: unmark, target: fmin}
       - {with: prev, act: hide, target: "tri#eb"}
@@ -211,8 +222,8 @@ beats:
   - id: NonExample
     shows: non_example
     say:
-      - {id: s1, pace: normal, text: "{@c}那七比五呢？{@a}七的平方四十九，{@b}五的平方的两倍是五十。", en: "What about seven fifths? Seven squared is forty-nine; twice five squared is fifty."}
-      - {id: s2, pace: normal, text: "{@x}差一点就不是相等，再接近的分数，也只是差得更少。", en: "Off by a bit is not equal; closer fractions are only off by less."}
+      - {id: s1, pace: normal, text: "{@c}那七比五呢？{@a}七的平方四十九，{@b}五的平方的两倍是五十。", en: "{@c}What about seven fifths? {@a}Seven squared is forty-nine; {@b}twice five squared is fifty."}
+      - {id: s2, pace: normal, text: "{@x}差一点就不是相等，再接近的分数，也只是差得更少。", en: "{@x}Off by a bit is not equal; closer fractions are only off by less."}
     do:
       - {at: s1@c, act: hide, target: f1}
       - {with: prev, act: hide, target: fmin}
@@ -226,7 +237,7 @@ beats:
   - id: Landing
     shows: landing
     say:
-      - {id: s1, pace: slow, text: "{@c}所以根号二不能写成分数，它是一个无理数。", en: "So root two can't be written as a fraction. It is an irrational number."}
+      - {id: s1, pace: slow, text: "{@c}所以根号二不能写成分数，它是一个无理数。", en: "{@c}So root two can't be written as a fraction. It is an irrational number."}
       - {id: s2, pace: normal, text: "这是一个证明，只用到了折纸，和正整数不能一直变小。", en: "This is a proof, using only a fold and the fact that whole numbers can't shrink forever."}
     do:
       - {at: s1@c, act: hide, target: f4a}

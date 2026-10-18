@@ -66,11 +66,21 @@ objects:
     below: law
     gap: lg
 
+i18n:
+  en:
+    meta: {title: "The Pythagorean Theorem: Rearrange and See"}
+    objects:
+      wrong: {text: '[$a+b=c$]{#w}?'}
+      practice: {lines: ["[Try it]{.HL}", "Short sides $3$ and $4$", "Long side $=$ ?"]}
+    beats:
+      Hook: {pause: {prompt: "The ladder's foot is a from the wall and its top is b high. How is the ladder c related to a and b?"}}
+      Predict: {pause: {prompt: "Keep the big square still and pair the triangles into rectangles. What does the empty space become?"}}
+
 beats:
   - id: Hook
     pause: {type: predict, prompt: 梯脚离墙 a、梯顶高 b，梯子 c 和 a、b 什么关系？, hold: 3, app_item: ep21-before-1}
     say:
-      - {id: s1, pace: normal, text: "{@tri}师傅要把梯子斜靠在墙上，梯脚离墙 a，梯顶要够到 b 高。", en: "A builder leans a ladder against a wall: its foot is a from the wall, and its top must reach a height of b."}
+      - {id: s1, pace: normal, text: "{@tri}师傅要把梯子斜靠在墙上，梯脚离墙 a，梯顶要够到 b 高。", en: "{@tri}A builder leans a ladder against a wall: its foot is a from the wall, and its top must reach a height of b."}
       - {id: s2, pace: ask, text: "梯子长 c，它和 a、b 什么关系？你是师傅，会怎么估？", en: "The ladder is c long. How is c related to a and b? If you were the builder, how would you estimate it?"}
     do:
       - {at: s1@tri, act: show, target: one}
@@ -78,14 +88,14 @@ beats:
   - id: Myth
     shows: misconception
     say:
-      - {id: s1, pace: normal, text: "徒弟抢着说：{@w}那就买 a 加 b 那么长的。", en: "The apprentice jumps in: just buy one that's a plus b long."}
+      - {id: s1, pace: normal, text: "徒弟抢着说：{@w}那就买 a 加 b 那么长的。", en: "The apprentice jumps in: {@w}just buy one that's a plus b long."}
     do:
       - {at: s1@w, act: show, target: wrong}
 
   - id: Setup
     say:
-      - {id: s1, pace: normal, text: "{@a}这个三角形的直角边 a 是二，{@b}b 是三。", en: "In this triangle, side a is two and side b is three."}
-      - {id: s2, pace: normal, text: "{@c}斜边 c 是最长的一条，比 a 长，也比 b 长。", en: "The long side c is the longest, longer than a and longer than b."}
+      - {id: s1, pace: normal, text: "{@a}这个三角形的直角边 a 是二，{@b}b 是三。", en: "In this triangle, {@a}side a is two and {@b}side b is three."}
+      - {id: s2, pace: normal, text: "{@c}斜边 c 是最长的一条，比 a 长，也比 b 长。", en: "{@c}The long side c is the longest, longer than a and longer than b."}
     do:
       - {at: s1@a, act: mark, target: "one.side[0]"}
       - {at: s1@b, act: mark, target: "one.side[1]"}
@@ -94,9 +104,9 @@ beats:
   - id: Wrong
     shows: misconception
     say:
-      - {id: s1, pace: normal, text: "如果 c 等于 a 加 b，{@e}斜边就和两条直角边接起来一样长。", en: "If c equalled a plus b, the long side would be as long as the two short sides end to end."}
-      - {id: s2, pace: normal, text: "{@x}可是直路总比绕远路短，所以 c 一定比 a 加 b 小。", en: "But the straight path is always shorter than going around, so c must be less than a plus b."}
-      - {id: s3, pace: slow, text: "长度对不上，那就换个思路：{@area}不比长度，比面积。", en: "Lengths don't add up, so let's switch: compare areas, not lengths."}
+      - {id: s1, pace: normal, text: "如果 c 等于 a 加 b，{@e}斜边就和两条直角边接起来一样长。", en: "If c equalled a plus b, {@e}the long side would be as long as the two short sides end to end."}
+      - {id: s2, pace: normal, text: "{@x}可是直路总比绕远路短，所以 c 一定比 a 加 b 小。", en: "{@x}But the straight path is always shorter than going around, so c must be less than a plus b."}
+      - {id: s3, pace: slow, text: "长度对不上，那就换个思路：{@area}不比长度，比面积。", en: "Lengths don't add up, so let's switch: {@area}compare areas, not lengths."}
     do:
       - {at: s1@e, act: focus, target: "one.side[2]"}
       - {at: s2@x, act: unfocus, target: one}
@@ -105,10 +115,10 @@ beats:
 
   - id: Square
     say:
-      - {id: s1, pace: normal, text: "{@sq}画一个边长是 a 加 b 的大正方形，四条边都一样长。", en: "Draw a big square with side a plus b. All four sides are the same."}
-      - {id: s2, pace: brisk, text: "放进四个一样的直角三角形，{@t0}一个、{@t1}两个、{@t2}三个、{@t3}四个。", en: "Put in four identical right triangles: one, two, three, four."}
-      - {id: s3, pace: normal, text: "{@h}中间空出了一块，它的四条边都是斜边 c。", en: "A space is left in the middle, and all four of its sides are the long side c."}
-      - {id: s4, pace: slow, text: "每个角都是九十度，所以它是正方形，{@c2}面积就是 c 方。", en: "Every corner is ninety degrees, so it's a square, and its area is c squared."}
+      - {id: s1, pace: normal, text: "{@sq}画一个边长是 a 加 b 的大正方形，四条边都一样长。", en: "{@sq}Draw a big square with side a plus b. All four sides are the same."}
+      - {id: s2, pace: brisk, text: "放进四个一样的直角三角形，{@t0}一个、{@t1}两个、{@t2}三个、{@t3}四个。", en: "Put in four identical right triangles: {@t0}one, {@t1}two, {@t2}three, {@t3}four."}
+      - {id: s3, pace: normal, text: "{@h}中间空出了一块，它的四条边都是斜边 c。", en: "{@h}A space is left in the middle, and all four of its sides are the long side c."}
+      - {id: s4, pace: slow, text: "每个角都是九十度，所以它是正方形，{@c2}面积就是 c 方。", en: "Every corner is ninety degrees, so it's a square, {@c2}and its area is c squared."}
     do:
       - {at: s1, act: hide, target: one}
       - {at: s1@sq, act: show, target: pyth}
@@ -122,15 +132,15 @@ beats:
   - id: Predict
     pause: {type: predict, prompt: 大正方形不动，三角形两两拼成长方形，空白会变成什么？, hold: 3, app_item: ep21-predict-1}
     say:
-      - {id: s1, pace: ask, text: "大正方形不动，{@pair}把三角形两两拼成长方形，空白会变成什么？", en: "Keep the big square still and pair up the triangles into rectangles. What will the empty space become?"}
+      - {id: s1, pace: ask, text: "大正方形不动，{@pair}把三角形两两拼成长方形，空白会变成什么？", en: "Keep the big square still and {@pair}pair up the triangles into rectangles. What will the empty space become?"}
     do:
       - {at: s1@pair, act: clear, target: pyth}
 
   - id: Rearrange
     say:
-      - {id: s1, pace: normal, text: "{@go}看好了，三角形只是平移，不转动，也不变形。", en: "Watch closely: the triangles only slide. No turning, no stretching."}
-      - {id: s2, pace: slow, text: "空白变成两个正方形，{@a2}面积是 a 方{@b2}加 b 方。", en: "The empty space becomes two squares, with area a squared plus b squared."}
-      - {id: s3, pace: normal, text: "{@same}大正方形没变，三角形也没变，空白的面积就不会变。", en: "The big square didn't change and the triangles didn't change, so the empty area can't change either."}
+      - {id: s1, pace: normal, text: "{@go}看好了，三角形只是平移，不转动，也不变形。", en: "{@go}Watch closely: the triangles only slide. No turning, no stretching."}
+      - {id: s2, pace: slow, text: "空白变成两个正方形，{@a2}面积是 a 方{@b2}加 b 方。", en: "The empty space becomes two squares, with area {@a2}a squared {@b2}plus b squared."}
+      - {id: s3, pace: normal, text: "{@same}大正方形没变，三角形也没变，空白的面积就不会变。", en: "{@same}The big square didn't change and the triangles didn't change, so the empty area can't change either."}
     do:
       - {at: s1@go, act: slide, target: pyth, args: {layout: two_rectangles}, dur: fit}
       - {at: s2@a2, act: show, target: "pyth.hole[1]"}
@@ -141,9 +151,9 @@ beats:
   - id: NonExample
     shows: non_example
     say:
-      - {id: s1, pace: ask, text: "要是不是直角呢？{@bend}把直角撑开，看看会怎样？", en: "What if the angle isn't a right angle? What happens if we push it open?"}
+      - {id: s1, pace: ask, text: "要是不是直角呢？{@bend}把直角撑开，看看会怎样？", en: "What if the angle isn't a right angle? {@bend}What happens if we push it open?"}
       - {id: s2, pace: normal, text: "三角形戳出了大正方形，互相压住，拼不起来。", en: "The triangles poke out of the square and overlap. Nothing fits."}
-      - {id: s3, pace: normal, text: "斜边变长了，{@back}所以 c 方比 a 方加 b 方还要大。", en: "Now the long side is longer, and c squared is bigger than a squared plus b squared."}
+      - {id: s3, pace: normal, text: "斜边变长了，{@back}所以 c 方比 a 方加 b 方还要大。", en: "Now the long side is longer, {@back}and c squared is bigger than a squared plus b squared."}
     do:
       - {at: s1, act: unfocus, target: pyth}
       - {at: s1@bend, act: bend, target: pyth, args: {angle: 110}, dur: 1.6}
@@ -153,8 +163,8 @@ beats:
   - id: Landing
     shows: landing
     say:
-      - {id: s1, pace: slow, text: "{@law}所以只有直角三角形，才一定有 a 方加 b 方等于 c 方。", en: "So only in a right triangle is a squared plus b squared always equal to c squared."}
-      - {id: s2, pace: normal, text: "{@a}图里这块是 a 方，{@b}那块是 b 方，{@back}挪回去，{@c}中间就是 c 方。", en: "This square is a squared, that one is b squared, and slide them back: the middle is c squared."}
+      - {id: s1, pace: slow, text: "{@law}所以只有直角三角形，才一定有 a 方加 b 方等于 c 方。", en: "{@law}So only in a right triangle is a squared plus b squared always equal to c squared."}
+      - {id: s2, pace: normal, text: "{@a}图里这块是 a 方，{@b}那块是 b 方，{@back}挪回去，{@c}中间就是 c 方。", en: "{@a}This square is a squared, {@b}that one is b squared, {@back}and slide them back: {@c}the middle is c squared."}
     do:
       - {at: s1@law, act: show, target: law}
       - {at: s2@a, act: mark, target: "pyth.area[1]"}
@@ -169,7 +179,7 @@ beats:
 
   - id: Close
     say:
-      - {id: s1, pace: ask, text: "{@w}两条直角边是三和四时{@q}斜边是多少？", en: "So if the short sides are three and four, how long is the long side?"}
+      - {id: s1, pace: ask, text: "{@w}两条直角边是三和四时{@q}斜边是多少？", en: "{@w}So if the short sides are three and four, {@q}how long is the long side?"}
     do:
       - {at: s1@w, act: unmark, target: "law#a2"}
       - {with: prev, act: unmark, target: "law#b2"}

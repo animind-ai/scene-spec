@@ -145,11 +145,41 @@ objects:
     role: HL
     in: footer
 
+i18n:
+  en:
+    meta: {title: "The Derivative: Zoom In Until the Curve Is Straight"}
+    objects:
+      nq: {text: "How fast is it rising?"}
+      odd:
+        guides:
+          rows: {label: '5 rows'}
+          cols: {label: '$3+11=14$ per row'}
+          n: {label: '$n$ rows'}
+          w: {label: '$a_1+a_n$ per row'}
+      g:
+        secants:
+          - {point: 0, h: 1, label: Q, readout: true, readout_text: "Right secant slope"}
+          - {point: 0, h: -1, label: "Q'", role: C, label_dir: ul, readout: true, readout_text: "Left secant slope"}
+      ab:
+        secants:
+          - {point: 0, h: 1.6, label: Q, readout: true, readout_text: "Right secant slope"}
+          - {point: 0, h: -1.6, label: "Q'", role: C, label_dir: ul, readout: true, readout_text: "Left secant slope"}
+      wrong: {text: '[Tangent = touches once?]{#m}'}
+      ask: {text: "Slope as Q nears P?"}
+      cap10: {text: "10x zoom"}
+      cap60: {text: "60x zoom: almost together"}
+      wrong2: {text: '[Every curve turns straight?]{#m}'}
+      capabs: {text: "60x zoom: still a corner"}
+      nq30: {text: "Another point?"}
+    beats:
+      Hook: {pause: {prompt: "Which line is the tangent at this point?"}}
+      Predict: {pause: {prompt: "Slide Q along the curve towards P. What does the slope approach?"}}
+
 beats:
   - id: Hook
     pause: {type: predict, prompt: 这一点的切线，到底是哪一条直线？, hold: 3, app_item: ep30-before-1}
     say:
-      - {id: s1, pace: normal, text: "夜里骑车过弯，{@g}车灯照出去的那条直线，就是弯路在这一点的切线。", en: "Riding a bike round a bend at night, the straight beam of your headlight is the tangent to the road at that point."}
+      - {id: s1, pace: normal, text: "夜里骑车过弯，{@g}车灯照出去的那条直线，就是弯路在这一点的切线。", en: "Riding a bike round a bend at night, {@g}the straight beam of your headlight is the tangent to the road at that point."}
       - {id: s2, pace: ask, text: "你会把这一点的切线画成哪一条直线？", en: "Which line would you draw as the tangent at this point?"}
     do:
       # 开场：一下子摆出 #29 的片尾画面
@@ -173,16 +203,16 @@ beats:
   - id: Myth
     shows: misconception
     say:
-      - {id: s1, pace: normal, text: "同伴随口一说：{@w}只碰曲线一个点的直线，就是切线。", en: "Your friend says offhand: a line that touches the curve at just one point is the tangent."}
+      - {id: s1, pace: normal, text: "同伴随口一说：{@w}只碰曲线一个点的直线，就是切线。", en: "Your friend says offhand: {@w}a line that touches the curve at just one point is the tangent."}
     do:
       - {at: s1@w, act: show, target: wrong}
 
   - id: Setup
     say:
-      - {id: s1, pace: normal, text: "{@v}可过 P 点的这条竖线也只碰一个点，{@x}却显然不是切线。", en: "But this vertical line through P also touches just once, and it's clearly not a tangent."}
-      - {id: s2, pace: normal, text: "{@go}换个问法：在 P 点附近，曲线到底有多陡？", en: "Let's ask a different question: near P, how steep is the curve?"}
-      - {id: s3, pace: normal, text: "在曲线上再取一点 Q，{@q}连成割线，{@k}算它的斜率。", en: "Take another point Q on the curve, join them with a secant, and find its slope."}
-      - {id: s4, pace: normal, text: "两点横坐标相差 h，现在 h 等于一，{@r}斜率是三。", en: "The two x-coordinates differ by h. Right now h is one, and the slope is three."}
+      - {id: s1, pace: normal, text: "{@v}可过 P 点的这条竖线也只碰一个点，{@x}却显然不是切线。", en: "{@v}But this vertical line through P also touches just once, and {@x}it's clearly not a tangent."}
+      - {id: s2, pace: normal, text: "{@go}换个问法：在 P 点附近，曲线到底有多陡？", en: "{@go}Let's ask a different question: near P, how steep is the curve?"}
+      - {id: s3, pace: normal, text: "在曲线上再取一点 Q，{@q}连成割线，{@k}算它的斜率。", en: "Take another point Q on the curve, {@q}join them with a secant, and {@k}find its slope."}
+      - {id: s4, pace: normal, text: "两点横坐标相差 h，现在 h 等于一，{@r}斜率是三。", en: "The two x-coordinates differ by h. Right now h is one, and {@r}the slope is three."}
     do:
       - {at: s1@v, act: show, target: "g.line[0]"}
       - {at: s1@x, act: cross, target: "wrong#m"}
@@ -196,15 +226,15 @@ beats:
   - id: Predict
     pause: {type: predict, prompt: 让 Q 沿着曲线一点一点滑向 P，斜率会靠近几？, hold: 3, app_item: ep30-why-1}
     say:
-      - {id: s1, pace: ask, text: "{@ask}让 Q 沿着曲线一点一点滑向 P，斜率会靠近几？", en: "Let Q slide along the curve towards P, bit by bit. What number does the slope approach?"}
+      - {id: s1, pace: ask, text: "{@ask}让 Q 沿着曲线一点一点滑向 P，斜率会靠近几？", en: "{@ask}Let Q slide along the curve towards P, bit by bit. What number does the slope approach?"}
     do:
       - {at: s1@ask, act: show, target: ask}
 
   - id: Approach
     say:
-      - {id: s1, pace: normal, text: "{@a1}h 缩到零点五、{@a2}零点一、{@a3}零点零一，斜率越来越接近二。", en: "Shrink h to a half, a tenth, a hundredth: the slope gets closer and closer to two."}
-      - {id: s2, pace: normal, text: "{@left}从左边靠近也一样，{@l2}斜率从一往上，也接近二。", en: "From the left it's the same: the slope climbs up from one, towards two as well."}
-      - {id: s3, pace: slow, text: "{@t}两边的割线逼近同一条直线，这就是 P 点的切线。", en: "Both secants close in on the same line. That's the tangent at P."}
+      - {id: s1, pace: normal, text: "{@a1}h 缩到零点五、{@a2}零点一、{@a3}零点零一，斜率越来越接近二。", en: "Shrink h to {@a1}a half, {@a2}a tenth, {@a3}a hundredth: the slope gets closer and closer to two."}
+      - {id: s2, pace: normal, text: "{@left}从左边靠近也一样，{@l2}斜率从一往上，也接近二。", en: "{@left}From the left it's the same: {@l2}the slope climbs up from one, towards two as well."}
+      - {id: s3, pace: slow, text: "{@t}两边的割线逼近同一条直线，这就是 P 点的切线。", en: "{@t}Both secants close in on the same line. That's the tangent at P."}
     do:
       - {at: s1, act: hide, target: ask}
       - {at: s1@a1, act: approach, target: g, args: {secant: 0, h: 0.5}, dur: fit}
@@ -218,9 +248,9 @@ beats:
 
   - id: Zoom
     say:
-      - {id: s1, pace: normal, text: "{@z}再把 P 点附近放大十倍，弯曲已经不太明显。", en: "Now zoom in ten times around P. The bend is already hard to see."}
-      - {id: s2, pace: normal, text: "{@z2}放大到六十倍，{@tan}曲线和切线几乎贴在一起。", en: "At sixty times, the curve and the tangent almost lie on top of each other."}
-      - {id: s3, pace: normal, text: "这是演示，不是证明：{@back}曲线始终是弯的，只是越来越像直线。", en: "This is a demonstration, not a proof: the curve is still curved, it just looks more and more like a line."}
+      - {id: s1, pace: normal, text: "{@z}再把 P 点附近放大十倍，弯曲已经不太明显。", en: "{@z}Now zoom in ten times around P. The bend is already hard to see."}
+      - {id: s2, pace: normal, text: "{@z2}放大到六十倍，{@tan}曲线和切线几乎贴在一起。", en: "{@z2}At sixty times, {@tan}the curve and the tangent almost lie on top of each other."}
+      - {id: s3, pace: normal, text: "这是演示，不是证明：{@back}曲线始终是弯的，只是越来越像直线。", en: "This is a demonstration, not a proof: {@back}the curve is still curved, it just looks more and more like a line."}
     do:
       - {at: s1, act: hide, target: g.secant}
       - {with: prev, act: hide, target: g.qpoint}
@@ -239,9 +269,9 @@ beats:
   - id: NonExample
     shows: non_example
     say:
-      - {id: s1, pace: ask, text: "{@w2}那么，任何曲线放大，都会变直吗？", en: "So does every curve turn straight if you zoom in?"}
-      - {id: s2, pace: normal, text: "{@abs}看 y 等于 x 的绝对值，{@zoom}原点放大六十倍，还是尖角。", en: "Take y equals the absolute value of x. Zoom sixty times at the origin: still a corner."}
-      - {id: s3, pace: normal, text: "右边割线{@r}斜率总是一，{@l}左边总是负一，{@x}原点处没有切线。", en: "Secants on the right always have slope one, on the left minus one. There's no tangent at the origin."}
+      - {id: s1, pace: ask, text: "{@w2}那么，任何曲线放大，都会变直吗？", en: "{@w2}So does every curve turn straight if you zoom in?"}
+      - {id: s2, pace: normal, text: "{@abs}看 y 等于 x 的绝对值，{@zoom}原点放大六十倍，还是尖角。", en: "{@abs}Take y equals the absolute value of x. {@zoom}Zoom sixty times at the origin: still a corner."}
+      - {id: s3, pace: normal, text: "右边割线{@r}斜率总是一，{@l}左边总是负一，{@x}原点处没有切线。", en: "Secants on the right {@r}always have slope one, on the left {@l}minus one. {@x}There's no tangent at the origin."}
     do:
       - {at: s1, act: hide, target: g}
       - {at: s1@w2, act: show, target: wrong2}
@@ -266,9 +296,9 @@ beats:
   - id: Landing
     shows: landing
     say:
-      - {id: s1, pace: normal, text: "{@back}回到抛物线，{@k}把割线斜率化简，{@calc}等于二加 h。", en: "Back to the parabola. Simplify the secant slope and you get two plus h."}
-      - {id: s2, pace: slow, text: "{@lim}h 趋近于零，二加 h 的极限是二，这就是 P 点的切线斜率。", en: "As h goes to zero, two plus h tends to two: the slope of the tangent at P."}
-      - {id: s3, pace: slow, text: "{@gen}割线斜率在 h 趋近于零时的极限，叫做导数。", en: "The limit of the secant slope as h goes to zero is called the derivative."}
+      - {id: s1, pace: normal, text: "{@back}回到抛物线，{@k}把割线斜率化简，{@calc}等于二加 h。", en: "{@back}Back to the parabola. {@k}Simplify the secant slope and {@calc}you get two plus h."}
+      - {id: s2, pace: slow, text: "{@lim}h 趋近于零，二加 h 的极限是二，这就是 P 点的切线斜率。", en: "{@lim}As h goes to zero, two plus h tends to two: the slope of the tangent at P."}
+      - {id: s3, pace: slow, text: "{@gen}割线斜率在 h 趋近于零时的极限，叫做导数。", en: "{@gen}The limit of the secant slope as h goes to zero is called the derivative."}
     do:
       - {at: s1@back, act: hide, target: ab}
       - {with: prev, act: hide, target: wrong2}
@@ -286,8 +316,8 @@ beats:
 
   - id: Close
     say:
-      - {id: s1, pace: normal, text: "所以切线不是只碰一个点的直线，{@t}而是割线逼近的那条直线。", en: "So a tangent isn't a line that touches once. It's the line the secants close in on."}
-      - {id: s2, pace: ask, text: "{@q}换一个点，抛物线的切线斜率又是多少？", en: "Next: at any other point, what's the slope of the parabola's tangent?"}
+      - {id: s1, pace: normal, text: "所以切线不是只碰一个点的直线，{@t}而是割线逼近的那条直线。", en: "So a tangent isn't a line that touches once. {@t}It's the line the secants close in on."}
+      - {id: s2, pace: ask, text: "{@q}换一个点，抛物线的切线斜率又是多少？", en: "{@q}Next: at any other point, what's the slope of the parabola's tangent?"}
     do:
       # 片尾画面：抛物线、P 点、切线、底部导数的定义和右侧一句下一集的问题，不留叠加层，#31 开场好还原
       - {at: s1, act: unmark, target: calc}

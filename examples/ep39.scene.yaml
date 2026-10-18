@@ -138,11 +138,33 @@ objects:
       L4: {dots: {points: [[4, 0], [4, 1], [4, 2], [4, 3], [4, 4], [0, 4], [1, 4], [2, 4], [3, 4]]}, hidden: true, role: B}
 
 
+i18n:
+  en:
+    meta: {title: "Finite Differences: The Discrete Derivative"}
+    objects:
+      nq: {text: "Whole numbers only?"}
+      hq2: {text: "[Gaps of gaps $=2$]{#l} [?]{#q .NO}"}
+      myth: {text: "[Unrelated topics?]{#m}"}
+      cm1: {text: '[Speed]{#k} [$2n$]{#a}[$+1$]{#c .C} [$\to\ 2x$]{#r .HL}'}
+      cm2: {text: '[Acceleration]{#k} [$2\to 2$]{#r .HL}'}
+      tab:
+        rows:
+          - {data: sq, role: A, label: '$n^2$', name: Position}
+          - {data: d1, role: B, label: '$\Delta$', name: Per second}
+          - {data: d2, role: C, label: '$\Delta^2$', name: Extra}
+      pow:
+        rows:
+          - {data: p2, role: A, label: '$2^n$', name: Powers of 2}
+          - {data: q1, role: "NO", label: '$\Delta$', name: Per second}
+    beats:
+      Hook: {pause: {prompt: "Gaps of gaps all equal two. Coincidence?"}}
+      Predict: {pause: {prompt: "How much more does the car go each second than the last?"}}
+
 beats:
   - id: Hook
     pause: {type: predict, prompt: 差的差全是二，是巧合吗？, hold: 3, app_item: ep39-before-1}
     say:
-      - {id: s1, pace: normal, text: "练习册上有道找规律题，{@q}开头是零、一、四、九、十六。", en: "A workbook has a find-the-pattern puzzle that starts zero, one, four, nine, sixteen."}
+      - {id: s1, pace: normal, text: "练习册上有道找规律题，{@q}开头是零、一、四、九、十六。", en: "A workbook has a find-the-pattern puzzle that {@q}starts zero, one, four, nine, sixteen."}
       - {id: s2, pace: ask, text: "相邻的差再求一次差，全是二。这是巧合吗？", en: "Take the gaps, then the gaps between those: all twos. Is that a coincidence?"}
     do:
       # 开场：一下子摆出 #31 的片尾画面
@@ -158,14 +180,14 @@ beats:
   - id: Myth
     shows: misconception
     say:
-      - {id: s1, pace: normal, text: "前桌摆摆手：{@m}这是数列题，跟函数不沾边，背题型就行。", en: "The kid in front waves it off: it's a sequence problem, nothing to do with functions, just memorise the type."}
+      - {id: s1, pace: normal, text: "前桌摆摆手：{@m}这是数列题，跟函数不沾边，背题型就行。", en: "The kid in front waves it off: {@m}it's a sequence problem, nothing to do with functions, just memorise the type."}
     do:
       - {at: s1@m, act: show, target: myth}
 
   - id: Setup
     say:
-      - {id: s1, pace: normal, text: "上一集边长多长了一小段 d x；{@t}现在把边长换成时间。", en: "Last time the side grew by a little dx. Now let's swap the side for time."}
-      - {id: s2, pace: normal, text: "一辆车第 n 秒停在 n 平方的位置，{@p}停在哪，就在哪插一根路标。", en: "A car stops at n squared after n seconds, and we plant a signpost wherever it stops."}
+      - {id: s1, pace: normal, text: "上一集边长多长了一小段 d x；{@t}现在把边长换成时间。", en: "Last time the side grew by a little dx. {@t}Now let's swap the side for time."}
+      - {id: s2, pace: normal, text: "一辆车第 n 秒停在 n 平方的位置，{@p}停在哪，就在哪插一根路标。", en: "A car stops at n squared after n seconds, and {@p}we plant a signpost wherever it stops."}
     do:
       - {at: s1@t, act: hide, target: sq01}
       - {with: prev, act: hide, target: law}
@@ -178,7 +200,7 @@ beats:
 
   - id: Road
     say:
-      - {id: s1, pace: normal, text: "第一秒{@j1}停在一，第二秒{@j2}到四，然后{@j3}九、{@j4}十六、{@j5}二十五。", en: "After one second it's at one, after two at four, then nine, sixteen, twenty-five."}
+      - {id: s1, pace: normal, text: "第一秒{@j1}停在一，第二秒{@j2}到四，然后{@j3}九、{@j4}十六、{@j5}二十五。", en: "After one second {@j1}it's at one, after two {@j2}at four, then {@j3}nine, {@j4}sixteen, {@j5}twenty-five."}
       - {id: s2, pace: normal, text: "路标越来越稀，可是稀得很均匀。", en: "The signposts spread further apart, but they spread out evenly."}
     do:
       - {at: s1@j1, act: jump, target: road, args: {length: "1", count: 1, from: 0, keep: true, numbers: false}, dur: 0.45}
@@ -200,24 +222,24 @@ beats:
   - id: Predict
     pause: {type: predict, prompt: 每秒走的路，一秒比一秒多多少？, hold: 3, app_item: ep39-why-1}
     say:
-      - {id: s1, pace: ask, text: "{@q}每秒走的路，一秒比一秒多多少？", en: "How much further does the car go each second than the second before?"}
+      - {id: s1, pace: ask, text: "{@q}每秒走的路，一秒比一秒多多少？", en: "{@q}How much further does the car go each second than the second before?"}
     do:
       - {at: s1@q, act: show, target: tab}
 
   - id: Table
     say:
-      - {id: s1, pace: normal, text: "每秒走的路，就是相邻路标的距离：{@d}一、三、五、七、九。", en: "The distance each second is the gap between neighbouring posts: one, three, five, seven, nine."}
-      - {id: s2, pace: normal, text: "这些距离一秒比一秒多二：{@e}二、二、二、二。", en: "Each of those is two more than the one before: two, two, two, two."}
-      - {id: s3, pace: slow, text: "路标稀得均匀，{@m}就是这个多出来的二一直不变。", en: "The posts spread out evenly because that extra two never changes."}
+      - {id: s1, pace: normal, text: "每秒走的路，就是相邻路标的距离：{@d}一、三、五、七、九。", en: "The distance each second is the gap between neighbouring posts: {@d}one, three, five, seven, nine."}
+      - {id: s2, pace: normal, text: "这些距离一秒比一秒多二：{@e}二、二、二、二。", en: "Each of those is two more than the one before: {@e}two, two, two, two."}
+      - {id: s3, pace: slow, text: "路标稀得均匀，{@m}就是这个多出来的二一直不变。", en: "The posts spread out evenly because {@m}that extra two never changes."}
     do:
       - {at: s1@d, act: derive, target: tab, args: {row: d1, index: "0:5"}, dur: fit}
       - {at: s2@e, act: derive, target: tab, args: {row: d2, index: "0:4"}, dur: fit}
 
   - id: Compare
     say:
-      - {id: s1, pace: normal, text: "{@a}每秒走的路像速度，它就是差分二 n 加一，{@r}对上导数二 x。", en: "Distance per second is like a speed: the difference two n plus one, matching the derivative two x."}
-      - {id: s2, pace: normal, text: "{@b}每秒多走的像加速度，是二阶差分二，对上二 x 的导数二。", en: "Extra distance per second is like an acceleration: the second difference two, matching the derivative of two x, which is two."}
-      - {id: s3, pace: normal, text: "{@c}多出来的那个一，就是上一集丢不掉的角块。", en: "The extra one is the corner we couldn't drop last time."}
+      - {id: s1, pace: normal, text: "{@a}每秒走的路像速度，它就是差分二 n 加一，{@r}对上导数二 x。", en: "{@a}Distance per second is like a speed: the difference two n plus one, {@r}matching the derivative two x."}
+      - {id: s2, pace: normal, text: "{@b}每秒多走的像加速度，是二阶差分二，对上二 x 的导数二。", en: "{@b}Extra distance per second is like an acceleration: the second difference two, matching the derivative of two x, which is two."}
+      - {id: s3, pace: normal, text: "{@c}多出来的那个一，就是上一集丢不掉的角块。", en: "{@c}The extra one is the corner we couldn't drop last time."}
     do:
       - {at: s1@a, act: show, target: cm1}
       - {at: s2@b, act: show, target: cm2}
@@ -227,8 +249,8 @@ beats:
   - id: NonExample
     shows: non_example
     say:
-      - {id: s1, pace: normal, text: "{@p}换成二的 n 次方：一、二、四、八、十六。", en: "Now try powers of two: one, two, four, eight, sixteen."}
-      - {id: s2, pace: normal, text: "{@d}每秒走的还是一、二、四、八，越拉越开，永远不均匀。", en: "The gaps are one, two, four, eight again: they spread faster and faster, never evenly."}
+      - {id: s1, pace: normal, text: "{@p}换成二的 n 次方：一、二、四、八、十六。", en: "{@p}Now try powers of two: one, two, four, eight, sixteen."}
+      - {id: s2, pace: normal, text: "{@d}每秒走的还是一、二、四、八，越拉越开，永远不均匀。", en: "{@d}The gaps are one, two, four, eight again: they spread faster and faster, never evenly."}
     do:
       - {at: s1, act: unmark, target: "cm1#c"}
       - {at: s1@p, act: hide, target: tab}
@@ -238,8 +260,8 @@ beats:
   - id: Landing
     shows: landing
     say:
-      - {id: s1, pace: slow, text: "{@back}所以平方数的二阶差分是常数，正像 x 平方的二阶导数是常数。", en: "So the second difference of the squares is constant, just as the second derivative of x squared is constant."}
-      - {id: s2, pace: normal, text: "数列的差分和函数的导数，{@x}是同一件事的两个版本。", en: "Differences of a sequence and derivatives of a function are two versions of the same idea."}
+      - {id: s1, pace: slow, text: "{@back}所以平方数的二阶差分是常数，正像 x 平方的二阶导数是常数。", en: "{@back}So the second difference of the squares is constant, just as the second derivative of x squared is constant."}
+      - {id: s2, pace: normal, text: "数列的差分和函数的导数，{@x}是同一件事的两个版本。", en: "Differences of a sequence and derivatives of a function are {@x}two versions of the same idea."}
     do:
       - {at: s1@back, act: hide, target: pow}
       - {after: prev, act: show, target: tab}
@@ -247,8 +269,8 @@ beats:
 
   - id: Close
     say:
-      - {id: s1, pace: normal, text: "{@st}还记得等差数列的台阶吗？{@l0}一加{@l1}三加{@l2}五加{@l3}七加{@l4}九，正好拼成五乘五。", en: "Remember the staircases of arithmetic series? One plus three plus five plus seven plus nine makes exactly five by five."}
-      - {id: s2, pace: normal, text: "一圈一圈加上去的，{@d}正是差分算出来的那些数。", en: "The rings we add are exactly the numbers the differences gave us."}
+      - {id: s1, pace: normal, text: "{@st}还记得等差数列的台阶吗？{@l0}一加{@l1}三加{@l2}五加{@l3}七加{@l4}九，正好拼成五乘五。", en: "{@st}Remember the staircases of arithmetic series? {@l0}One plus {@l1}three plus {@l2}five plus {@l3}seven plus {@l4}nine makes exactly five by five."}
+      - {id: s2, pace: normal, text: "一圈一圈加上去的，{@d}正是差分算出来的那些数。", en: "The rings we add are {@d}exactly the numbers the differences gave us."}
       - {id: s3, pace: ask, text: "那立方数，要差几次才变成常数？", en: "Next: how many rounds of differences does it take for the cubes to become constant?"}
     do:
       - {at: s1@st, act: hide, target: tab}

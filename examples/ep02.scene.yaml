@@ -112,11 +112,24 @@ objects:
     level: title
     in: top
 
+i18n:
+  en:
+    meta: {title: "Is 3×4 the Same as 4×3?"}
+    objects:
+      q: {text: '$2$ rows of $5$ $=$ $5$ rows of $2$?'}
+      myth: {text: "Two fives and five twos: different things?"}
+      lab34: {text: '[$3$ rows]{#r .A}, [$4$ per row]{#c .B}'}
+      lab43: {text: '[$4$ rows]{#r .B}, [$3$ per row]{#c .A}'}
+      subt2: {text: '[$2-5$]{#x}: not enough'}
+    beats:
+      Hook: {pause: {prompt: "Two rows of five kids become five rows of two. Does the number change?"}}
+      Predict: {pause: {prompt: "Turn the array around. More dots, fewer, or the same?"}}
+
 beats:
   - id: Hook
     pause: {type: predict, prompt: 两排五个人换成五排两个，人数变吗？, hold: 3, app_item: ep02-before-1}
     say:
-      - {id: s1, pace: ask, text: "{@q}排队时两排五个人，换成五排两个，人数变吗？", en: "We line up in two rows of five, then switch to five rows of two. Does the number of kids change?"}
+      - {id: s1, pace: ask, text: "{@q}排队时两排五个人，换成五排两个，人数变吗？", en: "{@q}We line up in two rows of five, then switch to five rows of two. Does the number of kids change?"}
       - {id: s2, pace: normal, text: "你先想一想，变还是不变？", en: "Think about it first: does it change or not?"}
     do:
       # 开场：一下子摆出 #1 的片尾画面
@@ -128,16 +141,16 @@ beats:
   - id: Myth
     shows: misconception
     say:
-      - {id: s1, pace: normal, text: "{@m}有同学嘀咕：两个五和五个二，是两回事。", en: "One kid mutters: two fives and five twos are different things."}
+      - {id: s1, pace: normal, text: "{@m}有同学嘀咕：两个五和五个二，是两回事。", en: "{@m}One kid mutters: two fives and five twos are different things."}
     do:
       - {at: s1@m, act: show, target: myth}
 
   - id: TurnFrame
     say:
-      - {id: s1, pace: normal, text: "我们一起看。{@r}把十格框整个转过来。", en: "Let's look together. We turn the whole ten frame around."}
-      - {id: s2, pace: normal, text: "{@d}变成五排两个，一个点也没多，一个也没少。", en: "Now it's five rows of two: not one dot more, not one less."}
-      - {id: s3, pace: normal, text: "{@n}再换一个点阵：三排，每排四个点。", en: "Here's another dot array: three rows, four dots in each."}
-      - {id: s4, pace: normal, text: "{@s}这是三个四：四加四加四，一共十二个。", en: "That's three fours: four plus four plus four, twelve in all."}
+      - {id: s1, pace: normal, text: "我们一起看。{@r}把十格框整个转过来。", en: "Let's look together. {@r}We turn the whole ten frame around."}
+      - {id: s2, pace: normal, text: "{@d}变成五排两个，一个点也没多，一个也没少。", en: "{@d}Now it's five rows of two: not one dot more, not one less."}
+      - {id: s3, pace: normal, text: "{@n}再换一个点阵：三排，每排四个点。", en: "{@n}Here's another dot array: three rows, four dots in each."}
+      - {id: s4, pace: normal, text: "{@s}这是三个四：四加四加四，一共十二个。", en: "{@s}That's three fours: four plus four plus four, twelve in all."}
     do:
       - {at: s1, act: hide, target: myth}
       - {with: prev, act: recolor, target: frame, args: {which: frame, role: A}}
@@ -155,7 +168,7 @@ beats:
   - id: Wrong
     shows: misconception
     say:
-      - {id: s1, pace: normal, text: "那四排三个呢？{@a}要重新摆一次，再数一遍吗？", en: "What about four rows of three? Do we set it up and count all over again?"}
+      - {id: s1, pace: normal, text: "那四排三个呢？{@a}要重新摆一次，再数一遍吗？", en: "What about four rows of three? {@a}Do we set it up and count all over again?"}
     do:
       - {at: s1@a, act: mark, target: "lab34#c"}
       - {after: prev, act: unmark, target: "lab34#c"}
@@ -163,15 +176,15 @@ beats:
   - id: Predict
     pause: {type: predict, prompt: 把点阵转过来，点会变多、变少，还是一样？, hold: 2.5, app_item: ep02-predict-1}
     say:
-      - {id: s1, pace: ask, text: "把这块点阵转过来，{@q}点会变多、变少，还是一样？", en: "If we turn this array around, will there be more dots, fewer, or the same?"}
+      - {id: s1, pace: ask, text: "把这块点阵转过来，{@q}点会变多、变少，还是一样？", en: "If we turn this array around, {@q}will there be more dots, fewer, or the same?"}
     do:
       - {at: s1@q, act: recolor, target: array, args: {role: HL}}
 
   - id: Rotate
     say:
-      - {id: s1, pace: slow, text: "{@r}转一下，就成了四排，每排三个点。", en: "Turn it, and it becomes four rows, three dots in each."}
-      - {id: s2, pace: normal, text: "{@s}三加三加三加三，还是十二个，一个也不少。", en: "Three plus three plus three plus three: still twelve, not one missing."}
-      - {id: s3, pace: normal, text: "{@b}一个点没加，一个点没拿，只是换了一个方向。", en: "Nothing added, nothing taken away. It just faces a new way."}
+      - {id: s1, pace: slow, text: "{@r}转一下，就成了四排，每排三个点。", en: "{@r}Turn it, and it becomes four rows, three dots in each."}
+      - {id: s2, pace: normal, text: "{@s}三加三加三加三，还是十二个，一个也不少。", en: "{@s}Three plus three plus three plus three: still twelve, not one missing."}
+      - {id: s3, pace: normal, text: "{@b}一个点没加，一个点没拿，只是换了一个方向。", en: "{@b}Nothing added, nothing taken away. It just faces a new way."}
     do:
       - {at: s1, act: recolor, target: array, args: {role: A}}
       - {with: prev, act: hide, target: lab34}
@@ -187,9 +200,9 @@ beats:
   - id: Reveal
     shows: non_example
     say:
-      - {id: s1, pace: slow, text: "{@a}三个四和四个三，原来是同一堆点。", en: "Three fours and four threes are the very same dots."}
-      - {id: s2, pace: normal, text: "可是减法就不行。{@t}五个拿走两个，剩三个。", en: "But subtraction doesn't work like this. Five take away two leaves three."}
-      - {id: s3, pace: normal, text: "{@n}两个要拿走五个，根本不够拿，顺序换不了。", en: "Two take away five? There aren't enough. You can't swap the order."}
+      - {id: s1, pace: slow, text: "{@a}三个四和四个三，原来是同一堆点。", en: "{@a}Three fours and four threes are the very same dots."}
+      - {id: s2, pace: normal, text: "可是减法就不行。{@t}五个拿走两个，剩三个。", en: "But subtraction doesn't work like this. {@t}Five take away two leaves three."}
+      - {id: s3, pace: normal, text: "{@n}两个要拿走五个，根本不够拿，顺序换不了。", en: "{@n}Two take away five? There aren't enough. You can't swap the order."}
     do:
       - {at: s1@a, act: recolor, target: array, args: {role: HL}}
       - {at: s2, act: step}
@@ -211,8 +224,8 @@ beats:
   - id: Equation
     shows: landing
     say:
-      - {id: s1, pace: normal, text: "{@e}写成算式，三乘四，就等于四乘三，都是十二。", en: "As a number sentence, three times four equals four times three. Both are twelve."}
-      - {id: s2, pace: normal, text: "{@r}排数是一个数，{@c}每排几个，是另一个数。", en: "The number of rows is one number; how many in each row is the other."}
+      - {id: s1, pace: normal, text: "{@e}写成算式，三乘四，就等于四乘三，都是十二。", en: "{@e}As a number sentence, three times four equals four times three. Both are twelve."}
+      - {id: s2, pace: normal, text: "{@r}排数是一个数，{@c}每排几个，是另一个数。", en: "{@r}The number of rows is one number; {@c}how many in each row is the other."}
     do:
       - {at: s1, act: hide, target: sub2}
       - {with: prev, act: hide, target: subt2}
@@ -227,7 +240,7 @@ beats:
     say:
       - {id: s1, pace: normal, text: "换成六排七个也一样，转一转，个数不变。", en: "Six rows of seven works too. Turn it, and the count stays the same."}
       - {id: s2, pace: normal, text: "看完和大人一起，用纽扣摆一摆，再转一转。", en: "After watching, line up some buttons with a grown-up and turn them around."}
-      - {id: s3, pace: ask, text: "{@n}下一集：九的口诀，为什么十位加一、个位减一？", en: "Next time: in the nines table, why do the tens go up by one and the ones go down by one?"}
+      - {id: s3, pace: ask, text: "{@n}下一集：九的口诀，为什么十位加一、个位减一？", en: "{@n}Next time: in the nines table, why do the tens go up by one and the ones go down by one?"}
     do:
       - {at: s1, act: unmark, target: "eq#a"}
       - {with: prev, act: unmark, target: "eq#b"}

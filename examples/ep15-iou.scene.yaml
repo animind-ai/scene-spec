@@ -98,12 +98,21 @@ objects:
     below: r4
     gap: lg
 
+i18n:
+  en:
+    meta: {title: "Why Is a Negative Times a Negative Positive?"}
+    objects:
+      myth: {text: '[No reason?]{#m}'}
+    beats:
+      Hook: {pause: {prompt: "The deskmate tears up the IOUs. Is Lin poorer or richer?"}}
+      Predict: {pause: {prompt: "Take away two IOUs: what happens to the balance?"}}
+
 beats:
   - id: Hook
     pause: {type: predict, prompt: 同桌把欠条撕了，小林变穷了还是变富了？, hold: 3, app_item: ep15-before-1}
     say:
-      - {id: s1, pace: normal, text: "{@w}小林欠同桌两张欠条，每张三元。", en: "Lin owes a deskmate two IOUs, three yuan each."}
-      - {id: s2, pace: ask, text: "{@q}同桌把欠条撕了，小林变穷了还是变富了？", en: "The deskmate tears the IOUs up. Is Lin poorer now, or richer?"}
+      - {id: s1, pace: normal, text: "{@w}小林欠同桌两张欠条，每张三元。", en: "{@w}Lin owes a deskmate two IOUs, three yuan each."}
+      - {id: s2, pace: ask, text: "{@q}同桌把欠条撕了，小林变穷了还是变富了？", en: "{@q}The deskmate tears the IOUs up. Is Lin poorer now, or richer?"}
       - {id: s3, pace: normal, text: "先别急，在心里算一算。", en: "Don't rush. Work it out in your head first."}
     do:
       - {at: s1@w, act: show, target: wallet}
@@ -112,14 +121,14 @@ beats:
   - id: Myth
     shows: misconception
     say:
-      - {id: s1, pace: normal, text: "小林挠挠头：{@m}负负得正，没什么道理，背下来就行吧。", en: "Lin isn't sure: negative times negative is positive, there's no reason, just memorise it."}
+      - {id: s1, pace: normal, text: "小林挠挠头：{@m}负负得正，没什么道理，背下来就行吧。", en: "Lin isn't sure: {@m}negative times negative is positive, there's no reason, just memorise it."}
     do:
       - {at: s1@m, act: show, target: myth}
 
   - id: Setup
     say:
-      - {id: s1, pace: normal, text: "我们一起看。{@w}给钱包再放两张三元现金，现金和欠条都是三元一张。", en: "Let's look together. Put two three-yuan notes of cash in the wallet too; cash and IOUs are three yuan each."}
-      - {id: s2, pace: normal, text: "现在两张现金、两张欠条，一张抵一张，{@b}余额是零。", en: "Two notes of cash, two IOUs, they cancel out: the balance is zero."}
+      - {id: s1, pace: normal, text: "我们一起看。{@w}给钱包再放两张三元现金，现金和欠条都是三元一张。", en: "Let's look together. {@w}Put two three-yuan notes of cash in the wallet too; cash and IOUs are three yuan each."}
+      - {id: s2, pace: normal, text: "现在两张现金、两张欠条，一张抵一张，{@b}余额是零。", en: "Two notes of cash, two IOUs, they cancel out: {@b}the balance is zero."}
       - {id: s3, pace: normal, text: "乘法还是几个几：前面的数管放进还是拿走，后面的数管现金还是欠条。", en: "Multiplication is still 'so many lots of': the first number says put in or take away, the second says cash or IOU."}
     do:
       - {at: s1@w, act: put, target: wallet, args: {kind: cash, count: 2}, dur: fit}
@@ -128,9 +137,9 @@ beats:
 
   - id: Cases
     say:
-      - {id: s1, pace: normal, text: "二乘三，{@p}放进两份三元现金，{@r}余额多了六元。", en: "Two times three: put in two lots of three yuan cash. The balance goes up by six."}
-      - {id: s2, pace: normal, text: "二乘负三，{@p}放进两张欠条，{@r}余额少了六元。", en: "Two times negative three: put in two IOUs. The balance goes down by six."}
-      - {id: s3, pace: normal, text: "负二乘三，{@p}拿走两份现金，{@r}余额也少了六元。", en: "Negative two times three: take away two lots of cash. The balance also goes down by six."}
+      - {id: s1, pace: normal, text: "二乘三，{@p}放进两份三元现金，{@r}余额多了六元。", en: "Two times three: {@p}put in two lots of three yuan cash. {@r}The balance goes up by six."}
+      - {id: s2, pace: normal, text: "二乘负三，{@p}放进两张欠条，{@r}余额少了六元。", en: "Two times negative three: {@p}put in two IOUs. {@r}The balance goes down by six."}
+      - {id: s3, pace: normal, text: "负二乘三，{@p}拿走两份现金，{@r}余额也少了六元。", en: "Negative two times three: {@p}take away two lots of cash. {@r}The balance also goes down by six."}
     do:
       - {at: s1@p, act: put, target: wallet, args: {kind: cash, count: 2}, dur: fit}
       - {at: s1@r, act: show, target: r1}
@@ -144,17 +153,17 @@ beats:
   - id: Predict
     pause: {type: predict, prompt: 拿走两张欠条，余额会怎样？, hold: 3, app_item: ep15-why-2}
     say:
-      - {id: s1, pace: ask, text: "那负二乘负三，{@q}拿走两张欠条，余额会怎样？", en: "So negative two times negative three: take away two IOUs. What happens to the balance?"}
+      - {id: s1, pace: ask, text: "那负二乘负三，{@q}拿走两张欠条，余额会怎样？", en: "So negative two times negative three: {@q}take away two IOUs. What happens to the balance?"}
     do:
       - {at: s1, act: put, target: wallet, args: {kind: cash, count: 2}}
       - {at: s1@q, act: show, target: r4q}
 
   - id: Tear
     say:
-      - {id: s1, pace: normal, text: "{@t}把这两张欠条撕掉，欠别人的六元钱就没有了。", en: "Tear up the two IOUs, and the money you owed is gone."}
-      - {id: s2, pace: slow, text: "{@r}余额反而涨了六元，所以负二乘负三是正六。", en: "The balance actually goes up by six, so negative two times negative three is positive six."}
-      - {id: s3, pace: normal, text: "拿走欠条和放进现金一样，{@m}都让你更有钱。", en: "Taking away IOUs is just like putting in cash: either way you're richer."}
-      - {id: s4, pace: normal, text: "欠条变少，就是你欠的钱变少，{@b}等于多了钱。", en: "Fewer IOUs means you owe less, which is the same as having more."}
+      - {id: s1, pace: normal, text: "{@t}把这两张欠条撕掉，欠别人的六元钱就没有了。", en: "{@t}Tear up the two IOUs, and the money you owed is gone."}
+      - {id: s2, pace: slow, text: "{@r}余额反而涨了六元，所以负二乘负三是正六。", en: "{@r}The balance actually goes up by six, so negative two times negative three is positive six."}
+      - {id: s3, pace: normal, text: "拿走欠条和放进现金一样，{@m}都让你更有钱。", en: "Taking away IOUs is just like putting in cash: {@m}either way you're richer."}
+      - {id: s4, pace: normal, text: "欠条变少，就是你欠的钱变少，{@b}等于多了钱。", en: "Fewer IOUs means you owe less, which is {@b}the same as having more."}
     do:
       - {at: s1@t, act: take, target: wallet, args: {kind: iou, count: 2}, dur: fit}
       - {at: s2@r, act: hide, target: r4q}
@@ -171,8 +180,8 @@ beats:
   - id: NonExample
     shows: non_example
     say:
-      - {id: s1, pace: normal, text: "加法可不一样。负二加负三，{@a}是先欠两元，{@b}再欠三元。", en: "Adding is different. Negative two plus negative three means owing two, then owing three more."}
-      - {id: s2, pace: normal, text: "{@f}一共欠了五元，余额是负五，两个负号并没有抵消。", en: "Five owed in all, a balance of negative five. The two minus signs don't cancel."}
+      - {id: s1, pace: normal, text: "加法可不一样。负二加负三，{@a}是先欠两元，{@b}再欠三元。", en: "Adding is different. Negative two plus negative three means {@a}owing two, then {@b}owing three more."}
+      - {id: s2, pace: normal, text: "{@f}一共欠了五元，余额是负五，两个负号并没有抵消。", en: "{@f}Five owed in all, a balance of negative five. The two minus signs don't cancel."}
     do:
       - {at: s1, act: unmark, target: "wallet.balance"}
       - {with: prev, act: hide, target: wallet}
@@ -185,8 +194,8 @@ beats:
   - id: Landing
     shows: landing
     say:
-      - {id: s1, pace: slow, text: "{@law}所以负负得正，就是拿走欠条，余额往上涨。", en: "So negative times negative is positive: take away IOUs and the balance goes up."}
-      - {id: s2, pace: normal, text: "四行放在一起看，{@m}放进现金和拿走欠条，余额都往上涨。", en: "Put the four lines together: putting in cash and taking away IOUs both raise the balance."}
+      - {id: s1, pace: slow, text: "{@law}所以负负得正，就是拿走欠条，余额往上涨。", en: "{@law}So negative times negative is positive: take away IOUs and the balance goes up."}
+      - {id: s2, pace: normal, text: "四行放在一起看，{@m}放进现金和拿走欠条，余额都往上涨。", en: "Put the four lines together: {@m}putting in cash and taking away IOUs both raise the balance."}
     do:
       - {at: s1, act: unmark, target: "wal2.balance"}
       - {with: prev, act: hide, target: wal2}
@@ -198,8 +207,8 @@ beats:
 
   - id: Close
     say:
-      - {id: s1, pace: normal, text: "负负得正是一个约定，可只有这样约定，{@x}这笔账才算得平。", en: "It is a convention, but it's the only one that makes the accounts balance."}
-      - {id: s2, pace: ask, text: "{@q}那减去一个负数，为什么反而是加上它？", en: "Next: why does subtracting a negative number add?"}
+      - {id: s1, pace: normal, text: "负负得正是一个约定，可只有这样约定，{@x}这笔账才算得平。", en: "It is a convention, but it's the only one that makes {@x}the accounts balance."}
+      - {id: s2, pace: ask, text: "{@q}那减去一个负数，为什么反而是加上它？", en: "{@q}Next: why does subtracting a negative number add?"}
     do:
       - {at: s1, act: unmark, target: "r1#all"}
       - {with: prev, act: unmark, target: "r4#all"}

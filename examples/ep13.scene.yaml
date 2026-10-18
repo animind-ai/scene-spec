@@ -155,11 +155,27 @@ objects:
     level: title
     in: footer
 
+i18n:
+  en:
+    meta: {title: "Circle Area: Cut It Up, Make a Rectangle"}
+    objects:
+      myth0: {text: '[A rule?]{#m}'}
+      myth: {text: '[A rule?]{#m}'}
+      c64:
+        guides:
+          hgt: {label: 'Height $r$'}
+          len: {label: 'Length $\pi r$'}
+      myth13: {text: '[Too curved?]{#m}'}
+      lawn: {text: '[Turf needed?]{#g}'}
+    beats:
+      Hook: {pause: {prompt: "A round flower bed has no base and no height. How do we find its area?"}}
+      Predict: {pause: {prompt: "Cut thinner and thinner: what will the pieces look like fitted together?"}}
+
 beats:
   - id: Hook
     pause: {type: predict, prompt: 圆形花坛没有底也没有高，面积怎么算？, hold: 3, app_item: ep13-before-1}
     say:
-      - {id: s1, pace: ask, text: "{@g}这个圆形花坛要铺草皮，可圆没有底也没有高，面积该怎么算？", en: "This round flower bed needs new turf. But a circle has no base and no height, so how do we find its area?"}
+      - {id: s1, pace: ask, text: "{@g}这个圆形花坛要铺草皮，可圆没有底也没有高，面积该怎么算？", en: "{@g}This round flower bed needs new turf. But a circle has no base and no height, so how do we find its area?"}
       - {id: s2, pace: ask, text: "要是交给你，你会怎么办？", en: "If it were your job, what would you do?"}
     do:
       # 开场：一下子摆出 #12 的片尾画面
@@ -173,7 +189,7 @@ beats:
   - id: Myth
     shows: misconception
     say:
-      - {id: s1, pace: normal, text: "{@m}边都是弯的，好像没法像长方形那样，量一量、乘一乘就出来。", en: "The edge is all curved, so it seems you can't just measure and multiply like a rectangle."}
+      - {id: s1, pace: normal, text: "{@m}边都是弯的，好像没法像长方形那样，量一量、乘一乘就出来。", en: "{@m}The edge is all curved, so it seems you can't just measure and multiply like a rectangle."}
     do:
       - {at: s1, act: transform, from: circle0, to: circle, dur: 0.6}
       - {with: prev, act: hide, target: circle0}
@@ -182,8 +198,8 @@ beats:
 
   - id: Setup
     say:
-      - {id: s1, pace: normal, text: "我们一起看。{@r}这个圆的半径是 r，绕一圈的长度是周长。", en: "Let's look together. This circle has radius r, and the distance around it is the circumference."}
-      - {id: s2, pace: normal, text: "{@c}圆周长等于二派 r，派大约是三点一四，比三多一点。", en: "The circumference is two pi r, and pi is about three point one four, a bit more than three."}
+      - {id: s1, pace: normal, text: "我们一起看。{@r}这个圆的半径是 r，绕一圈的长度是周长。", en: "Let's look together. {@r}This circle has radius r, and the distance around it is the circumference."}
+      - {id: s2, pace: normal, text: "{@c}圆周长等于二派 r，派大约是三点一四，比三多一点。", en: "{@c}The circumference is two pi r, and pi is about three point one four, a bit more than three."}
     do:
       - {at: s1@r, act: mark, target: "circle#r"}
       - {at: s2@c, act: show, target: circ}
@@ -191,8 +207,8 @@ beats:
   - id: Four
     shows: non_example
     say:
-      - {id: s1, pace: normal, text: "{@cut}先把圆切成四块，{@go}一块朝上一块朝下，交错着拼起来。", en: "First cut the circle into four pieces, then fit them together, one pointing up, one pointing down."}
-      - {id: s2, pace: normal, text: "{@b}拼出来边上坑坑洼洼的，确实一点也不像长方形。", en: "The edges are all bumps. It really doesn't look like a rectangle."}
+      - {id: s1, pace: normal, text: "{@cut}先把圆切成四块，{@go}一块朝上一块朝下，交错着拼起来。", en: "First {@cut}cut the circle into four pieces, then {@go}fit them together, one pointing up, one pointing down."}
+      - {id: s2, pace: normal, text: "{@b}拼出来边上坑坑洼洼的，确实一点也不像长方形。", en: "{@b}The edges are all bumps. It really doesn't look like a rectangle."}
     do:
       - {at: s1, act: unmark, target: "circle#r"}
       - {with: prev, act: hide, target: "circle#r"}
@@ -209,13 +225,13 @@ beats:
   - id: Predict
     pause: {type: predict, prompt: 越切越细，拼出来会像什么？, hold: 3, app_item: ep13-predict-1}
     say:
-      - {id: s1, pace: ask, text: "{@q}要是切成更多块，越切越细，拼出来会像什么？", en: "What if we cut more and more, thinner and thinner? What will it look like?"}
+      - {id: s1, pace: ask, text: "{@q}要是切成更多块，越切越细，拼出来会像什么？", en: "{@q}What if we cut more and more, thinner and thinner? What will it look like?"}
 
   - id: Finer
     say:
-      - {id: s1, pace: normal, text: "{@e}那就切成八块，{@go}再像刚才那样交错拼一拼。", en: "So cut it into eight and fit them together the same way."}
-      - {id: s2, pace: normal, text: "{@s}切成十六块，{@go}上下的边越来越平，越来越直。", en: "Sixteen pieces: the top and bottom edges get flatter and straighter."}
-      - {id: s3, pace: brisk, text: "{@f}切成六十四块，{@go}看起来几乎就是一个长方形了。", en: "Sixty-four pieces, and it looks almost exactly like a rectangle."}
+      - {id: s1, pace: normal, text: "{@e}那就切成八块，{@go}再像刚才那样交错拼一拼。", en: "{@e}So cut it into eight and {@go}fit them together the same way."}
+      - {id: s2, pace: normal, text: "{@s}切成十六块，{@go}上下的边越来越平，越来越直。", en: "{@s}Sixteen pieces: {@go}the top and bottom edges get flatter and straighter."}
+      - {id: s3, pace: brisk, text: "{@f}切成六十四块，{@go}看起来几乎就是一个长方形了。", en: "{@f}Sixty-four pieces, and {@go}it looks almost exactly like a rectangle."}
     do:
       - {at: s1@e, act: hide, target: circle}
       - {with: prev, act: show, target: c8}
@@ -232,11 +248,11 @@ beats:
 
   - id: Reveal
     say:
-      - {id: s1, pace: slow, text: "{@h}这个长方形的高，就是圆的半径 r。", en: "This rectangle's height is the circle's radius r."}
+      - {id: s1, pace: slow, text: "{@h}这个长方形的高，就是圆的半径 r。", en: "{@h}This rectangle's height is the circle's radius r."}
       - {id: s2, pace: normal, text: "每一小块扇形，都是从圆心到圆边，一条半径那么长。", en: "Each little wedge reaches from the centre to the edge, one radius long."}
-      - {id: s3, pace: normal, text: "{@l}长方形的长，是圆周的一半，也就是派乘 r。", en: "The rectangle's length is half the circumference, which is pi times r."}
+      - {id: s3, pace: normal, text: "{@l}长方形的长，是圆周的一半，也就是派乘 r。", en: "{@l}The rectangle's length is half the circumference, which is pi times r."}
       - {id: s4, pace: normal, text: "因为上下两条边，各用掉了一半的圆周。", en: "Because the top and bottom edges each use up half of the circle's edge."}
-      - {id: s5, pace: normal, text: "{@n}这是演示，不是证明：它没有真的变成长方形，边上还有一点点弯。", en: "This is a demonstration, not a proof: it hasn't truly become a rectangle. The edges still curve a tiny bit."}
+      - {id: s5, pace: normal, text: "{@n}这是演示，不是证明：它没有真的变成长方形，边上还有一点点弯。", en: "{@n}This is a demonstration, not a proof: it hasn't truly become a rectangle. The edges still curve a tiny bit."}
       - {id: s6, pace: normal, text: "切得越细，就越接近，面积却始终是这个圆的面积。", en: "The finer we cut, the closer it gets, but the area is always the circle's area."}
     do:
       - {at: s1@h, act: show, target: "c64#hgt"}
@@ -248,8 +264,8 @@ beats:
   - id: Landing
     shows: landing
     say:
-      - {id: s1, pace: slow, text: "{@law}所以圆的面积是长乘高，派乘半径再乘半径，{@sq}也就是派乘半径的平方。", en: "So the circle's area is length times height, pi r times r, which is pi r squared."}
-      - {id: s2, pace: normal, text: "{@l}长方形的长对着半个圆周，{@h}高对着半径，一个都没少。", en: "The length matches half the circumference, the height matches the radius, and nothing is left out."}
+      - {id: s1, pace: slow, text: "{@law}所以圆的面积是长乘高，派乘半径再乘半径，{@sq}也就是派乘半径的平方。", en: "{@law}So the circle's area is length times height, pi r times r, which is {@sq}pi r squared."}
+      - {id: s2, pace: normal, text: "{@l}长方形的长对着半个圆周，{@h}高对着半径，一个都没少。", en: "{@l}The length matches half the circumference, {@h}the height matches the radius, and nothing is left out."}
     do:
       - {at: s1@law, act: hide, target: circ}
       - {after: prev, act: show, target: law3}
@@ -259,8 +275,8 @@ beats:
 
   - id: Close
     say:
-      - {id: s1, pace: normal, text: "圆是弯的，可是切得够细，{@x}照样能拼成长方形来算面积。", en: "A circle is curved, but cut finely enough, it still lines up into a rectangle for its area."}
-      - {id: s2, pace: ask, text: "{@q}圆锥的体积，为什么是圆柱的三分之一？", en: "So why is a cone's volume one third of a cylinder's?"}
+      - {id: s1, pace: normal, text: "圆是弯的，可是切得够细，{@x}照样能拼成长方形来算面积。", en: "A circle is curved, but cut finely enough, {@x}it still lines up into a rectangle for its area."}
+      - {id: s2, pace: ask, text: "{@q}圆锥的体积，为什么是圆柱的三分之一？", en: "{@q}So why is a cone's volume one third of a cylinder's?"}
     do:
       - {at: s1, act: unmark, target: "law3#r2"}
       - {with: prev, act: unmark, target: "c64#len"}

@@ -122,11 +122,24 @@ objects:
     level: title
     in: side
 
+i18n:
+  en:
+    meta: {title: "Where Is the Vertex of a Parabola?"}
+    objects:
+      wrong: {text: '[Vertex at $x=-1$?]{#m}'}
+      ask: {text: "Where does the vertex go?"}
+      wrong2: {text: '[Vertex $(2,3)$?]{#m}'}
+      law: {text: '$y=a(x-h)^2+k$  →  vertex $(h,k)$'}
+      nq: {text: 'Why does $x+2$ shift left?'}
+    beats:
+      Hook: {pause: {prompt: "A U-ramp like y = (x − 1)². Where is its lowest point?"}}
+      Predict: {pause: {prompt: "Where does the vertex of y = (x − 1)² + 2 go?"}}
+
 beats:
   - id: Hook
     pause: {type: predict, prompt: U 形池像 y = (x − 1)²，池底最低点在哪？, hold: 3, app_item: ep24-before-1}
     say:
-      - {id: s1, pace: normal, text: "滑板场 U 形池的截面，像抛物线{@f} y 等于 x 减一的平方。", en: "The cross-section of a skate park's U-ramp looks like the parabola y equals x minus one, squared."}
+      - {id: s1, pace: normal, text: "滑板场 U 形池的截面，像抛物线{@f} y 等于 x 减一的平方。", en: "The cross-section of a skate park's U-ramp looks like the parabola {@f}y equals x minus one, squared."}
       - {id: s2, pace: ask, text: "池底最低点，也就是顶点，在哪？", en: "Where is the lowest point of the ramp, the vertex?"}
       - {id: s3, pace: normal, text: "先别画图，在心里选一个点。", en: "Don't draw it yet. Choose a point in your head."}
     do:
@@ -136,16 +149,16 @@ beats:
   - id: Myth
     shows: misconception
     say:
-      - {id: s1, pace: normal, text: "朋友瞄了一眼减一，{@w}就说池底在 x 等于负一。", en: "A friend glances at the minus one and says the bottom is at x equals minus one."}
+      - {id: s1, pace: normal, text: "朋友瞄了一眼减一，{@w}就说池底在 x 等于负一。", en: "A friend glances at the minus one and {@w}says the bottom is at x equals minus one."}
     do:
       - {at: s1@w, act: show, target: wrong}
 
   - id: Setup
     say:
-      - {id: s1, pace: normal, text: "我们先代进去看看，{@x}x 等于负一时，括号里是负二，{@y}y 等于四。", en: "Let's try it. At x equals minus one, the bracket is minus two, so y is four."}
+      - {id: s1, pace: normal, text: "我们先代进去看看，{@x}x 等于负一时，括号里是负二，{@y}y 等于四。", en: "Let's try it. {@x}At x equals minus one, the bracket is minus two, so {@y}y is four."}
       - {id: s2, pace: normal, text: "这可不是最低点，曲线在它右边还一路往下走，越走越低。", en: "That's not the lowest point. The curve keeps going down to its right, lower and lower."}
-      - {id: s3, pace: normal, text: "{@sq}平方不会是负数，最小就是零，所以要括号里等于零才行。", en: "A square is never negative. Its smallest value is zero, so we need the bracket to be zero."}
-      - {id: s4, pace: normal, text: "x 减一等于零，就是 x 等于一，{@v}顶点是横坐标一、纵坐标零。", en: "x minus one equals zero means x equals one, so the vertex is at one, zero."}
+      - {id: s3, pace: normal, text: "{@sq}平方不会是负数，最小就是零，所以要括号里等于零才行。", en: "{@sq}A square is never negative. Its smallest value is zero, so we need the bracket to be zero."}
+      - {id: s4, pace: normal, text: "x 减一等于零，就是 x 等于一，{@v}顶点是横坐标一、纵坐标零。", en: "x minus one equals zero means x equals one, so {@v}the vertex is at one, zero."}
     do:
       - {at: s1@x, act: draw, target: g, args: {plot: 0}}
       - {with: prev, act: show, target: "g.point[0]"}
@@ -157,7 +170,7 @@ beats:
   - id: Predict
     pause: {type: predict, prompt: y = (x − 1)² + 2 的顶点会跑到哪里？, hold: 3, app_item: ep24-why-1}
     say:
-      - {id: s1, pace: ask, text: "{@ask}那在后面再加上二，顶点会跑到哪里去？", en: "Now add two at the end. Where will the vertex go?"}
+      - {id: s1, pace: ask, text: "{@ask}那在后面再加上二，顶点会跑到哪里去？", en: "{@ask}Now add two at the end. Where will the vertex go?"}
     do:
       - {at: s1, act: hide, target: f1}
       - {with: prev, act: hide, target: wrong}
@@ -169,9 +182,9 @@ beats:
 
   - id: Move
     say:
-      - {id: s1, pace: normal, text: "加二，就是每个 y 都多二，{@up}整条曲线往上抬两格。", en: "Adding two raises every y by two, so the whole curve lifts up two units."}
-      - {id: s2, pace: normal, text: "最低点还在括号等于零的地方，{@v}横坐标还是一，纵坐标变成二。", en: "The lowest point is still where the bracket is zero: x is still one, and y is now two."}
-      - {id: s3, pace: normal, text: "{@a}要是前面再乘二，每一点离顶点的高度都翻倍，{@n}曲线变窄。", en: "And if we multiply by two in front, every point's height above the vertex doubles, and the curve gets narrower."}
+      - {id: s1, pace: normal, text: "加二，就是每个 y 都多二，{@up}整条曲线往上抬两格。", en: "Adding two raises every y by two, so {@up}the whole curve lifts up two units."}
+      - {id: s2, pace: normal, text: "最低点还在括号等于零的地方，{@v}横坐标还是一，纵坐标变成二。", en: "The lowest point is still where the bracket is zero: {@v}x is still one, and y is now two."}
+      - {id: s3, pace: normal, text: "{@a}要是前面再乘二，每一点离顶点的高度都翻倍，{@n}曲线变窄。", en: "{@a}And if we multiply by two in front, every point's height above the vertex doubles, and {@n}the curve gets narrower."}
       - {id: s4, pace: normal, text: "括号等于零的地方，乘二还是零，所以顶点不动。", en: "Where the bracket is zero, times two is still zero, so the vertex stays put."}
     do:
       - {at: s1, act: hide, target: ask}
@@ -184,9 +197,9 @@ beats:
   - id: NonExample
     shows: non_example
     say:
-      - {id: s1, pace: ask, text: "{@f}要是式子写成 x 方减二 x 加三，顶点在哪？", en: "What if the formula is written as x squared minus two x plus three? Where is the vertex?"}
-      - {id: s2, pace: normal, text: "照数字去读，{@w}会以为横坐标二、纵坐标三，{@p}可那个点只在半山腰。", en: "Reading off the numbers, you'd guess x is two and y is three. But that point is only halfway up the side."}
-      - {id: s3, pace: normal, text: "还记得配方吗？{@c}它正是 x 减一的平方加二，{@v}顶点还是横坐标一、纵坐标二。", en: "Remember completing the square? It's exactly x minus one squared plus two, so the vertex is still x one, y two."}
+      - {id: s1, pace: ask, text: "{@f}要是式子写成 x 方减二 x 加三，顶点在哪？", en: "{@f}What if the formula is written as x squared minus two x plus three? Where is the vertex?"}
+      - {id: s2, pace: normal, text: "照数字去读，{@w}会以为横坐标二、纵坐标三，{@p}可那个点只在半山腰。", en: "Reading off the numbers, {@w}you'd guess x is two and y is three. {@p}But that point is only halfway up the side."}
+      - {id: s3, pace: normal, text: "还记得配方吗？{@c}它正是 x 减一的平方加二，{@v}顶点还是横坐标一、纵坐标二。", en: "Remember completing the square? {@c}It's exactly x minus one squared plus two, so {@v}the vertex is still x one, y two."}
     do:
       - {at: s1, act: hide, target: f2}
       - {with: prev, act: hide, target: "g.point[2]"}
@@ -202,9 +215,9 @@ beats:
   - id: Landing
     shows: landing
     say:
-      - {id: s1, pace: slow, text: "所以 y 等于 a 乘 x 减 h 的平方加 k，{@law}顶点的坐标就是 h 和 k。", en: "So for y equals a times x minus h squared plus k, the vertex is h, k."}
+      - {id: s1, pace: slow, text: "所以 y 等于 a 乘 x 减 h 的平方加 k，{@law}顶点的坐标就是 h 和 k。", en: "So for y equals a times x minus h squared plus k, {@law}the vertex is h, k."}
       - {id: s2, pace: normal, text: "h 是让括号等于零的那个 x，k 是这时候的 y 值。", en: "h is the x that makes the bracket zero, and k is the y at that moment."}
-      - {id: s3, pace: normal, text: "{@a}a 只管开口的宽窄，{@back}不会挪动顶点的位置。", en: "The a only changes how wide it opens. It never moves the vertex."}
+      - {id: s3, pace: normal, text: "{@a}a 只管开口的宽窄，{@back}不会挪动顶点的位置。", en: "{@a}The a only changes how wide it opens. {@back}It never moves the vertex."}
     do:
       - {at: s1, act: hide, target: "g.point[3]"}
       - {at: s1@law, act: show, target: law}
@@ -214,7 +227,7 @@ beats:
   - id: Close
     say:
       - {id: s1, pace: normal, text: "看到减一，顶点却在正一，因为括号只有在那里才等于零。", en: "See minus one, find the vertex at plus one: that's the only place the bracket is zero."}
-      - {id: s2, pace: ask, text: "{@q}那为什么把 x 换成 x 加二，图像反而往左移？", en: "Then why does replacing x with x plus two move the graph to the left?"}
+      - {id: s2, pace: ask, text: "{@q}那为什么把 x 换成 x 加二，图像反而往左移？", en: "{@q}Then why does replacing x with x plus two move the graph to the left?"}
     do:
       - {at: s2@q, act: hide, target: f4}
       - {with: prev, act: hide, target: wrong2}

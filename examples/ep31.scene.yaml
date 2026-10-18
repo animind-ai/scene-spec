@@ -189,11 +189,40 @@ objects:
     below: rd5
     gap: sm
 
+i18n:
+  en:
+    meta: {title: "Why the Derivative of x² Is 2x"}
+    objects:
+      g:
+        secants:
+          - {point: 0, h: 1, label: Q, readout: true, readout_text: "Right secant slope"}
+          - {point: 0, h: -1, label: "Q'", role: C, label_dir: ul, readout: true, readout_text: "Left secant slope"}
+      nq30: {text: "Another point?"}
+      myth: {text: '[Corner thrown away?]{#m}'}
+      nq: {text: "Whole-number sides?"}
+      sq3:
+        guides:
+          lr: {label: 'Roller $x$'}
+          lt: {label: 'Roller $x$'}
+      sq5:
+        guides:
+          lr: {label: 'Roller $x$'}
+          lt: {label: 'Roller $x$'}
+      zc:
+        guides:
+          mag: {label: 'Zoom in on corner'}
+      rd3: {text: '[Per second]{#l} [$2\times 3=6$]{#r .HL}'}
+      rd5: {text: '[Per second]{#l} [$2\times 5=10$]{#r .HL}'}
+      rd2x: {text: '[Per second]{#l} [$2x$]{#r .HL}'}
+    beats:
+      Hook: {pause: {prompt: "A little corner piece is thrown away. Does this step earn the mark?"}}
+      Predict: {pause: {prompt: "Picture two rollers pushing the edges out. How much do they cover each second?"}}
+
 beats:
   - id: Hook
     pause: {type: predict, prompt: 扔掉角上一小块，这一步给不给分？, hold: 3, app_item: ep31-before-1}
     say:
-      - {id: s1, pace: normal, text: "推导 x 平方的导数，{@q}最后一步，角上一小块被直接扔掉了。", en: "When you work out the derivative of x squared, the last step simply throws away a little corner piece."}
+      - {id: s1, pace: normal, text: "推导 x 平方的导数，{@q}最后一步，角上一小块被直接扔掉了。", en: "When you work out the derivative of x squared, {@q}the last step simply throws away a little corner piece."}
       - {id: s2, pace: ask, text: "要是你来批改，这一步给不给分？", en: "If you were marking it, would that step get the mark?"}
     do:
       # 开场：一下子摆出 #30 的片尾画面
@@ -211,14 +240,14 @@ beats:
   - id: Myth
     shows: misconception
     say:
-      - {id: s1, pace: normal, text: "后排同学不服：{@m}扔掉一块还说相等，二 x 只能算近似值。", en: "A classmate at the back objects: you threw a piece away and still call it equal, so two x is only an approximation."}
+      - {id: s1, pace: normal, text: "后排同学不服：{@m}扔掉一块还说相等，二 x 只能算近似值。", en: "A classmate at the back objects: {@m}you threw a piece away and still call it equal, so two x is only an approximation."}
     do:
       - {at: s1@m, act: show, target: myth}
 
   - id: Setup
     say:
-      - {id: s1, pace: normal, text: "上一集我们在一这个点算出斜率是二，{@v}这次换个看法。", en: "Last time we found the slope at one is two. This time, a different view."}
-      - {id: s2, pace: normal, text: "{@sq}x 的平方，就是一块边长为 x 的正方形草坪的面积。", en: "x squared is the area of a square lawn with side x."}
+      - {id: s1, pace: normal, text: "上一集我们在一这个点算出斜率是二，{@v}这次换个看法。", en: "Last time we found the slope at one is two. {@v}This time, a different view."}
+      - {id: s2, pace: normal, text: "{@sq}x 的平方，就是一块边长为 x 的正方形草坪的面积。", en: "{@sq}x squared is the area of a square lawn with side x."}
       - {id: s3, pace: normal, text: "草坪的边每秒往外长一，面积每秒多出多少？", en: "The lawn's edges move out by one every second. How much area does it gain per second?"}
     do:
       - {at: s1@v, act: hide, target: g}
@@ -227,18 +256,18 @@ beats:
   - id: Predict
     pause: {type: predict, prompt: 想象两把滚筒刷推着边往外走，每秒能刷多少？, hold: 3, app_item: ep31-why-1}
     say:
-      - {id: s1, pace: ask, text: "想象{@r}两把滚筒刷推着边往外走，每秒能刷多少？", en: "Picture two paint rollers pushing the edges outward. How much do they cover each second?"}
+      - {id: s1, pace: ask, text: "想象{@r}两把滚筒刷推着边往外走，每秒能刷多少？", en: "Picture {@r}two paint rollers pushing the edges outward. How much do they cover each second?"}
     do:
       - {at: s1@r, act: show, target: "sq3#RR"}
       - {with: prev, act: show, target: "sq3#RT"}
 
   - id: Brush
     say:
-      - {id: s1, pace: normal, text: "{@a}右边一把，{@b}上边一把，每把刷子都和边一样长，是 x。", en: "One roller on the right, one on top, each exactly as long as the side: x."}
-      - {id: s2, pace: normal, text: "{@p}刷子往外推，刷过的地方，就是新长出来的草坪。", en: "Push the rollers out, and whatever they sweep is the new lawn."}
-      - {id: s3, pace: normal, text: "边长三的时候，两把各刷三，{@r}每秒刷六。", en: "When the side is three, each roller sweeps three: six per second."}
-      - {id: s4, pace: normal, text: "{@five}边长五的时候，每把刷子长五，{@r}每秒刷十。", en: "When the side is five, each sweeps five: ten per second."}
-      - {id: s5, pace: slow, text: "两把刷子，每把长 x，{@x}所以每秒刷二 x。", en: "Two rollers, each x long, so they cover two x per second."}
+      - {id: s1, pace: normal, text: "{@a}右边一把，{@b}上边一把，每把刷子都和边一样长，是 x。", en: "{@a}One roller on the right, {@b}one on top, each exactly as long as the side: x."}
+      - {id: s2, pace: normal, text: "{@p}刷子往外推，刷过的地方，就是新长出来的草坪。", en: "{@p}Push the rollers out, and whatever they sweep is the new lawn."}
+      - {id: s3, pace: normal, text: "边长三的时候，两把各刷三，{@r}每秒刷六。", en: "When the side is three, each roller sweeps three: {@r}six per second."}
+      - {id: s4, pace: normal, text: "{@five}边长五的时候，每把刷子长五，{@r}每秒刷十。", en: "{@five}When the side is five, each sweeps five: {@r}ten per second."}
+      - {id: s5, pace: slow, text: "两把刷子，每把长 x，{@x}所以每秒刷二 x。", en: "Two rollers, each x long, so {@x}they cover two x per second."}
     do:
       - {at: s1@a, act: show, target: "sq3#lr"}
       - {at: s1@b, act: show, target: "sq3#lt"}
@@ -264,9 +293,9 @@ beats:
 
   - id: Corner
     say:
-      - {id: s1, pace: normal, text: "那角上呢？{@c}两把刷子都没刷到，补出一个小方块。", en: "And the corner? Neither roller sweeps it, so a little square fills the gap."}
-      - {id: s2, pace: normal, text: "{@s}只推一小段 d x，它就是 d x 乘 d x，推得越短，小得越快。", en: "Push only a little dx and it's dx by dx: the shorter the push, the faster it shrinks."}
-      - {id: s3, pace: normal, text: "{@g}两条长条是 x 乘 d x，{@c}角块和它们一比，几乎没有。", en: "The strips are x times dx; next to them the corner is almost nothing."}
+      - {id: s1, pace: normal, text: "那角上呢？{@c}两把刷子都没刷到，补出一个小方块。", en: "And the corner? {@c}Neither roller sweeps it, so a little square fills the gap."}
+      - {id: s2, pace: normal, text: "{@s}只推一小段 d x，它就是 d x 乘 d x，推得越短，小得越快。", en: "{@s}Push only a little dx and it's dx by dx: the shorter the push, the faster it shrinks."}
+      - {id: s3, pace: normal, text: "{@g}两条长条是 x 乘 d x，{@c}角块和它们一比，几乎没有。", en: "{@g}The strips are x times dx; {@c}next to them the corner is almost nothing."}
     do:
       - {at: s1, act: unmark, target: "rd2x#r"}
       - {at: s1@c, act: show, target: "sq5#C"}
@@ -285,7 +314,7 @@ beats:
   - id: NonExample
     shows: non_example
     say:
-      - {id: s1, pace: normal, text: "可要是{@big}一下推出 x 那么远，{@c}角块就和一条一样大，丢不得。", en: "But push all the way out by x in one go and the corner is as big as a strip. You can't drop it."}
+      - {id: s1, pace: normal, text: "可要是{@big}一下推出 x 那么远，{@c}角块就和一条一样大，丢不得。", en: "But {@big}push all the way out by x in one go and {@c}the corner is as big as a strip. You can't drop it."}
     do:
       - {at: s1@big, act: hide, target: sq01}
       - {with: prev, act: show, target: sq4}
@@ -294,10 +323,10 @@ beats:
   - id: Landing
     shows: landing
     say:
-      - {id: s1, pace: slow, text: "{@back}所以面积长得有多快，{@a}就看两把刷子有多长，二 x。", en: "So how fast the area grows is just how long the two rollers are: two x."}
-      - {id: s2, pace: slow, text: "{@law}所以 x 平方的导数是二 x。", en: "So the derivative of x squared is two x."}
-      - {id: s3, pace: normal, text: "{@k}代 x 等于一，正好就是上一集算出的斜率二。", en: "Put x equal to one and you get two, the slope we found last time."}
-      - {id: s4, pace: normal, text: "角块不是硬丢的，{@x}而是它比长条小得越来越快。", en: "The corner isn't thrown away: it just gets small much faster than the strips."}
+      - {id: s1, pace: slow, text: "{@back}所以面积长得有多快，{@a}就看两把刷子有多长，二 x。", en: "{@back}So how fast the area grows is just {@a}how long the two rollers are: two x."}
+      - {id: s2, pace: slow, text: "{@law}所以 x 平方的导数是二 x。", en: "{@law}So the derivative of x squared is two x."}
+      - {id: s3, pace: normal, text: "{@k}代 x 等于一，正好就是上一集算出的斜率二。", en: "{@k}Put x equal to one and you get two, the slope we found last time."}
+      - {id: s4, pace: normal, text: "角块不是硬丢的，{@x}而是它比长条小得越来越快。", en: "The corner isn't thrown away: {@x}it just gets small much faster than the strips."}
     do:
       - {at: s1@back, act: unmark, target: "grow2#c"}
       - {with: prev, act: hide, target: sq4}
@@ -311,7 +340,7 @@ beats:
   - id: Close
     say:
       - {id: s1, pace: normal, text: "台阶一级一级地加，正方形一圈一圈地长，看的都是多出来的那块。", en: "Staircases add step by step, squares grow ring by ring: either way, we look at the piece that's added."}
-      - {id: s2, pace: ask, text: "{@q}如果边长只能取整数，d x 最小是一，角块还能丢吗？", en: "Next: if the side can only be a whole number, so dx is at least one, can we still drop the corner?"}
+      - {id: s2, pace: ask, text: "{@q}如果边长只能取整数，d x 最小是一，角块还能丢吗？", en: "{@q}Next: if the side can only be a whole number, so dx is at least one, can we still drop the corner?"}
     do:
       # 片尾画面：dx = 0.1 的正方形、底部 (x²)′ = 2x 和右侧一句下一集的问题，不留叠加层，#39 开场好还原
       - {at: s1, act: unmark, target: "rd2x#r"}

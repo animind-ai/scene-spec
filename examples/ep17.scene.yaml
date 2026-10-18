@@ -139,11 +139,20 @@ objects:
     merges:
       R: {pieces: [Bottom, Top], label: '$(a+b)(a-b)$', role: HL}
 
+i18n:
+  en:
+    meta: {title: "(a+b)²: Where the Extra 2ab Comes From"}
+    objects:
+      wrong: {text: '[$(a+b)^2=a^2+b^2$ ?]{#w}'}
+    beats:
+      Hook: {pause: {prompt: "A square of side a grows by b on each side. What is the area (a+b)²?"}}
+      Predict: {pause: {prompt: "What shape is each of the two empty pieces, and how big?"}}
+
 beats:
   - id: Hook
     pause: {type: predict, prompt: 边长 a 的正方形每边加 b，面积 (a+b)² 是多少？, hold: 3, app_item: ep17-before-1}
     say:
-      - {id: s1, pace: ask, text: "表弟家的菜园是边长 a 米的正方形，每边再加 b 米，{@q}面积是多少？", en: "Your cousin's vegetable patch is a square, a metres on a side. Each side grows by b metres. What's the new area?"}
+      - {id: s1, pace: ask, text: "表弟家的菜园是边长 a 米的正方形，每边再加 b 米，{@q}面积是多少？", en: "Your cousin's vegetable patch is a square, a metres on a side. Each side grows by b metres. {@q}What's the new area?"}
       - {id: s2, pace: normal, text: "先自己定个答案，再往下看。", en: "Settle on an answer before you read on."}
     do:
       - {at: s1@q, act: show, target: q}
@@ -151,14 +160,14 @@ beats:
   - id: Myth
     shows: misconception
     say:
-      - {id: s1, pace: normal, text: "表弟张口就答：{@w}平方就各自平方，a 方加 b 方。", en: "Your cousin answers straight away: squaring squares each part, a squared plus b squared."}
+      - {id: s1, pace: normal, text: "表弟张口就答：{@w}平方就各自平方，a 方加 b 方。", en: "Your cousin answers straight away: {@w}squaring squares each part, a squared plus b squared."}
     do:
       - {at: s1@w, act: show, target: wrong}
 
   - id: Setup
     say:
-      - {id: s1, pace: normal, text: "我们一起看。平方就是正方形，{@s}这个正方形的边长是 a 加 b。", en: "Let's look together. A square number is a square, and this square has side a plus b."}
-      - {id: s2, pace: normal, text: "{@t}上边、{@l}左边都分成 a、b 两段，{@f}它的面积就是 a 加 b 的平方。", en: "The top and left sides each split into a and b, and its area is a plus b, squared."}
+      - {id: s1, pace: normal, text: "我们一起看。平方就是正方形，{@s}这个正方形的边长是 a 加 b。", en: "Let's look together. A square number is a square, and {@s}this square has side a plus b."}
+      - {id: s2, pace: normal, text: "{@t}上边、{@l}左边都分成 a、b 两段，{@f}它的面积就是 a 加 b 的平方。", en: "{@t}The top and {@l}left sides each split into a and b, and {@f}its area is a plus b, squared."}
     do:
       - {at: s1@s, act: hide, target: q}
       - {after: prev, act: show, target: "sq#S"}
@@ -171,10 +180,10 @@ beats:
   - id: Wrong
     shows: non_example
     say:
-      - {id: s1, pace: normal, text: "要是它等于 a 方加 b 方，{@a}正方形里就只有{@b}这两块。", en: "If it equalled a squared plus b squared, the square would hold just these two pieces."}
-      - {id: s2, pace: normal, text: "可是另外两个角上{@g}还空着两块，正方形根本没填满。", en: "But two pieces in the other corners are still empty. The square isn't filled."}
-      - {id: s3, pace: normal, text: "代个数试试，a 是三，b 是二，{@n}五的平方是二十五。", en: "Try numbers: a is three and b is two, so five squared is twenty-five."}
-      - {id: s4, pace: normal, text: "{@n}三的平方加二的平方只有十三，{@x}差了整整十二。", en: "Three squared plus two squared is only thirteen, a whole twelve short."}
+      - {id: s1, pace: normal, text: "要是它等于 a 方加 b 方，{@a}正方形里就只有{@b}这两块。", en: "If it equalled a squared plus b squared, the square would hold just {@a}this piece and {@b}this one."}
+      - {id: s2, pace: normal, text: "可是另外两个角上{@g}还空着两块，正方形根本没填满。", en: "But two pieces in the other corners {@g}are still empty. The square isn't filled."}
+      - {id: s3, pace: normal, text: "代个数试试，a 是三，b 是二，{@n}五的平方是二十五。", en: "Try numbers: a is three and b is two, so {@n}five squared is twenty-five."}
+      - {id: s4, pace: normal, text: "{@n}三的平方加二的平方只有十三，{@x}差了整整十二。", en: "{@n}Three squared plus two squared is only thirteen, {@x}a whole twelve short."}
     do:
       - {at: s1, act: unmark, target: "sq#S"}
       - {at: s1@a, act: show, target: "sq#A2"}
@@ -188,17 +197,17 @@ beats:
   - id: Predict
     pause: {type: predict, prompt: 空着的这两块，各是什么形状、有多大？, hold: 3}
     say:
-      - {id: s1, pace: ask, text: "{@g}空着的这两块，各是什么形状、有多大？", en: "What shape is each of those empty pieces, and how big?"}
+      - {id: s1, pace: ask, text: "{@g}空着的这两块，各是什么形状、有多大？", en: "{@g}What shape is each of those empty pieces, and how big?"}
     do:
       - {at: s1@g, act: mark, target: "sq#G1"}
       - {with: prev, act: mark, target: "sq#G2"}
 
   - id: Fill
     say:
-      - {id: s1, pace: normal, text: "{@p}左下这块，长是 a，{@w}宽是 b，它的面积是 a 乘 b。", en: "The bottom-left piece is a long and b wide, so its area is a times b."}
-      - {id: s2, pace: normal, text: "{@p}右上这块也是 a 乘 b，两块一模一样。", en: "The top-right piece is a times b too. The two are exactly the same."}
-      - {id: s3, pace: slow, text: "所以多出来的是{@two}两个 a b，也就是二 a b。", en: "So the extra part is two a b's: two a b."}
-      - {id: s4, pace: normal, text: "{@n}差的这十二正好是两个三乘二，就是这两条长条。", en: "The missing twelve is exactly two lots of three times two: these two strips."}
+      - {id: s1, pace: normal, text: "{@p}左下这块，长是 a，{@w}宽是 b，它的面积是 a 乘 b。", en: "{@p}The bottom-left piece is a long and {@w}b wide, so its area is a times b."}
+      - {id: s2, pace: normal, text: "{@p}右上这块也是 a 乘 b，两块一模一样。", en: "{@p}The top-right piece is a times b too. The two are exactly the same."}
+      - {id: s3, pace: slow, text: "所以多出来的是{@two}两个 a b，也就是二 a b。", en: "So the extra part is {@two}two a b's: two a b."}
+      - {id: s4, pace: normal, text: "{@n}差的这十二正好是两个三乘二，就是这两条长条。", en: "{@n}The missing twelve is exactly two lots of three times two: these two strips."}
     do:
       - {at: s1@p, act: unmark, target: "sq#G1"}
       - {with: prev, act: unmark, target: "sq#G2"}
@@ -217,8 +226,8 @@ beats:
   - id: NonExample
     shows: non_example
     say:
-      - {id: s1, pace: ask, text: "要是 a 和 b 一样长，{@s}四块都成了一样的正方形，总该对了吧？", en: "What if a and b are the same length, so all four pieces are equal squares? Surely it works then?"}
-      - {id: s2, pace: normal, text: "{@a}a 方加 b 方只数了其中两个，{@ab}另外两个还是那两条 a b。", en: "a squared plus b squared only counts two of them. The other two are still the a b strips."}
+      - {id: s1, pace: ask, text: "要是 a 和 b 一样长，{@s}四块都成了一样的正方形，总该对了吧？", en: "What if a and b are the same length, so {@s}all four pieces are equal squares? Surely it works then?"}
+      - {id: s2, pace: normal, text: "{@a}a 方加 b 方只数了其中两个，{@ab}另外两个还是那两条 a b。", en: "{@a}a squared plus b squared only counts two of them. {@ab}The other two are still the a b strips."}
     do:
       - {at: s1, act: unmark, target: "sq#AB1"}
       - {with: prev, act: unmark, target: "sq#AB2"}
@@ -238,10 +247,10 @@ beats:
   - id: Landing
     shows: landing
     say:
-      - {id: s1, pace: slow, text: "{@l}所以 a 加 b 的平方，等于 a 方加二 a b 加 b 方。", en: "So a plus b squared equals a squared plus two a b plus b squared."}
-      - {id: s2, pace: normal, text: "{@a}这块是 a 方，{@ab}这两条是二 a b，{@b}那块是 b 方。", en: "This piece is a squared, these two strips are two a b, and that piece is b squared."}
-      - {id: s3, pace: normal, text: "还记得切一刀吗？{@c}这回是横竖各切一刀，切出四块。", en: "Remember cutting a rectangle once? This time we cut once across and once down, into four pieces."}
-      - {id: s4, pace: normal, text: "{@m}竖式算十二乘十二，也是一百、两个二十，再加四。", en: "Twelve times twelve in long multiplication is the same: a hundred, two twenties, and four."}
+      - {id: s1, pace: slow, text: "{@l}所以 a 加 b 的平方，等于 a 方加二 a b 加 b 方。", en: "{@l}So a plus b squared equals a squared plus two a b plus b squared."}
+      - {id: s2, pace: normal, text: "{@a}这块是 a 方，{@ab}这两条是二 a b，{@b}那块是 b 方。", en: "{@a}This piece is a squared, {@ab}these two strips are two a b, and {@b}that piece is b squared."}
+      - {id: s3, pace: normal, text: "还记得切一刀吗？{@c}这回是横竖各切一刀，切出四块。", en: "Remember cutting a rectangle once? {@c}This time we cut once across and once down, into four pieces."}
+      - {id: s4, pace: normal, text: "{@m}竖式算十二乘十二，也是一百、两个二十，再加四。", en: "{@m}Twelve times twelve in long multiplication is the same: a hundred, two twenties, and four."}
     do:
       - {at: s1, act: hide, target: same}
       - {with: prev, act: hide, target: num1}
@@ -275,8 +284,8 @@ beats:
 
   - id: Close
     say:
-      - {id: s1, pace: normal, text: "{@x}平方不是各自平方，中间那两条长条，一条也不能丢。", en: "Squaring isn't squaring each part. Neither of those two strips can be left out."}
-      - {id: s2, pace: ask, text: "{@n}要是反过来，从正方形里{@h}挖掉一个小正方形呢？", en: "What if we go the other way and cut a small square out of a big one?"}
+      - {id: s1, pace: normal, text: "{@x}平方不是各自平方，中间那两条长条，一条也不能丢。", en: "{@x}Squaring isn't squaring each part. Neither of those two strips can be left out."}
+      - {id: s2, pace: ask, text: "{@n}要是反过来，从正方形里{@h}挖掉一个小正方形呢？", en: "{@n}What if we go the other way and {@h}cut a small square out of a big one?"}
     do:
       - {at: s1@x, act: mark, target: "wrong#w"}
       - {with: prev, act: mark, target: "sq#AB1"}

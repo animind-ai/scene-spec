@@ -108,11 +108,24 @@ objects:
     below: unit
     gap: sm
 
+i18n:
+  en:
+    meta: {title: "What Long Multiplication Is Really Doing"}
+    objects:
+      myth: {text: '[$20\times10+3\times4=212$]{#m}?'}
+      q: {text: '$23\times14$: why does the lower row shift?'}
+      r1: {text: '[Top two: $23\times10=230$]{#t .A}'}
+      r2: {text: '[Bottom two: $23\times4=92$]{#b .B}'}
+      bad: {text: 'No shift: [$92+23=115$]{#x}, less than $230$'}
+    beats:
+      Hook: {pause: {prompt: "In long multiplication, does the second row line up or shift over?"}}
+      Predict: {pause: {prompt: "The 23 in the lower row: how many 23s is it really?"}}
+
 beats:
   - id: Hook
     pause: {type: predict, prompt: 竖式第二行对齐还是错开？, hold: 3, app_item: ep05-before-1}
     say:
-      - {id: s1, pace: ask, text: "{@q}礼堂每排二十三座，有十四排，共几座？", en: "The hall has twenty-three seats in each row and fourteen rows. How many seats?"}
+      - {id: s1, pace: ask, text: "{@q}礼堂每排二十三座，有十四排，共几座？", en: "{@q}The hall has twenty-three seats in each row and fourteen rows. How many seats?"}
       - {id: s2, pace: normal, text: "列竖式时，第二行对齐还是错开？你选哪个？", en: "In long multiplication, does the second row line up or shift over? Which do you pick?"}
     do:
       # 开场：#4 的片尾画面
@@ -127,14 +140,14 @@ beats:
   - id: Myth
     shows: misconception
     say:
-      - {id: s1, pace: normal, text: "{@m}表哥图省事：二十乘十加三乘四，二百一十二。", en: "Our cousin takes a shortcut: twenty times ten plus three times four, two hundred and twelve."}
+      - {id: s1, pace: normal, text: "{@m}表哥图省事：二十乘十加三乘四，二百一十二。", en: "{@m}Our cousin takes a shortcut: twenty times ten plus three times four, two hundred and twelve."}
     do:
       - {at: s1@m, act: show, target: myth}
 
   - id: Setup
     say:
-      - {id: s1, pace: normal, text: "我们一起看。{@r}还是上一集的长方形。", en: "Let's look together. It's the rectangle from last time."}
-      - {id: s2, pace: normal, text: "这次宽二十三，高十四，{@b}格子太多，画成大块。", en: "This time it's twenty-three wide and fourteen tall. Too many squares, so we draw big blocks."}
+      - {id: s1, pace: normal, text: "我们一起看。{@r}还是上一集的长方形。", en: "Let's look together. {@r}It's the rectangle from last time."}
+      - {id: s2, pace: normal, text: "这次宽二十三，高十四，{@b}格子太多，画成大块。", en: "This time it's twenty-three wide and fourteen tall. {@b}Too many squares, so we draw big blocks."}
     do:
       - {at: s1@r, act: unfill, target: rect}
       - {at: s2@b, act: hide, target: rect}
@@ -142,9 +155,9 @@ beats:
 
   - id: Cut
     say:
-      - {id: s1, pace: normal, text: "宽在二十和三中间，{@c}先竖着切一刀。", en: "Across the width, between twenty and three, cut down once."}
-      - {id: s2, pace: normal, text: "高在十和四中间，{@r}再横着切一刀。", en: "Up the height, between ten and four, cut across once more."}
-      - {id: s3, pace: normal, text: "{@f}切成四块，二百、三十、八十，还有十二。", en: "That makes four blocks: two hundred, thirty, eighty, and twelve."}
+      - {id: s1, pace: normal, text: "宽在二十和三中间，{@c}先竖着切一刀。", en: "Across the width, between twenty and three, {@c}cut down once."}
+      - {id: s2, pace: normal, text: "高在十和四中间，{@r}再横着切一刀。", en: "Up the height, between ten and four, {@r}cut across once more."}
+      - {id: s3, pace: normal, text: "{@f}切成四块，二百、三十、八十，还有十二。", en: "{@f}That makes four blocks: two hundred, thirty, eighty, and twelve."}
     do:
       - {at: s1@c, act: split, target: big, args: {cols: [20, 3]}, dur: 0.8}
       - {at: s2@r, act: split, target: big, args: {cols: [20, 3], rows: [10, 4]}, dur: 0.8}
@@ -157,15 +170,15 @@ beats:
   - id: Wrong
     shows: misconception
     say:
-      - {id: s1, pace: normal, text: "{@w}二十乘十加三乘四，只算了两个角。", en: "Twenty times ten plus three times four only counts two corners."}
-      - {id: s2, pace: normal, text: "{@x}中间交叉的两块，三十和八十，漏掉了。", en: "The two crossing blocks, thirty and eighty, got left out."}
+      - {id: s1, pace: normal, text: "{@w}二十乘十加三乘四，只算了两个角。", en: "{@w}Twenty times ten plus three times four only counts two corners."}
+      - {id: s2, pace: normal, text: "{@x}中间交叉的两块，三十和八十，漏掉了。", en: "{@x}The two crossing blocks, thirty and eighty, got left out."}
     do:
       - {at: s2@x, act: cross, target: "myth#m"}
 
   - id: Predict
     pause: {type: predict, prompt: 竖式下面那一排的 23，其实是几个 23？, hold: 2.5, app_item: ep05-predict-1}
     say:
-      - {id: s1, pace: ask, text: "{@q}竖式下面那一排的二十三，其实是几个二十三？", en: "The twenty-three in the lower row of the working: how many twenty-threes is it really?"}
+      - {id: s1, pace: ask, text: "{@q}竖式下面那一排的二十三，其实是几个二十三？", en: "{@q}The twenty-three in the lower row of the working: how many twenty-threes is it really?"}
     do:
       - {at: s1, act: hide, target: myth}
       - {at: s1@q, act: show, target: work}
@@ -173,10 +186,10 @@ beats:
   - id: Reveal
     shows: non_example
     say:
-      - {id: s1, pace: slow, text: "{@t}是十个二十三，就是上面两块，二百三十。", en: "It's ten twenty-threes: the top two blocks, two hundred and thirty."}
-      - {id: s2, pace: normal, text: "{@b}第一排二十三乘四，是下面两块，九十二。", en: "The first row, twenty-three times four, is the bottom two blocks, ninety-two."}
-      - {id: s3, pace: normal, text: "{@w}要是不错位，就成了九十二加二十三。", en: "Without the shift, it would be ninety-two plus twenty-three."}
-      - {id: s4, pace: normal, text: "{@x}才一百一十五，比十个二十三还少，不对。", en: "Only one hundred and fifteen, fewer than ten twenty-threes. That's wrong."}
+      - {id: s1, pace: slow, text: "{@t}是十个二十三，就是上面两块，二百三十。", en: "{@t}It's ten twenty-threes: the top two blocks, two hundred and thirty."}
+      - {id: s2, pace: normal, text: "{@b}第一排二十三乘四，是下面两块，九十二。", en: "{@b}The first row, twenty-three times four, is the bottom two blocks, ninety-two."}
+      - {id: s3, pace: normal, text: "{@w}要是不错位，就成了九十二加二十三。", en: "{@w}Without the shift, it would be ninety-two plus twenty-three."}
+      - {id: s4, pace: normal, text: "{@x}才一百一十五，比十个二十三还少，不对。", en: "{@x}Only one hundred and fifteen, fewer than ten twenty-threes. That's wrong."}
     do:
       - {at: s1@t, act: show, target: r1}
       - {at: s2, act: step}
@@ -189,8 +202,8 @@ beats:
   - id: Equation
     shows: landing
     say:
-      - {id: s1, pace: normal, text: "{@e}九十二加上二百三十，一共三百二十二。", en: "Ninety-two plus two hundred and thirty makes three hundred and twenty-two."}
-      - {id: s2, pace: normal, text: "{@s}错一位，是因为那一排是十个二十三。", en: "The shift is there because that row is ten twenty-threes."}
+      - {id: s1, pace: normal, text: "{@e}九十二加上二百三十，一共三百二十二。", en: "{@e}Ninety-two plus two hundred and thirty makes three hundred and twenty-two."}
+      - {id: s2, pace: normal, text: "{@s}错一位，是因为那一排是十个二十三。", en: "{@s}The shift is there because that row is ten twenty-threes."}
     do:
       - {at: s1, act: hide, target: bad}
       - {with: prev, act: hide, target: q}
@@ -204,7 +217,7 @@ beats:
     say:
       - {id: s1, pace: normal, text: "这五集，我们把数排一排、转一转、切一切。", en: "In these five episodes, we lined numbers up, turned them, and cut them."}
       - {id: s2, pace: normal, text: "看完和大人一起，在方格纸上切四块算一算。", en: "After watching, cut a rectangle into four blocks on squared paper with a grown-up and add them up."}
-      - {id: s3, pace: ask, text: "{@n}要是把一切成几份，会得到什么新的数？", en: "What if we cut one into equal parts? What new kind of number do we get?"}
+      - {id: s3, pace: ask, text: "{@n}要是把一切成几份，会得到什么新的数？", en: "{@n}What if we cut one into equal parts? What new kind of number do we get?"}
     do:
       - {at: s1, act: unmark, target: "r1#t"}
       # 收尾：只留一个小方块"1"，问题接到分数系列 #6

@@ -83,11 +83,23 @@ objects:
     role: B
     in: stage
 
+i18n:
+  en:
+    meta: {title: "Make Ten: Why Split the 5 in 8+5?"}
+    objects:
+      myth: {text: "Do we lose some if we split?"}
+      ten: {text: 'Full frame = one [$10$]{#t .HL}'}
+      split: {text: '[$2+3=5$]{#s .B}: none lost'}
+      nonex: {text: '$3+4=7$: not ten, no help'}
+    beats:
+      Hook: {pause: {prompt: "Eight eggs in the box and five more come. How many in all?"}}
+      Predict: {pause: {prompt: "How many of the five jump over to fill the frame?"}}
+
 beats:
   - id: Hook
     pause: {type: predict, prompt: 蛋盒里八个蛋又来五个，一共几个？, hold: 3, app_item: ep01-before-1}
     say:
-      - {id: s1, pace: ask, text: "{@q}蛋盒里放了八个蛋，又拿来五个，一共几个？", en: "There are eight eggs in the egg box, and here come five more. How many in all?"}
+      - {id: s1, pace: ask, text: "{@q}蛋盒里放了八个蛋，又拿来五个，一共几个？", en: "{@q}There are eight eggs in the egg box, and here come five more. How many in all?"}
       - {id: s2, pace: normal, text: "先别数，在心里估一估。", en: "Don't count yet. Just make a guess in your head."}
     do:
       - {at: s1, act: show, target: frame}
@@ -99,13 +111,13 @@ beats:
     shows: misconception
     say:
       - {id: s1, pace: normal, text: "弟弟要从八开始，一个一个往上数。", en: "Little brother wants to start at eight and count up one at a time."}
-      - {id: s2, pace: normal, text: "{@w}妹妹担心，把五拆开，会少掉几个。", en: "Little sister worries that breaking the five apart will lose a few."}
+      - {id: s2, pace: normal, text: "{@w}妹妹担心，把五拆开，会少掉几个。", en: "{@w}Little sister worries that breaking the five apart will lose a few."}
     do:
       - {at: s2@w, act: show, target: myth}
 
   - id: Setup
     say:
-      - {id: s1, pace: normal, text: "我们一起看。{@f}这是十格框，两排，每排五格。", en: "Let's look together. This is a ten frame: two rows, five boxes in each."}
+      - {id: s1, pace: normal, text: "我们一起看。{@f}这是十格框，两排，每排五格。", en: "Let's look together. {@f}This is a ten frame: two rows, five boxes in each."}
       - {id: s2, pace: normal, text: "框里放了八个圆点，框外面还有五个。", en: "Eight dots are inside the frame, and five more are outside."}
     do:
       - {at: s1@f, act: focus, target: "frame.frame"}
@@ -113,7 +125,7 @@ beats:
 
   - id: CountOn
     say:
-      - {id: s1, pace: brisk, text: "{@c}从八往上数，九、十、十一、十二、十三。", en: "Counting up from eight: nine, ten, eleven, twelve, thirteen."}
+      - {id: s1, pace: brisk, text: "{@c}从八往上数，九、十、十一、十二、十三。", en: "{@c}Counting up from eight: nine, ten, eleven, twelve, thirteen."}
       - {id: s2, pace: normal, text: "数对了，可是要数五下，数多了容易乱。", en: "That's right, but it takes five counts, and it's easy to slip."}
     do:
       - {at: s1@c, act: count, target: frame, args: {start: 9}, dur: fit}
@@ -121,16 +133,16 @@ beats:
   - id: Predict
     pause: {type: predict, prompt: 五个里面跳几个过去，框就满了？, hold: 2.5, app_item: ep01-predict-1}
     say:
-      - {id: s1, pace: ask, text: "换个办法。{@q}五个里面跳几个过去，框就满了？", en: "Let's try another way. How many of the five should jump in to fill the frame?"}
+      - {id: s1, pace: ask, text: "换个办法。{@q}五个里面跳几个过去，框就满了？", en: "Let's try another way. {@q}How many of the five should jump in to fill the frame?"}
     do:
       - {at: s1@q, act: mark, target: "frame.cell[8]"}
       - {with: prev, act: mark, target: "frame.cell[9]"}
 
   - id: MakeTen
     say:
-      - {id: s1, pace: slow, text: "{@j}跳两个过去，十格框正好装满，一格不空。", en: "Two jump in, and the frame is full. Not one empty box."}
-      - {id: s2, pace: normal, text: "{@t}装满的十格框，就是一个十，不用再一个个数。", en: "A full ten frame is one ten. No need to count each one."}
-      - {id: s3, pace: normal, text: "{@s}五拆成了两个和三个，合起来还是五个。", en: "The five became two and three. Put together, it's still five."}
+      - {id: s1, pace: slow, text: "{@j}跳两个过去，十格框正好装满，一格不空。", en: "{@j}Two jump in, and the frame is full. Not one empty box."}
+      - {id: s2, pace: normal, text: "{@t}装满的十格框，就是一个十，不用再一个个数。", en: "{@t}A full ten frame is one ten. No need to count each one."}
+      - {id: s3, pace: normal, text: "{@s}五拆成了两个和三个，合起来还是五个。", en: "{@s}The five became two and three. Put together, it's still five."}
     do:
       - {at: s1, act: unmark, target: "frame.cell[8]"}
       - {with: prev, act: unmark, target: "frame.cell[9]"}
@@ -146,9 +158,9 @@ beats:
   - id: Reveal
     shows: non_example
     say:
-      - {id: s1, pace: slow, text: "{@a}一个十，再加三个，一眼就能看出是十三。", en: "One ten and three more. You can see thirteen at a glance."}
-      - {id: s2, pace: normal, text: "那三加四呢？{@n}三个加四个，框还没装满。", en: "What about three plus four? Three and four don't fill the frame."}
-      - {id: s3, pace: normal, text: "{@x}不到十，凑十就帮不上忙，直接数就好。", en: "It's less than ten, so making ten doesn't help. Just count."}
+      - {id: s1, pace: slow, text: "{@a}一个十，再加三个，一眼就能看出是十三。", en: "{@a}One ten and three more. You can see thirteen at a glance."}
+      - {id: s2, pace: normal, text: "那三加四呢？{@n}三个加四个，框还没装满。", en: "What about three plus four? {@n}Three and four don't fill the frame."}
+      - {id: s3, pace: normal, text: "{@x}不到十，凑十就帮不上忙，直接数就好。", en: "{@x}It's less than ten, so making ten doesn't help. Just count."}
     do:
       - {at: s1, act: hide, target: split}
       - {at: s1@a, act: hide, target: q}
@@ -164,9 +176,9 @@ beats:
   - id: Equation
     shows: landing
     say:
-      - {id: s1, pace: normal, text: "{@e}写成算式，八加五，和十加三一样多。", en: "As a number sentence, eight plus five is the same as ten plus three."}
-      - {id: s2, pace: normal, text: "{@m}等号的意思不是算出来，是两边一样多。", en: "The equals sign doesn't mean work it out. It means both sides are the same."}
-      - {id: s3, pace: normal, text: "{@l}在数轴上，从八跳两格到十，{@h}再跳三格到十三。", en: "On the number line, hop two from eight to ten, then three more to thirteen."}
+      - {id: s1, pace: normal, text: "{@e}写成算式，八加五，和十加三一样多。", en: "{@e}As a number sentence, eight plus five is the same as ten plus three."}
+      - {id: s2, pace: normal, text: "{@m}等号的意思不是算出来，是两边一样多。", en: "{@m}The equals sign doesn't mean work it out. It means both sides are the same."}
+      - {id: s3, pace: normal, text: "{@l}在数轴上，从八跳两格到十，{@h}再跳三格到十三。", en: "{@l}On the number line, hop two from eight to ten, {@h}then three more to thirteen."}
     do:
       - {at: s1, act: hide, target: frame2}
       - {with: prev, act: hide, target: nonex}
@@ -191,7 +203,7 @@ beats:
   - id: LookBack
     say:
       - {id: s1, pace: normal, text: "看完和大人一起，用豆子摆一摆，自己凑个十。", en: "After watching, grab some beans with a grown-up and make your own ten."}
-      - {id: s2, pace: ask, text: "{@n}十格框是两排五个。换成五排两个，一样多吗？", en: "A ten frame is two rows of five. What about five rows of two: is that the same?"}
+      - {id: s2, pace: ask, text: "{@n}十格框是两排五个。换成五排两个，一样多吗？", en: "{@n}A ten frame is two rows of five. What about five rows of two: is that the same?"}
     do:
       # 收成 #2 的开头画面：只留装满的十格框
       - {at: s2@n, act: hide, target: line}

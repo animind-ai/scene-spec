@@ -98,11 +98,30 @@ objects:
     level: title
     in: footer
 
+i18n:
+  en:
+    meta: {title: "Why sin 30° Is Always One Half"}
+    objects:
+      ratio: {label: "Opp ÷ hyp ="}
+      area: {label: "Area ="}
+      wrong: {text: '[Bigger = bigger sin?]{#m}'}
+      tri:
+        shapes:
+          T:
+            edges:
+              - {at: [[3.464, 0], [3.464, 2]], text: 'opposite'}
+              - {at: [[0, 0], [3.464, 2]], text: 'hypotenuse'}
+        guides:
+          side: {label: '$2\times$opposite'}
+    beats:
+      Hook: {pause: {prompt: "Draw a 30° right triangle bigger. Does sin 30° get bigger?"}}
+      Predict: {pause: {prompt: "Enlarge it three times. Does opposite ÷ hypotenuse change?"}}
+
 beats:
   - id: Hook
     pause: {type: predict, prompt: 三十度的直角三角形画大一点，sin30° 会变大吗？, hold: 3, app_item: ep25-before-1}
     say:
-      - {id: s1, pace: normal, text: "两个同学各画了一个{@q}三十度的直角三角形，一小一大。", en: "Two classmates each draw a thirty-degree right triangle, one small and one big."}
+      - {id: s1, pace: normal, text: "两个同学各画了一个{@q}三十度的直角三角形，一小一大。", en: "Two classmates each draw {@q}a thirty-degree right triangle, one small and one big."}
       - {id: s2, pace: ask, text: "大的那个，sin 三十度会变大吗？", en: "For the big one, does sine of thirty degrees get bigger?"}
       - {id: s3, pace: normal, text: "你站哪一边？先想想。", en: "Whose side are you on? Think first."}
     do:
@@ -115,14 +134,14 @@ beats:
   - id: Myth
     shows: misconception
     say:
-      - {id: s1, pace: normal, text: "画大的那位很得意，{@m}说自己的边更长，sin 肯定也更大。", en: "The one with the big triangle is pleased, saying their sides are longer, so their sine must be bigger."}
+      - {id: s1, pace: normal, text: "画大的那位很得意，{@m}说自己的边更长，sin 肯定也更大。", en: "The one with the big triangle is pleased, {@m}saying their sides are longer, so their sine must be bigger."}
     do:
       - {at: s1@m, act: show, target: wrong}
 
   - id: Setup
     say:
-      - {id: s1, pace: normal, text: "我们一起看。{@r}sin 三十度，是对边除以斜边。", en: "Let's look together. Sine of thirty degrees is the opposite side divided by the hypotenuse."}
-      - {id: s2, pace: normal, text: "对边是三十度角对着的那条，{@h}斜边是最长的那条。", en: "The opposite side faces the thirty-degree angle; the hypotenuse is the longest side."}
+      - {id: s1, pace: normal, text: "我们一起看。{@r}sin 三十度，是对边除以斜边。", en: "Let's look together. {@r}Sine of thirty degrees is the opposite side divided by the hypotenuse."}
+      - {id: s2, pace: normal, text: "对边是三十度角对着的那条，{@h}斜边是最长的那条。", en: "The opposite side faces the thirty-degree angle; {@h}the hypotenuse is the longest side."}
     do:
       - {at: s1@r, act: show, target: ratio}
       - {at: s2@h, act: mark, target: ratio}
@@ -130,15 +149,15 @@ beats:
   - id: Predict
     pause: {type: predict, prompt: 放大到三倍，对边 ÷ 斜边会变吗？, hold: 3, app_item: ep25-why-1}
     say:
-      - {id: s1, pace: ask, text: "{@q}把三角形放大到三倍，对边除以斜边会变吗？", en: "Enlarge the triangle to three times the size. Does opposite over hypotenuse change?"}
+      - {id: s1, pace: ask, text: "{@q}把三角形放大到三倍，对边除以斜边会变吗？", en: "{@q}Enlarge the triangle to three times the size. Does opposite over hypotenuse change?"}
     do:
       - {at: s1, act: unmark, target: ratio}
       - {at: s1@q, act: show, target: area}
 
   - id: Scale
     say:
-      - {id: s1, pace: normal, text: "{@up}放大，对边变长了，斜边也跟着一样变长。", en: "Enlarge it: the opposite side grows, and the hypotenuse grows by the same factor."}
-      - {id: s2, pace: normal, text: "{@dn}缩小再{@up}放大，比值一直停在二分之一，一点不动。", en: "Shrink it, enlarge it again: the ratio stays at one half and doesn't budge."}
+      - {id: s1, pace: normal, text: "{@up}放大，对边变长了，斜边也跟着一样变长。", en: "{@up}Enlarge it: the opposite side grows, and the hypotenuse grows by the same factor."}
+      - {id: s2, pace: normal, text: "{@dn}缩小再{@up}放大，比值一直停在二分之一，一点不动。", en: "{@dn}Shrink it, {@up}enlarge it again: the ratio stays at one half and doesn't budge."}
       - {id: s3, pace: normal, text: "大小在变，形状没变，这些三角形都是相似的。", en: "The size changes but the shape doesn't: these triangles are all similar."}
     do:
       - {at: s1@up, act: tween, args: {s: 6}, dur: fit, ease: in_out}
@@ -147,9 +166,9 @@ beats:
 
   - id: Why
     say:
-      - {id: s1, pace: normal, text: "为什么正好是二分之一？{@c}把三角形复制一个，{@f}沿着邻边翻过去。", en: "Why exactly one half? Copy the triangle and flip it over the adjacent side."}
-      - {id: s2, pace: normal, text: "{@a}三十度加三十度是六十度，{@e}三个角都是六十度的就是等边三角形。", en: "Two thirty-degree angles make sixty. All three angles are sixty: it's an equilateral triangle."}
-      - {id: s3, pace: slow, text: "{@v}竖着的这条边是对边的两倍，{@h}又和斜边一样长。", en: "This vertical side is twice the opposite side, and it's as long as the hypotenuse."}
+      - {id: s1, pace: normal, text: "为什么正好是二分之一？{@c}把三角形复制一个，{@f}沿着邻边翻过去。", en: "Why exactly one half? {@c}Copy the triangle and {@f}flip it over the adjacent side."}
+      - {id: s2, pace: normal, text: "{@a}三十度加三十度是六十度，{@e}三个角都是六十度的就是等边三角形。", en: "{@a}Two thirty-degree angles make sixty. {@e}All three angles are sixty: it's an equilateral triangle."}
+      - {id: s3, pace: slow, text: "{@v}竖着的这条边是对边的两倍，{@h}又和斜边一样长。", en: "{@v}This vertical side is twice the opposite side, and {@h}it's as long as the hypotenuse."}
       - {id: s4, pace: normal, text: "所以对边正好是斜边的一半，不管三角形画多大。", en: "So the opposite side is exactly half the hypotenuse, however big the triangle is."}
     do:
       - {at: s1, act: hide, target: g}
@@ -165,8 +184,8 @@ beats:
   - id: NonExample
     shows: non_example
     say:
-      - {id: s1, pace: normal, text: "{@back}可是面积就不一样了，我们再回到坐标系里看一看面积。", en: "Area is a different story. Let's go back to the coordinate plane and look at it."}
-      - {id: s2, pace: normal, text: "{@d}边长放大两倍时{@m}面积变成了四倍，面积跟着大小在变。", en: "Double the sides and the area becomes four times as big. Area changes with size."}
+      - {id: s1, pace: normal, text: "{@back}可是面积就不一样了，我们再回到坐标系里看一看面积。", en: "{@back}Area is a different story. Let's go back to the coordinate plane and look at it."}
+      - {id: s2, pace: normal, text: "{@d}边长放大两倍时{@m}面积变成了四倍，面积跟着大小在变。", en: "{@d}Double the sides and {@m}the area becomes four times as big. Area changes with size."}
     do:
       - {at: s1@back, act: unmark, target: "tri#side"}
       - {with: prev, act: hide, target: tri}
@@ -179,8 +198,8 @@ beats:
   - id: Landing
     shows: landing
     say:
-      - {id: s1, pace: slow, text: "{@law}所以 sin 三十度永远是二分之一，和三角形的大小无关。", en: "So sine of thirty degrees is always one half, whatever the size of the triangle."}
-      - {id: s2, pace: normal, text: "{@r}它是一个比值，只看形状，不看大小，放大缩小都一样。", en: "It's a ratio: it depends on shape, not size, and scaling never changes it."}
+      - {id: s1, pace: slow, text: "{@law}所以 sin 三十度永远是二分之一，和三角形的大小无关。", en: "{@law}So sine of thirty degrees is always one half, whatever the size of the triangle."}
+      - {id: s2, pace: normal, text: "{@r}它是一个比值，只看形状，不看大小，放大缩小都一样。", en: "{@r}It's a ratio: it depends on shape, not size, and scaling never changes it."}
     do:
       - {at: s1, act: unmark, target: area}
       - {at: s1@law, act: show, target: law}
@@ -188,8 +207,8 @@ beats:
 
   - id: Close
     say:
-      - {id: s1, pace: normal, text: "三角形再大，sin 三十度也不会变大，{@x}它只和角度有关。", en: "However big the triangle, sine of thirty degrees doesn't grow. It depends only on the angle."}
-      - {id: s2, pace: ask, text: "{@q}那换成六十度，对边除以斜边又是多少？", en: "So what about sixty degrees: what's opposite over hypotenuse then?"}
+      - {id: s1, pace: normal, text: "三角形再大，sin 三十度也不会变大，{@x}它只和角度有关。", en: "However big the triangle, sine of thirty degrees doesn't grow. {@x}It depends only on the angle."}
+      - {id: s2, pace: ask, text: "{@q}那换成六十度，对边除以斜边又是多少？", en: "{@q}So what about sixty degrees: what's opposite over hypotenuse then?"}
     do:
       - {at: s1, act: unmark, target: ratio}
       - {at: s1@x, act: cross, target: "wrong#m"}

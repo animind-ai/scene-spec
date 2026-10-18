@@ -138,12 +138,21 @@ objects:
       tb: {from: [5, 5], to: [9, 5], label: '$b$', role: B, side: above, solid: true}
       lx: {from: [0, 5], to: [0, 0], label: '$x$', role: A, side: left, solid: true}
 
+i18n:
+  en:
+    meta: {title: "Difference of Squares: Cut and Paste"}
+    objects:
+      wrong: {text: '[$a^2-b^2=(a-b)^2$ ?]{#w}'}
+    beats:
+      Hook: {pause: {prompt: "A square room with a square pillar in one corner: what times what is the floor area a² − b²?"}}
+      Predict: {pause: {prompt: "Cut the L-shape once into a rectangle: how long and how wide is it?"}}
+
 beats:
   - id: Hook
     pause: {type: predict, prompt: 角落立着方柱的正方形房间，地板 a² − b² 能写成谁乘谁？, hold: 3, app_item: ep18-before-1}
     say:
       - {id: s1, pace: normal, text: "边长 a 的正方形房间，角落里立着边长 b 的方柱。", en: "A square room with side a has a square pillar with side b standing in one corner."}
-      - {id: s2, pace: ask, text: "{@q}要铺的地板是 a 方减 b 方，凭直觉猜，能写成谁乘谁？", en: "The floor to cover is a squared minus b squared. Go with your gut: what times what is it?"}
+      - {id: s2, pace: ask, text: "{@q}要铺的地板是 a 方减 b 方，凭直觉猜，能写成谁乘谁？", en: "{@q}The floor to cover is a squared minus b squared. Go with your gut: what times what is it?"}
     do:
       # 开场：一下子摆出 #17 的片尾画面（挖掉的角就是方柱）
       - {at: s1, act: show, target: "dsq#S", dur: 0.01}
@@ -159,14 +168,14 @@ beats:
   - id: Myth
     shows: misconception
     say:
-      - {id: s1, pace: normal, text: "装修师傅随口说：{@w}减法也照搬，就是 a 减 b 的平方。", en: "The builder says offhand: subtraction works the same, so it's a minus b, squared."}
+      - {id: s1, pace: normal, text: "装修师傅随口说：{@w}减法也照搬，就是 a 减 b 的平方。", en: "The builder says offhand: {@w}subtraction works the same, so it's a minus b, squared."}
     do:
       - {at: s1@w, act: show, target: wrong}
 
   - id: Setup
     say:
       - {id: s1, pace: normal, text: "上一集是加起来再平方，这一集是平方了再相减。", en: "Last time we added, then squared. This time we square, then subtract."}
-      - {id: s2, pace: normal, text: "我们一起看。{@a}大正方形边长是 a，{@b}挖掉的小正方形边长是 b。", en: "Let's look together. The big square has side a, and the small square cut out has side b."}
+      - {id: s2, pace: normal, text: "我们一起看。{@a}大正方形边长是 a，{@b}挖掉的小正方形边长是 b。", en: "Let's look together. {@a}The big square has side a, and {@b}the small square cut out has side b."}
     do:
       - {at: s2@a, act: mark, target: "dsq#ba"}
       - {at: s2@b, act: unmark, target: "dsq#ba"}
@@ -175,11 +184,11 @@ beats:
   - id: Wrong
     shows: non_example
     say:
-      - {id: s1, pace: normal, text: "要是它等于 a 减 b 的平方，{@w}L 形就该是这个正方形。", en: "If it equalled a minus b squared, the L-shape would be just this square."}
-      - {id: s2, pace: normal, text: "{@s}正方形旁边还剩两条长条，一条在上，一条在右。", en: "But above it and to its right there are two strips left over."}
+      - {id: s1, pace: normal, text: "要是它等于 a 减 b 的平方，{@w}L 形就该是这个正方形。", en: "If it equalled a minus b squared, {@w}the L-shape would be just this square."}
+      - {id: s2, pace: normal, text: "{@s}正方形旁边还剩两条长条，一条在上，一条在右。", en: "{@s}But above it and to its right there are two strips left over."}
       - {id: s3, pace: normal, text: "这两条长条，刚才的猜想里一条也没有算。", en: "The guess doesn't count either of those two strips."}
-      - {id: s4, pace: normal, text: "代个数试试，a 是五，b 是二，{@n}二十五减四是二十一。", en: "Try numbers: a is five and b is two, and twenty-five minus four is twenty-one."}
-      - {id: s5, pace: normal, text: "{@n}三的平方只有九，{@x}差得远了，这个猜法不对。", en: "Three squared is only nine. That's way off, so the guess is wrong."}
+      - {id: s4, pace: normal, text: "代个数试试，a 是五，b 是二，{@n}二十五减四是二十一。", en: "Try numbers: a is five and b is two, and {@n}twenty-five minus four is twenty-one."}
+      - {id: s5, pace: normal, text: "{@n}三的平方只有九，{@x}差得远了，这个猜法不对。", en: "{@n}Three squared is only nine. {@x}That's way off, so the guess is wrong."}
     do:
       - {at: s1, act: unmark, target: "dsq#hb"}
       - {with: prev, act: labels, target: dsq, args: {piece: L, show: false}}
@@ -195,16 +204,16 @@ beats:
   - id: Predict
     pause: {type: predict, prompt: 把 L 形剪一刀拼成长方形，长和宽各是多少？, hold: 3}
     say:
-      - {id: s1, pace: ask, text: "{@p}把 L 形剪一刀拼成长方形，长和宽各是多少？", en: "Cut the L-shape once and make a rectangle. How long and how wide is it?"}
+      - {id: s1, pace: ask, text: "{@p}把 L 形剪一刀拼成长方形，长和宽各是多少？", en: "{@p}Cut the L-shape once and make a rectangle. How long and how wide is it?"}
     do:
       - {at: s1@p, act: hide, target: "dsq#W"}
 
   - id: Rearrange
     say:
-      - {id: s1, pace: normal, text: "{@cut}沿着这条线剪开，{@turn}上面这一条，转过来补到右边。", en: "Cut along this line, then turn the top strip round and fit it on the right."}
-      - {id: s2, pace: slow, text: "{@rect}拼成了一个长方形，面积一点也没变。", en: "It's a rectangle now, and the area hasn't changed at all."}
-      - {id: s3, pace: normal, text: "{@l}长是 a 接上补过来的 b，就是 a 加 b。", en: "Its length is a plus the b that moved over: a plus b."}
-      - {id: s4, pace: normal, text: "{@s}宽是 a 去掉挖掉的 b，就是 a 减 b。", en: "Its width is a with b taken away: a minus b."}
+      - {id: s1, pace: normal, text: "{@cut}沿着这条线剪开，{@turn}上面这一条，转过来补到右边。", en: "{@cut}Cut along this line, then {@turn}turn the top strip round and fit it on the right."}
+      - {id: s2, pace: slow, text: "{@rect}拼成了一个长方形，面积一点也没变。", en: "{@rect}It's a rectangle now, and the area hasn't changed at all."}
+      - {id: s3, pace: normal, text: "{@l}长是 a 接上补过来的 b，就是 a 加 b。", en: "{@l}Its length is a plus the b that moved over: a plus b."}
+      - {id: s4, pace: normal, text: "{@s}宽是 a 去掉挖掉的 b，就是 a 减 b。", en: "{@s}Its width is a with b taken away: a minus b."}
     do:
       - {at: s1@cut, act: hide, target: "dsq#hb"}
       - {with: prev, act: cut, target: dsq, args: {cut: c2}, dur: 1.0}
@@ -217,8 +226,8 @@ beats:
   - id: NonExample
     shows: non_example
     say:
-      - {id: s1, pace: ask, text: "那 a 方加 b 方，{@t}也能这样剪了再补吗？", en: "So can a squared plus b squared be cut and fitted like this too?"}
-      - {id: s2, pace: normal, text: "这两个正方形分开放着，{@g}中间没有缺口可以补上。", en: "The two squares are apart, with no gap to fill, so this trick doesn't work."}
+      - {id: s1, pace: ask, text: "那 a 方加 b 方，{@t}也能这样剪了再补吗？", en: "So can a squared plus b squared {@t}be cut and fitted like this too?"}
+      - {id: s2, pace: normal, text: "这两个正方形分开放着，{@g}中间没有缺口可以补上。", en: "The two squares are apart, {@g}with no gap to fill, so this trick doesn't work."}
     do:
       - {at: s1@t, act: hide, target: dsq}
       - {after: prev, act: show, target: two}
@@ -227,9 +236,9 @@ beats:
   - id: Landing
     shows: landing
     say:
-      - {id: s1, pace: slow, text: "{@l}所以 a 方减 b 方，等于 a 加 b 乘 a 减 b。", en: "So a squared minus b squared equals a plus b times a minus b."}
-      - {id: s2, pace: normal, text: "{@l}长方形的长就是 a 加 b，{@w}宽就是 a 减 b。", en: "The rectangle's length is a plus b, and its width is a minus b."}
-      - {id: s3, pace: normal, text: "{@m}竖式里的二十一乘十九，就是二十方减一，三百九十九。", en: "Twenty-one times nineteen in long multiplication is twenty squared minus one: three hundred ninety-nine."}
+      - {id: s1, pace: slow, text: "{@l}所以 a 方减 b 方，等于 a 加 b 乘 a 减 b。", en: "{@l}So a squared minus b squared equals a plus b times a minus b."}
+      - {id: s2, pace: normal, text: "{@l}长方形的长就是 a 加 b，{@w}宽就是 a 减 b。", en: "{@l}The rectangle's length is a plus b, and {@w}its width is a minus b."}
+      - {id: s3, pace: normal, text: "{@m}竖式里的二十一乘十九，就是二十方减一，三百九十九。", en: "{@m}Twenty-one times nineteen in long multiplication is twenty squared minus one: three hundred ninety-nine."}
     do:
       - {at: s1, act: unmark, target: "two#Q"}
       - {with: prev, act: hide, target: two}
@@ -257,8 +266,8 @@ beats:
 
   - id: Close
     say:
-      - {id: s1, pace: normal, text: "{@x}和切一刀一样，剪下来再补上去，面积一点也不会变。", en: "Just like cutting a rectangle once, cutting and moving never changes the area."}
-      - {id: s2, pace: ask, text: "{@n}要是正方形旁边多贴了一条，能补成正方形吗？", en: "What if a strip is stuck on the side of a square? Can we make it a square?"}
+      - {id: s1, pace: normal, text: "{@x}和切一刀一样，剪下来再补上去，面积一点也不会变。", en: "{@x}Just like cutting a rectangle once, cutting and moving never changes the area."}
+      - {id: s2, pace: ask, text: "{@n}要是正方形旁边多贴了一条，能补成正方形吗？", en: "{@n}What if a strip is stuck on the side of a square? Can we make it a square?"}
     do:
       - {at: s1@x, act: mark, target: "wrong#w"}
       # 收成 #23 的开头画面：正方形加一条长条，右侧只留公式

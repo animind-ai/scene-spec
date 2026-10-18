@@ -111,11 +111,30 @@ objects:
     below: law
     gap: sm
 
+i18n:
+  en:
+    meta: {title: "Coin Flips: Why Frequencies Settle Down"}
+    objects:
+      q: {text: 'Probability of heads $=\dfrac{1}{2}$ ?'}
+      myth: {text: "[Heads is due?]{#m}"}
+      chart: {heads_text: "Heads"}
+      seq: {text: "First ten:"}
+      seq2: {text: "[HHHH]{#a .A}TT[HHH]{#b .A}T"}
+      streak: {text: "Flips 10–14: [TTTTT]{#s .NO}"}
+      next15: {text: "Flip 15: [?]{#q}"}
+      next15b: {text: "Flip 15: [T]{#q .NO}"}
+      after: {text: "[After 5 tails: 31 times]{#a}"}
+      after2: {text: "[Next flip heads: 15 times]{#b .HL}"}
+      law: {text: "[frequency = heads ÷ flips]{#l}"}
+    beats:
+      Hook: {pause: {prompt: "Five tails in a row. Which side for the sixth flip?"}}
+      Predict: {pause: {prompt: "By a thousand flips, where will the line settle?"}}
+
 beats:
   - id: Hook
     pause: {type: predict, prompt: 连着五次反面，第六次押哪一面？, hold: 3, app_item: ep36-before-1}
     say:
-      - {id: s1, pace: normal, text: "课间抛硬币猜正反，{@q}一连五次，落下来都是反面。", en: "At break, a few classmates flip a coin and call it. Five times in a row, it lands tails."}
+      - {id: s1, pace: normal, text: "课间抛硬币猜正反，{@q}一连五次，落下来都是反面。", en: "At break, a few classmates flip a coin and call it. {@q}Five times in a row, it lands tails."}
       - {id: s2, pace: ask, text: "要是你来押，第六次押哪一面？", en: "If you were betting, which side would you pick for the sixth flip?"}
     do:
       - {at: s1@q, act: show, target: q}
@@ -124,15 +143,15 @@ beats:
   - id: Myth
     shows: misconception
     say:
-      - {id: s1, pace: normal, text: "旁边有人说：正面的概率是二分之一，反面都五次了，{@m}这回该轮到正面了。", en: "Someone next to you says: heads has a one-half chance, and it's been tails five times, so heads is due now."}
+      - {id: s1, pace: normal, text: "旁边有人说：正面的概率是二分之一，反面都五次了，{@m}这回该轮到正面了。", en: "Someone next to you says: heads has a one-half chance, and it's been tails five times, so {@m}heads is due now."}
     do:
       - {at: s1@m, act: show, target: myth}
 
   - id: Setup
     say:
       - {id: s1, pace: normal, text: "我们一起看电脑模拟的一枚硬币，它正面反面机会一样。", en: "Let's look together. This is a computer-simulated coin; each flip, heads and tails are equally likely."}
-      - {id: s2, pace: normal, text: "{@s}前十次是：正正正正反反正正正反，七次正面。", en: "The first ten flips: heads, heads, heads, heads, tails, tails, heads, heads, heads, tails. Seven heads."}
-      - {id: s3, pace: normal, text: "{@d}七除以十是零点七，离二分之一还差得远。", en: "Seven divided by ten is zero point seven, far from one half."}
+      - {id: s2, pace: normal, text: "{@s}前十次是：正正正正反反正正正反，七次正面。", en: "{@s}The first ten flips: heads, heads, heads, heads, tails, tails, heads, heads, heads, tails. Seven heads."}
+      - {id: s3, pace: normal, text: "{@d}七除以十是零点七，离二分之一还差得远。", en: "{@d}Seven divided by ten is zero point seven, far from one half."}
     do:
       - {at: s2@s, act: show, target: seq}
       - {with: prev, act: show, target: seq2}
@@ -142,8 +161,8 @@ beats:
 
   - id: Streak
     say:
-      - {id: s1, pace: normal, text: "{@s}第十到第十四次一连出了五次反面。", en: "Then flips ten to fourteen: five tails in a row."}
-      - {id: s2, pace: normal, text: "第十五次呢？{@r}还是反面。硬币不记得前面出过什么。", en: "Flip fifteen? Tails again. The coin doesn't remember what came before."}
+      - {id: s1, pace: normal, text: "{@s}第十到第十四次一连出了五次反面。", en: "{@s}Then flips ten to fourteen: five tails in a row."}
+      - {id: s2, pace: normal, text: "第十五次呢？{@r}还是反面。硬币不记得前面出过什么。", en: "Flip fifteen? {@r}Tails again. The coin doesn't remember what came before."}
     do:
       - {at: s1@s, act: hide, target: f10}
       - {with: prev, act: show, target: streak}
@@ -153,9 +172,9 @@ beats:
 
   - id: Chart
     say:
-      - {id: s1, pace: normal, text: "{@c}把每次之后正面的比例画成折线，{@f}横轴是抛了几次。", en: "Draw the share of heads after each flip as a line; across is the number of flips so far."}
-      - {id: s2, pace: normal, text: "{@f}开头几次，折线上下乱跳。", en: "At first, the line jumps up and down."}
-      - {id: s3, pace: normal, text: "{@f}一百次里正面有四十六次，所以频率是零点四六。", en: "By a hundred flips: forty-six heads, a frequency of zero point four six."}
+      - {id: s1, pace: normal, text: "{@c}把每次之后正面的比例画成折线，{@f}横轴是抛了几次。", en: "{@c}Draw the share of heads after each flip as a line; {@f}across is the number of flips so far."}
+      - {id: s2, pace: normal, text: "{@f}开头几次，折线上下乱跳。", en: "{@f}At first, the line jumps up and down."}
+      - {id: s3, pace: normal, text: "{@f}一百次里正面有四十六次，所以频率是零点四六。", en: "{@f}By a hundred flips: forty-six heads, a frequency of zero point four six."}
     do:
       - {at: s1@c, act: hide, target: streak}
       - {with: prev, act: hide, target: next15b}
@@ -170,9 +189,9 @@ beats:
 
   - id: Settle
     say:
-      - {id: s1, pace: normal, text: "{@f}到一千次，正面四百九十八次，{@r}频率零点四九八。", en: "At a thousand flips: four hundred ninety-eight heads, a frequency of zero point four nine eight."}
-      - {id: s2, pace: normal, text: "{@r}再换四枚硬币各抛一千次，开头都乱跳，后来都挤到一半附近。", en: "Four more coins, a thousand flips each: they all jump around at first and all crowd near one half later."}
-      - {id: s3, pace: normal, text: "{@b}次数越多，折线被夹得越窄。", en: "The more flips, the narrower the lines are squeezed."}
+      - {id: s1, pace: normal, text: "{@f}到一千次，正面四百九十八次，{@r}频率零点四九八。", en: "{@f}At a thousand flips: four hundred ninety-eight heads, {@r}a frequency of zero point four nine eight."}
+      - {id: s2, pace: normal, text: "{@r}再换四枚硬币各抛一千次，开头都乱跳，后来都挤到一半附近。", en: "{@r}Four more coins, a thousand flips each: they all jump around at first and all crowd near one half later."}
+      - {id: s3, pace: normal, text: "{@b}次数越多，折线被夹得越窄。", en: "{@b}The more flips, the narrower the lines are squeezed."}
     do:
       - {at: s1@f, act: flip, target: chart, args: {to: 1000, expect: 498}, dur: 2.4}
       - {at: s1@r, act: show, target: f1000}
@@ -182,8 +201,8 @@ beats:
   - id: NonExample
     shows: non_example
     say:
-      - {id: s1, pace: normal, text: "再看连着五次反面的时候。{@a}这一千次里，这样的情况有三十一回。", en: "Now look at the times tails came up five in a row. In these thousand flips, that happened thirty-one times."}
-      - {id: s2, pace: normal, text: "{@b}下一次是正面的，十五回，{@x}差不多正好一半。", en: "The next flip was heads fifteen times, almost exactly half."}
+      - {id: s1, pace: normal, text: "再看连着五次反面的时候。{@a}这一千次里，这样的情况有三十一回。", en: "Now look at the times tails came up five in a row. {@a}In these thousand flips, that happened thirty-one times."}
+      - {id: s2, pace: normal, text: "{@b}下一次是正面的，十五回，{@x}差不多正好一半。", en: "{@b}The next flip was heads fifteen times, {@x}almost exactly half."}
     do:
       - {at: s1@a, act: hide, target: f1000}
       - {with: prev, act: show, target: after}
@@ -194,7 +213,7 @@ beats:
   - id: Landing
     shows: landing
     say:
-      - {id: s1, pace: slow, text: "{@l}所以概率二分之一，说的是抛很多次，频率会稳在一半附近。", en: "So a probability of one half means that over many flips, the frequency settles near one half."}
+      - {id: s1, pace: slow, text: "{@l}所以概率二分之一，说的是抛很多次，频率会稳在一半附近。", en: "{@l}So a probability of one half means that over many flips, the frequency settles near one half."}
       - {id: s2, pace: normal, text: "这是演示，不是证明：我们看见的是次数多了，频率才稳。", en: "This is a demonstration, not a proof: what we see is that with more flips, the frequency steadies."}
       - {id: s3, pace: normal, text: "频率变稳，靠的是次数多，不是后面去补前面。", en: "It steadies because of the sheer number of flips, not because later flips make up for earlier ones."}
     do:
