@@ -77,17 +77,17 @@ objects:
 
 beats:
   - id: Hook
-    pause: {type: predict, prompt: 已知有男孩，两个都是男孩的概率是多少？先猜一猜。, hold: 3, app_item: ep37-before-1}
+    pause: {type: predict, prompt: 至少一个男孩，两个都是男孩的可能有多大？, hold: 3, app_item: ep37-before-1}
     say:
-      - {id: s1, pace: ask, text: "{@q}已知有男孩，两个都是男孩的概率是多少？", en: "A family has two children, at least one a boy. What's the chance both are boys?"}
-      - {id: s2, pace: normal, text: "先猜一猜，想三秒钟。", en: "Take a guess. Think for three seconds."}
+      - {id: s1, pace: normal, text: "新搬来的邻居家有两个孩子，{@q}你只知道，其中至少有一个男孩。", en: "The new neighbours have two children. All you know is that at least one of them is a boy."}
+      - {id: s2, pace: ask, text: "不用算，凭感觉说：两个都是男孩的可能有多大？", en: "Don't calculate, just go with your gut: how likely is it that both are boys?"}
     do:
       - {at: s1@q, act: show, target: q}
 
   - id: Myth
     shows: misconception
     say:
-      - {id: s1, pace: normal, text: "很多人说{@m}二分之一：另一个不是男孩就是女孩。", en: "Lots of people say one half: the other child is either a boy or a girl."}
+      - {id: s1, pace: normal, text: "朋友脱口而出：{@m}二分之一，另一个不是男孩就是女孩嘛。", en: "A friend blurts out: one half, the other one is either a boy or a girl."}
     do:
       - {at: s1@m, act: show, target: myth}
 

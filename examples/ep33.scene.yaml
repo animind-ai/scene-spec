@@ -79,10 +79,10 @@ objects:
 
 beats:
   - id: Hook
-    pause: {type: predict, prompt: 为什么 i 的平方等于负一？先猜一猜。, hold: 3, app_item: ep33-before-1}
+    pause: {type: predict, prompt: 平方等于负一的数，能有吗？, hold: 3, app_item: ep33-before-1}
     say:
-      - {id: s1, pace: ask, text: "{@q}为什么 i 的平方等于负一？", en: "Why does i squared equal negative one?"}
-      - {id: s2, pace: normal, text: "先猜一猜，想三秒钟。", en: "Take a guess. Think for three seconds."}
+      - {id: s1, pace: normal, text: "四百多年前，数学家解三次方程，{@q}算到一半冒出了负数开平方。", en: "Over four hundred years ago, mathematicians solving cubic equations hit the square root of a negative number halfway through."}
+      - {id: s2, pace: ask, text: "一个平方等于负一的数，你觉得能有吗？", en: "A number whose square is negative one: do you think it can exist?"}
     do:
       - {at: s1@q, act: show, target: q}
       - {with: prev, act: show, target: plane}
@@ -91,7 +91,7 @@ beats:
   - id: Myth
     shows: misconception
     say:
-      - {id: s1, pace: normal, text: "很多人说，{@m}虚数是不存在的数，是硬编出来的。", en: "Lots of people say imaginary numbers don't exist; someone just made them up."}
+      - {id: s1, pace: normal, text: "当时不少人直摇头：{@m}这种数根本不存在，是硬编出来凑答案的。", en: "Plenty of people back then shook their heads: such numbers don't exist, they were just made up to force an answer."}
     do:
       - {at: s1@m, act: show, target: myth}
 

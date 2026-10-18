@@ -34,7 +34,7 @@ style:
 objects:
   q:
     type: text
-    text: '为什么堆成钟形？'
+    text: '球会怎么分布？'
     level: title
     in: top
   myth:
@@ -58,10 +58,10 @@ objects:
 
 beats:
   - id: Hook
-    pause: {type: predict, prompt: 小球左右乱弹，为什么会堆成钟的形状？先猜一猜。, hold: 3, app_item: ep38-before-1}
+    pause: {type: predict, prompt: 一大把球落下去，会怎么分布？, hold: 3, app_item: ep38-before-1}
     say:
-      - {id: s1, pace: ask, text: "{@q}小球左右乱弹，为什么会堆成钟的形状？", en: "Balls bounce left and right at random. Why do they pile into a bell shape?"}
-      - {id: s2, pace: normal, text: "先猜一猜，想三秒钟。", en: "Take a guess. Think for three seconds."}
+      - {id: s1, pace: normal, text: "游园会上有个弹珠游戏：{@q}小球一路碰着钉子，掉进七个格子。", en: "At the school fair there's a marble game: a ball bounces off pins all the way down and lands in one of seven slots."}
+      - {id: s2, pace: ask, text: "倒下一大把球，你猜它们会落成什么样子？", en: "Pour in a whole handful of balls. What shape do you think they will land in?"}
     do:
       - {at: s1@q, act: show, target: q}
       - {with: prev, act: show, target: board}
@@ -69,7 +69,7 @@ beats:
   - id: Myth
     shows: misconception
     say:
-      - {id: s1, pace: normal, text: "很多人觉得，{@m}七个格子机会一样，球该落得差不多平。", en: "Lots of people think the seven slots are equally likely, so the balls should land about flat."}
+      - {id: s1, pace: normal, text: "摊主说：{@m}七个格子机会一样，球该落得差不多平。", en: "The stall keeper says: all seven slots are equally likely, so the balls should land about flat."}
     do:
       - {at: s1@m, act: show, target: myth}
 

@@ -1,4 +1,5 @@
-# 洞察系列 #32 向量加法：首尾相接（高一）。单集。按脚本 insight/ep32-vector-addition/script.yaml（第 1 轮）写。
+# 洞察系列 #32 向量加法：首尾相接（高一）。单集。按脚本 insight/ep32-vector-addition/script.yaml 写；
+# 2026-10-18 换成情境式开场（Hook、Myth 两段，Setup 第一句时收起路线）：从家出门往东 4 公里、往北 3 公里，离家多远？
 # 一个洞察：向量只管长度和方向，平移不变，所以 a+b 是"先走 a 再走 b"——b 的尾巴接到 a 的头上（组件 plane 的 slide copy）。
 # 钩子问和的长度是不是长度相加、停三秒、说出"4+3=7"；a=(4,0)、b=(0,3) 首尾相接，和 (4,3)；预测暂停"有多长"；
 # 勾股定理得 5 ≠ 7；斜的一对 a=(3,1)、b=(1,2) 两种顺序拼成平行四边形，对角线是和；
@@ -62,19 +63,24 @@ objects:
     in: side
 
 beats:
+  # 开场情境：平面当地图，原点旁的第一格里一座小房子是家，一格一公里；路线用虚线画，Setup 第一句收起，换成正式的向量 a、b。
+  # plane 的标签只排公式（中文排不出），所以家画成房子形状、路线标 km
   - id: Hook
-    pause: {type: predict, prompt: 两支箭头相加，和的长度是长度相加吗？先猜一猜。, hold: 3, app_item: ep32-before-1}
+    pause: {type: predict, prompt: 往东走 4 公里、再往北走 3 公里，离家多远？, hold: 3, app_item: ep32-before-1}
     say:
-      - {id: s1, pace: ask, text: "{@q}两支箭头相加，和的长度是长度相加吗？", en: "Add two arrows: is the length of the sum the two lengths added?"}
-      - {id: s2, pace: normal, text: "先猜一猜，想三秒钟。", en: "Take a guess. Think for three seconds."}
+      - {id: s1, pace: ask, text: "{@h}你从家出门，{@e}往东走四公里，{@n}再往北走三公里，现在离家多远？", en: "You leave home, walk four kilometres east, then three kilometres north. How far are you from home now?"}
+      - {id: s2, pace: normal, text: "{@q}先别急着算，在心里估一估。", en: "Don't work it out yet. Just estimate it in your head."}
     do:
-      - {at: s1@q, act: show, target: q}
-      - {with: prev, act: show, target: plane}
+      - {at: s1@h, act: show, target: plane}
+      - {after: prev, act: shape, target: plane, args: {name: home, points: [[0.08, 0.08], [0.52, 0.08], [0.52, 0.36], [0.3, 0.6], [0.08, 0.36]], role: C}}
+      - {at: s1@e, act: vector, target: plane, args: {name: w1, v: [4, 0], role: DIM, label: '4\ \mathrm{km}', dashed: true}}
+      - {at: s1@n, act: vector, target: plane, args: {name: w2, v: [0, 3], at: [4, 0], role: DIM, label: '3\ \mathrm{km}', side: r, dashed: true}}
+      - {at: s2@q, act: show, target: q}
 
   - id: Myth
     shows: misconception
     say:
-      - {id: s1, pace: normal, text: "很多人会说：{@m}一支长四，一支长三，加起来就是七。", en: "Lots of people say: one is four long, one is three long, so together they're seven."}
+      - {id: s1, pace: normal, text: "路一共走了七公里，{@m}离家好像也该是七公里。", en: "You walked seven kilometres in all, so it seems you should be seven kilometres from home."}
     do:
       - {at: s1@m, act: show, target: myth}
 
@@ -84,6 +90,7 @@ beats:
       - {id: s2, pace: normal, text: "{@a}向量 a 向右四格，{@b}向量 b 向上三格。", en: "Vector a goes four squares right, vector b goes three squares up."}
       - {id: s3, pace: normal, text: "{@m}把箭头平移到别处，长度方向都没变，还是同一个向量。", en: "Slide an arrow somewhere else: same length, same direction, still the same vector."}
     do:
+      - {at: s1, act: remove, target: plane, args: {name: [w1, w2, home]}}
       - {at: s2@a, act: vector, target: plane, args: {name: a, v: [4, 0], label: '\vec a'}}
       - {at: s2@b, act: vector, target: plane, args: {name: b, v: [0, 3], role: C, label: '\vec b', side: r}}
       - {at: s3@m, act: slide, target: plane, args: {name: b, at: [4, 0], copy: b2}, dur: 1.4}

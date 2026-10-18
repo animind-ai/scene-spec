@@ -26,7 +26,7 @@ style:
   theme: paper
   canvas: "16:9"
   voice:
-    persona: peer-ms
+    persona: teacher-hs
     speed: 1.0
   segmented: true
   step_hold: 1.0
@@ -113,10 +113,10 @@ objects:
 
 beats:
   - id: Hook
-    pause: {type: predict, prompt: 十次不一定五次正面，那二分之一指什么？先猜一猜。, hold: 3, app_item: ep36-before-1}
+    pause: {type: predict, prompt: 连着五次反面，第六次押哪一面？, hold: 3, app_item: ep36-before-1}
     say:
-      - {id: s1, pace: ask, text: "{@q}十次不一定五次正面，那二分之一指什么？", en: "Ten flips don't always give five heads. So what does one half mean?"}
-      - {id: s2, pace: normal, text: "先猜一猜，想三秒钟。", en: "Take a guess. Think for three seconds."}
+      - {id: s1, pace: normal, text: "课间抛硬币猜正反，{@q}一连五次，落下来都是反面。", en: "At break, a few classmates flip a coin and call it. Five times in a row, it lands tails."}
+      - {id: s2, pace: ask, text: "要是你来押，第六次押哪一面？", en: "If you were betting, which side would you pick for the sixth flip?"}
     do:
       - {at: s1@q, act: show, target: q}
       - {with: prev, act: show, target: chart}
@@ -124,7 +124,7 @@ beats:
   - id: Myth
     shows: misconception
     say:
-      - {id: s1, pace: normal, text: "很多人觉得，{@m}连着五次反面，下一次一定该是正面了。", en: "Lots of people feel that after five tails in a row, the next one is bound to be heads."}
+      - {id: s1, pace: normal, text: "旁边有人说：正面的概率是二分之一，反面都五次了，{@m}这回该轮到正面了。", en: "Someone next to you says: heads has a one-half chance, and it's been tails five times, so heads is due now."}
     do:
       - {at: s1@m, act: show, target: myth}
 
@@ -182,7 +182,7 @@ beats:
   - id: NonExample
     shows: non_example
     say:
-      - {id: s1, pace: normal, text: "那连着五次反面之后呢？{@a}这一千次里，这种情况有三十一回。", en: "And after five tails in a row? In these thousand flips, that happened thirty-one times."}
+      - {id: s1, pace: normal, text: "再看连着五次反面的时候。{@a}这一千次里，这样的情况有三十一回。", en: "Now look at the times tails came up five in a row. In these thousand flips, that happened thirty-one times."}
       - {id: s2, pace: normal, text: "{@b}下一次是正面的，十五回，{@x}差不多正好一半。", en: "The next flip was heads fifteen times, almost exactly half."}
     do:
       - {at: s1@a, act: hide, target: f1000}
@@ -206,4 +206,4 @@ beats:
 
   - id: Close
     say:
-      - {id: s1, pace: ask, text: "一个个小球左右乱弹，为什么最后会堆成一座山？", en: "Little balls bounce left and right at random. Why do they end up piled into a hill?"}
+      - {id: s1, pace: ask, text: "为什么一个个小球左右乱弹，最后会堆成一座山？", en: "Why do little balls, bouncing left and right at random, end up piled into a hill?"}
