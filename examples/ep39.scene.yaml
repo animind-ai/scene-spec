@@ -140,10 +140,10 @@ objects:
 
 beats:
   - id: Hook
-    pause: {type: predict, prompt: 平方数相邻的差，再求一次差，为什么总是二？先猜一猜。, hold: 3, app_item: ep39-before-1}
+    pause: {type: predict, prompt: 差的差全是二，是巧合吗？, hold: 3, app_item: ep39-before-1}
     say:
-      - {id: s1, pace: ask, text: "平方数{@q}相邻的差，再求一次差，为什么总是二？", en: "Take the gaps between square numbers, then the gaps between those: why is it always two?"}
-      - {id: s2, pace: normal, text: "先猜一猜，想三秒。", en: "Take a guess. Think for three seconds."}
+      - {id: s1, pace: normal, text: "练习册上有道找规律题，{@q}开头是零、一、四、九、十六。", en: "A workbook has a find-the-pattern puzzle that starts zero, one, four, nine, sixteen."}
+      - {id: s2, pace: ask, text: "相邻的差再求一次差，全是二。这是巧合吗？", en: "Take the gaps, then the gaps between those: all twos. Is that a coincidence?"}
     do:
       # 开场：一下子摆出 #31 的片尾画面
       - {at: s1, act: show, target: sq01, dur: 0.01}
@@ -158,7 +158,7 @@ beats:
   - id: Myth
     shows: misconception
     say:
-      - {id: s1, pace: normal, text: "很多人觉得{@m}数列是数列，函数是函数，这种题只能背题型。", en: "Lots of people think sequences and functions are different worlds, and this is just a problem type to memorise."}
+      - {id: s1, pace: normal, text: "前桌摆摆手：{@m}这是数列题，跟函数不沾边，背题型就行。", en: "The kid in front waves it off: it's a sequence problem, nothing to do with functions, just memorise the type."}
     do:
       - {at: s1@m, act: show, target: myth}
 

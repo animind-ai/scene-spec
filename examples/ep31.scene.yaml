@@ -191,10 +191,10 @@ objects:
 
 beats:
   - id: Hook
-    pause: {type: predict, prompt: x 的平方的导数为什么是二 x？先猜一猜。, hold: 3, app_item: ep31-before-1}
+    pause: {type: predict, prompt: 扔掉角上一小块，这一步给不给分？, hold: 3, app_item: ep31-before-1}
     say:
-      - {id: s1, pace: ask, text: "x 的平方，{@q}在任意一点的导数，为什么是二 x？", en: "Why is the derivative of x squared, at any point, equal to two x?"}
-      - {id: s2, pace: normal, text: "先猜一猜，想三秒。", en: "Take a guess. Think for three seconds."}
+      - {id: s1, pace: normal, text: "推导 x 平方的导数，{@q}最后一步，角上一小块被直接扔掉了。", en: "When you work out the derivative of x squared, the last step simply throws away a little corner piece."}
+      - {id: s2, pace: ask, text: "要是你来批改，这一步给不给分？", en: "If you were marking it, would that step get the mark?"}
     do:
       # 开场：一下子摆出 #30 的片尾画面
       - {at: s1, act: show, target: g.axes, dur: 0.01}
@@ -211,7 +211,7 @@ beats:
   - id: Myth
     shows: misconception
     say:
-      - {id: s1, pace: normal, text: "很多人会算，却总觉得{@m}角上那一小块是硬丢掉的。", en: "Lots of people can do the algebra, but feel the little corner piece is just thrown away."}
+      - {id: s1, pace: normal, text: "后排同学不服：{@m}扔掉一块还说相等，二 x 只能算近似值。", en: "A classmate at the back objects: you threw a piece away and still call it equal, so two x is only an approximation."}
     do:
       - {at: s1@m, act: show, target: myth}
 
