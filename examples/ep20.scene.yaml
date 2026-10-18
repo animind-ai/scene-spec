@@ -1,16 +1,18 @@
-# 洞察系列 #20 √2 为什么不是分数（八年级）。单集。第 3 版：找一把能同时量完的尺子（2026-10-18 用户定）。
-# 按脚本 insight/ep20-sqrt2-irrational/script.yaml 写；第 1 版正方形留在 ep20-v1-squares.scene.yaml，第 2 版折叠留在 ep20-fold.scene.yaml。
-# 一个洞察：√2 = a/b 就是"有一把尺子能同时量完正方形的边和对角线"。拿边量对角线（dissect 的 fold：直角边转到斜边上）剩一截；
-# 拿这截量边（底边量掉一截，cut 切出小三角形），剩下的是更小正方形的对角线：又回到开头。再量一轮（第二次 fold + cut），
-# 镜头推近到小三角形、更小的三角形（放大 √2 + 1 倍一层），一层套一层；整数格不能一直变小，所以尺子不存在。
-# 开场先摆 7/5、17/12、41/29 三对只差一的数，迷思"总能碰上"；回扣 #7 通分（公分母 = 公共的尺子）；非例 12√2 ≈ 16.97。
-# 几何（b = 5 个图形单位）：C(0,0) B(5,0) A(0,5)；D = (5√2 − 5, 0)；C 折到 E(5/√2, 5 − 5/√2)；
-# 第二层：沿 D 角平分线 D→F 折，E 落到 G(4.1421, 0)，F(4.1421, 0.8579)；第三层小三角形 G-F-B 由 cut c3 切出。
+# 第 2 版（三角形折叠），2026-10-18 用户反馈「我没能理解」，换成 ep20.scene.yaml 的"找尺子"版；留档。
+# 洞察系列 #20 √2 为什么不是分数（八年级），三角形折叠版。按脚本 insight/ep20-sqrt2-irrational/archive/script-v2-fold.yaml 写；
+# 正方形版（Tennenbaum）是 ep20.scene.yaml，两版并排出片给用户选。
+# 一个洞察（几何无穷递降）：假设 √2 = a/b、b 最小，a² = b² + b²：直角边 b、斜边 a 的等腰直角三角形；沿上面那个角的平分线
+# 把左边的直角边折到斜边上（dissect 的 fold），斜边剩 a − b，右下角切出直角边 a − b、斜边 2b − a 的小等腰直角三角形；
+# 1 < √2 < 2 ⇒ b < a < 2b，新边长是更小的正整数，矛盾。再折一次表示一直缩小。
+# 画法：直角在 C(0,0)，B(5,0)，A(0,5)（b = 5 个图形单位），D = (5√2 − 5, 0)，C 折到 E = (5/√2, 5 − 5/√2)；
+# 第二次在 △DEB 里沿 D 角的平分线折，折痕 D→F，E 落到 G = (2·DE, 0) = F 的正下方。
+# 钩子问有没有分数平方正好是 2、停三秒、说出"差不多就是分数"；预测暂停"边长还是整数吗"；非例 7/5：49 和 50 差 1；
+# 落到 √2 是无理数，说明这是证明；结尾问 √2 的小数会不会循环（不问 √3：这个折法对 √3 不能照搬）。
 spec: "0.1"
 
 meta:
-  id: ep20
-  title: √2 为什么不是分数
+  id: ep20-fold
+  title: √2 为什么不是分数（折叠版）
   line: insight
   units: [J5]
   episode: 20
@@ -19,9 +21,9 @@ meta:
   license: CC-BY-4.0
 
 pedagogy:
-  insight: 根号二是分数，就是有一把尺子能同时量完正方形的边和对角线；拿边量对角线剩一截，拿这截量边剩下的是更小正方形的对角线，一层套一层永远量不完，整数格不能一直变小，所以尺子不存在
-  misconception: 七和五、十七和十二、四十一和二十九越来越接近，再找下去总能碰上一对正好相等的
-  non_example: 用十二分之一当尺子，边正好十二格，对角线却是十六点九七格，量不完
+  insight: 假设根号二等于 a 比 b 且 b 最小，就有直角边 b、斜边 a 的等腰直角三角形；把直角边折到斜边上，切出直角边 a 减 b、斜边二 b 减 a 的小等腰直角三角形，边长是更小的正整数，矛盾
+  misconception: 分数可以无限接近根号二，差不多就是分数了
+  non_example: 七比五很接近，但七的平方四十九，五的平方的两倍是五十，差一就不是相等
   status: proof
   landing: Landing
 
@@ -37,33 +39,16 @@ style:
 objects:
   q:
     type: text
-    text: '$a^2=2b^2\ ?$'
+    text: '$\left(\dfrac{a}{b}\right)^2=2\ ?$'
     level: title
     in: top
   myth:
     type: text
-    text: '[总能碰上？]{#m}'
+    text: '[差不多就是？]{#m}'
     role: "NO"
     level: title
     right_of: q
     gap: lg
-  n1:
-    type: text
-    text: '$7^2=49\qquad 2\times 5^2=50$'
-    level: display
-    in: stage
-  n2:
-    type: text
-    text: '$17^2=289\qquad 2\times 12^2=288$'
-    level: display
-    below: n1
-    gap: sm
-  n3:
-    type: text
-    text: '$41^2=1681\qquad 2\times 29^2=1682$'
-    level: display
-    below: n2
-    gap: sm
   tri:
     widget: dissect
     role: A
@@ -73,187 +58,165 @@ objects:
       T:
         polygon: [[0, 0], [5, 0], [0, 5]]
         edges:
-          - {at: [[0, 0], [0, 5]], text: '边'}
-          - {at: [[0, 0], [5, 0]], text: '边'}
-          - {at: [[0, 5], [5, 0]], text: '对角线'}
+          - {at: [[0, 0], [0, 5]], text: '$b$'}
+          - {at: [[0, 0], [5, 0]], text: '$b$'}
+          - {at: [[0, 5], [5, 0]], text: '$a$'}
     cuts:
-      # 拿边量对角线：A 角的平分线 A→D 当折痕，左边的边转到对角线上；拿那截量边：竖边 D→E 切出小三角形；
-      # 再量一轮：D 角的平分线 D→F 当折痕，竖边 G→F 切出第三层小三角形
+      # 折痕：A 角的平分线 A→D；落点 E 处的竖边 D→E；第二次折痕：D 角的平分线 D→F
       f1: {piece: T, line: [[0, 5], [2.0710678, 0]], into: [flap, rest]}
       c2: {piece: rest, line: [[2.0710678, 0], [3.5355339, 1.4644661]], into: [under, small]}
       f2: {piece: small, line: [[2.0710678, 0], [4.1421356, 0.8578644]], into: [flap2, rest2]}
-      c3: {piece: rest2, line: [[4.1421356, 0], [4.1421356, 0.8578644]], into: [under2, small2]}
     pieces:
-      flap: {edges: [{at: [[0, 5], [0, 0]], text: '边'}]}
+      flap: {edges: [{at: [[0, 5], [0, 0]], text: '$b$'}]}
       small: {role: HL}
-      small2: {role: HL}
     guides:
-      # 先用字说，代数那段再换成字母
-      eb0: {from: [3.5355339, 1.4644661], to: [5, 0], label: '一截', role: HL, solid: true, side: above}
-      cd0: {from: [0, 0], to: [2.0710678, 0], label: '一截', role: C, solid: true, side: below}
       eb: {from: [3.5355339, 1.4644661], to: [5, 0], label: '$a-b$', role: HL, solid: true, side: above}
+      ed: {from: [3.5355339, 1.4644661], to: [2.0710678, 0], label: '$a-b$', role: HL, solid: true, side: left}
       cd: {from: [0, 0], to: [2.0710678, 0], label: '$a-b$', role: C, solid: true, side: below}
       db: {from: [2.0710678, 0], to: [5, 0], label: '$2b-a$', role: HL, solid: true, side: below}
-      # 镜头对准用（不显示）：第二层、第三层小三角形的包围盒对角
-      z1: {from: [2.0710678, 0], to: [5, 1.4644661]}
-      z2: {from: [4.1421356, 0], to: [5, 0.8578644]}
-  r0:
-    type: text
-    text: '$\dfrac12=\dfrac36$，$\dfrac13=\dfrac26$'
-    level: title
-    in: side
-  r1:
-    type: text
-    text: '边 $b$ 格，对角线 $a$ 格'
-    level: title
-    below: r0
-    gap: md
-  re:
+  f1:
     type: text
     text: '$\sqrt{2}=\dfrac{a}{b}$'
     level: title
-    below: r1
-    gap: sm
-  r2:
+    in: side
+  fmin:
     type: text
-    text: '剩 $a-b$ 格'
-    role: HL
+    text: '[$b$ 最小]{#min}'
     level: title
-    below: re
+    below: f1
+    gap: sm
+  f2:
+    type: text
+    text: '$a^2=b^2+b^2$'
+    level: title
+    below: fmin
     gap: md
-  r2b:
+  f3:
     type: text
-    text: '再剩 $2b-a$ 格'
-    role: HL
+    text: '$b<a<2b$'
     level: title
-    below: r2
-    gap: sm
-  r3:
+    below: f2
+    gap: md
+  f5:
     type: text
     text: '$0<a-b<b$'
     role: HL
     level: title
-    below: r2b
+    below: f3
     gap: sm
-  ne:
+  f4a:
     type: text
-    text: '$12\sqrt{2}\approx 16.97$'
+    text: '$7^2=49$'
     role: "NO"
     level: title
-    below: r3
-    gap: md
+    in: side
+  f4b:
+    type: text
+    text: '$2\times 5^2=50$'
+    role: "NO"
+    level: title
+    below: f4a
+    gap: sm
 
 beats:
   - id: Hook
-    pause: {type: predict, prompt: 有没有一对数正好相等？你先猜一下，再往下看。, hold: 3, app_item: ep20-before-1}
+    pause: {type: predict, prompt: 有没有一个分数，平方以后正好等于二？先猜一猜。, hold: 3, app_item: ep20-before-1}
     say:
-      - {id: s1, pace: normal, text: "{@a}七方对五方的两倍，{@b}十七方对十二方的两倍，{@c}都只差一，{@q}能不能正好相等？", en: "Seven squared against twice five squared, seventeen squared against twice twelve squared: off by just one. Can they ever be exactly equal?"}
-      - {id: s2, pace: normal, text: "你先猜一下，再往下看。", en: "Make a guess first."}
+      - {id: s1, pace: ask, text: "{@q}有没有一个分数，平方以后正好等于二？", en: "Is there a fraction whose square is exactly two?"}
+      - {id: s2, pace: normal, text: "先猜一猜，想三秒钟。", en: "Take a guess. Think for three seconds."}
     do:
-      - {at: s1@a, act: show, target: n1}
-      - {at: s1@b, act: show, target: n2}
-      - {at: s1@c, act: show, target: n3}
       - {at: s1@q, act: show, target: q}
 
   - id: Myth
     shows: misconception
     say:
-      - {id: s1, pace: normal, text: "越往后越接近，{@m}好像再找下去，总能碰上正好相等的一对。", en: "They keep getting closer; it seems that if you keep looking, you'll hit a pair that's exactly equal."}
+      - {id: s1, pace: normal, text: "很多人觉得，{@m}分数能无限接近根号二，差不多就是分数了。", en: "Lots of people think fractions get so close to root two that it's basically a fraction."}
     do:
       - {at: s1@m, act: show, target: myth}
 
-  - id: Ruler
+  - id: Setup
     say:
-      - {id: s1, pace: normal, text: "{@c}我们一起看。还记得通分吗？{@r}找公分母，就是找一把小尺子。", en: "Let's look together. Remember common denominators? Finding one means finding a small ruler."}
-      - {id: s2, pace: normal, text: "用六分之一当尺子，二分之一和三分之一都能正好量完。", en: "A ruler of one sixth measures both one half and one third exactly."}
-      - {id: s3, pace: normal, text: "{@t}根号二是分数，就是说有一把尺子{@g}能同时量完正方形的边和对角线。", en: "Root two being a fraction means one ruler measures both the side and the diagonal of a square."}
+      - {id: s1, pace: normal, text: "我们先假设，{@f}根号二等于 a 比 b，a 和 b 都是正整数。", en: "First suppose root two equals a over b, with a and b whole numbers."}
+      - {id: s2, pace: normal, text: "这样的分数要是有，{@m}就取分母 b 最小的那一个。", en: "If such fractions exist, take the one whose denominator b is smallest."}
+      - {id: s3, pace: normal, text: "{@s}两边平方，a 方等于 b 方加 b 方。", en: "Square both sides: a squared equals b squared plus b squared."}
+      - {id: s4, pace: normal, text: "按勾股定理，{@t}这就是一个等腰直角三角形，两条直角边是 b，斜边是 a。", en: "By Pythagoras, that's an isosceles right triangle: both legs b, hypotenuse a."}
     do:
-      - {at: s1@c, act: hide, target: n1}
-      - {with: prev, act: hide, target: n2}
-      - {with: prev, act: hide, target: n3}
-      - {at: s1@r, act: show, target: r0}
-      - {at: s3@t, act: show, target: tri}
-      - {at: s3@g, act: show, target: r1}
-      - {with: prev, act: show, target: re}
+      - {at: s1@f, act: show, target: f1}
+      - {at: s2@m, act: show, target: fmin}
+      - {with: prev, act: mark, target: fmin}
+      - {at: s3@s, act: unmark, target: fmin}
+      - {with: prev, act: show, target: f2}
+      - {at: s4@t, act: show, target: tri}
 
-  - id: Measure
+  - id: Fold
     say:
-      - {id: s1, pace: normal, text: "{@f}先拿边去量对角线：量一次，{@r}还剩一截。", en: "First measure the diagonal with the side: it fits once, and a piece is left."}
-      - {id: s2, pace: normal, text: "再拿这一截去量边：{@m}量掉一段，{@c}剩下的这条线，", en: "Then measure the side with that piece: take off one piece, and the line that's left"}
-      - {id: s3, pace: normal, text: "{@s}正好是一个小正方形的对角线，小正方形的边就是那一截。", en: "is exactly the diagonal of a small square whose side is that piece."}
-      - {id: s4, pace: slow, text: "又回到开头：拿边去量对角线，只是全都变小了。", en: "We're back at the start: measuring a diagonal with a side, only everything is smaller."}
+      - {id: s1, pace: normal, text: "{@f}沿着上面这个角的平分线折一下，让左边的直角边贴到斜边上。", en: "Fold along the bisector of the top angle, so the left leg lies flat on the hypotenuse."}
+      - {id: s2, pace: normal, text: "折过去的这条边长 b，斜边长 a，{@r}所以斜边上还剩一段 a 减 b。", en: "The folded leg is b long and the hypotenuse is a, so a piece a minus b is left over."}
+      - {id: s3, pace: normal, text: "原来的直角落在了斜边上，{@c}所以右下角切出了一个小三角形。", en: "The right angle now sits on the hypotenuse, and it cuts off a small triangle in the bottom right."}
     do:
       - {at: s1@f, act: fold, target: tri, args: {cut: f1, flap: flap, back: C}, dur: 2.0}
-      - {at: s1@r, act: show, target: "tri#eb0"}
-      - {at: s2@m, act: show, target: "tri#cd0"}
-      - {at: s2@c, act: cut, target: tri, args: {cut: c2}, dur: 1.0}
-      - {at: s3@s, act: mark, target: "tri#small"}
-      - {at: s4, act: unmark, target: "tri#small"}
+      - {at: s2@r, act: show, target: "tri#eb"}
+      - {at: s3@c, act: cut, target: tri, args: {cut: c2}, dur: 1.0}
 
   - id: Predict
-    pause: {type: predict, prompt: 照这样一轮一轮量下去，会有量完的时候吗？, hold: 3, app_item: ep20-why-1}
+    pause: {type: predict, prompt: 这个小三角形，边长还是整数吗？, hold: 3, app_item: ep20-fold-why-1}
     say:
-      - {id: s1, pace: ask, text: "照这样一轮一轮量下去，会有量完的时候吗？", en: "Measuring round after round like this, will it ever come out exact?"}
+      - {id: s1, pace: ask, text: "这个小三角形，边长还是整数吗？", en: "Are this small triangle's sides still whole numbers?"}
 
-  - id: Zoom
+  - id: Count
     say:
-      - {id: s1, pace: normal, text: "{@f}再量一轮，{@c}还是剩一截，还是一样的形状。", en: "Another round: again a piece is left, again the same shape."}
-      - {id: s2, pace: slow, text: "{@z}把镜头推近，形状跟最开始一模一样，{@y}一层套一层，{@b}永远量不完。", en: "Zoom in, and the shape is exactly like the first one: nested again and again, never coming out exact."}
+      - {id: s1, pace: normal, text: "它的右下角也是四十五度，所以两条直角边一样长，{@e}都是 a 减 b。", en: "Its bottom-right angle is also forty-five degrees, so its two legs are equal: both a minus b."}
+      - {id: s2, pace: normal, text: "{@l}底边左边那段折上去就是这条边，也是 a 减 b，{@h}剩下的斜边是二 b 减 a。", en: "The left part of the bottom edge folded up into that leg, so it's a minus b too, and the rest, the small hypotenuse, is two b minus a."}
+      - {id: s3, pace: normal, text: "再看大小：一小于根号二小于二，{@i}所以 b 小于 a 小于二 b。", en: "Now sizes: one is less than root two, which is less than two, so b is less than a, which is less than two b."}
+      - {id: s4, pace: normal, text: "于是 a 减 b 和二 b 减 a 都是正整数，{@p}而且 a 减 b 比 b 小。", en: "So a minus b and two b minus a are both positive whole numbers, and a minus b is smaller than b."}
+      - {id: s5, pace: normal, text: "又是一个整数边的等腰直角三角形，直角边却比 b 还小，{@x}这就矛盾了。", en: "Again an isosceles right triangle with whole-number sides, but with legs shorter than b. That's a contradiction."}
     do:
-      - {at: s1, act: hide, target: "tri#eb0"}
-      - {with: prev, act: hide, target: "tri#cd0"}
-      - {at: s1@f, act: fold, target: tri, args: {cut: f2, flap: flap2, back: C}, dur: 1.6}
-      - {at: s1@c, act: cut, target: tri, args: {cut: c3}, dur: 0.8}
-      - {at: s2@z, act: hide, target: r0}
-      - {with: prev, act: hide, target: r1}
-      - {with: prev, act: hide, target: re}
-      - {with: prev, act: hide, target: "tri#flap"}
-      - {with: prev, act: hide, target: "tri#under"}
-      - {with: prev, act: camera, target: "tri#z1", args: {fit: true, margin: 0.4}, dur: 2.0}
-      - {at: s2@y, act: hide, target: "tri#flap2"}
-      - {with: prev, act: hide, target: "tri#under2"}
-      - {with: prev, act: camera, target: "tri#z2", args: {fit: true, margin: 0.4}, dur: 2.0}
-      - {at: s2@b, act: camera, args: {reset: true}, dur: 1.5}
-      - {with: prev, act: show, target: "tri#flap"}
-      - {with: prev, act: show, target: "tri#under"}
-      - {with: prev, act: show, target: "tri#flap2"}
-      - {with: prev, act: show, target: "tri#under2"}
+      - {at: s1@e, act: show, target: "tri#ed"}
+      - {at: s2@l, act: show, target: "tri#cd"}
+      - {at: s2@h, act: show, target: "tri#db"}
+      - {at: s3@i, act: show, target: f3}
+      - {at: s4@p, act: show, target: f5}
+      - {at: s5@x, act: mark, target: fmin}
 
-  - id: Algebra
+  - id: Again
     say:
-      - {id: s1, pace: normal, text: "{@g}要是真有那把尺子，边是 b 格，对角线是 a 格。", en: "If that ruler really existed, the side would be b rulers and the diagonal a rulers."}
-      - {id: s2, pace: normal, text: "{@a}剩下的那截是 a 减 b 格，{@d}下一轮剩二 b 减 a 格，{@s}还是整数格，而且更小。", en: "The leftover piece would be a minus b rulers, the next one two b minus a: still whole numbers, and smaller."}
-      - {id: s3, pace: normal, text: "整数格不能一直变小，早晚该量完，{@x}可图上永远量不完。", en: "Whole numbers can't keep shrinking, so it should end, but the picture never ends."}
+      - {id: s1, pace: normal, text: "{@f}在小三角形里还能再折一次，{@e}一个比一个小，正整数却不能一直变小。", en: "We can fold the small one again, smaller and smaller, but whole numbers can't keep shrinking."}
     do:
-      - {at: s1@g, act: show, target: r0}
-      - {with: prev, act: show, target: r1}
-      - {with: prev, act: show, target: re}
-      - {after: prev, act: mark, target: r1}
-      - {at: s2@a, act: unmark, target: r1}
-      - {with: prev, act: show, target: "tri#eb"}
-      - {with: prev, act: show, target: "tri#cd"}
-      - {with: prev, act: show, target: r2}
-      - {at: s2@d, act: show, target: "tri#db"}
-      - {with: prev, act: show, target: r2b}
-      - {at: s2@s, act: show, target: r3}
-      - {at: s3@x, act: mark, target: r3}
+      - {at: s1, act: unmark, target: fmin}
+      - {with: prev, act: hide, target: "tri#eb"}
+      - {with: prev, act: hide, target: "tri#ed"}
+      - {with: prev, act: hide, target: "tri#cd"}
+      - {with: prev, act: hide, target: "tri#db"}
+      - {at: s1@f, act: fold, target: tri, args: {cut: f2, flap: flap2, back: C}, dur: 1.8}
 
   - id: NonExample
     shows: non_example
     say:
-      - {id: s1, pace: normal, text: "{@c}十七比十二再接近：用十二分之一当尺子，{@d}对角线却是十六点九七格。", en: "Seventeen twelfths is close: with a ruler of one twelfth, the diagonal is still sixteen point nine seven rulers."}
+      - {id: s1, pace: normal, text: "{@c}那七比五呢？{@a}七的平方四十九，{@b}五的平方的两倍是五十。", en: "What about seven fifths? Seven squared is forty-nine; twice five squared is fifty."}
+      - {id: s2, pace: normal, text: "{@x}差一点就不是相等，再接近的分数，也只是差得更少。", en: "Off by a bit is not equal; closer fractions are only off by less."}
     do:
-      - {at: s1@c, act: unmark, target: r3}
-      - {at: s1@d, act: show, target: ne}
-      - {after: prev, act: cross, target: "myth#m"}
+      - {at: s1@c, act: hide, target: f1}
+      - {with: prev, act: hide, target: fmin}
+      - {with: prev, act: hide, target: f2}
+      - {with: prev, act: hide, target: f3}
+      - {with: prev, act: hide, target: f5}
+      - {at: s1@a, act: show, target: f4a}
+      - {at: s1@b, act: show, target: f4b}
+      - {at: s2@x, act: cross, target: "myth#m"}
 
   - id: Landing
     shows: landing
     say:
-      - {id: s1, pace: slow, text: "所以这把尺子不存在，{@e}根号二不能写成分数。", en: "So that ruler doesn't exist, and root two can't be written as a fraction."}
-      - {id: s2, pace: normal, text: "这是一个证明，只用到了量长度，和整数不能一直变小。", en: "This is a proof, using only measuring and the fact that whole numbers can't keep shrinking."}
+      - {id: s1, pace: slow, text: "{@c}所以根号二不能写成分数，它是一个无理数。", en: "So root two can't be written as a fraction. It is an irrational number."}
+      - {id: s2, pace: normal, text: "这是一个证明，只用到了折纸，和正整数不能一直变小。", en: "This is a proof, using only a fold and the fact that whole numbers can't shrink forever."}
     do:
-      - {at: s1@e, act: mark, target: re}
+      - {at: s1@c, act: hide, target: f4a}
+      - {with: prev, act: hide, target: f4b}
+      - {with: prev, act: show, target: f1}
+      - {with: prev, act: show, target: fmin}
+      - {with: prev, act: show, target: f2}
+      - {with: prev, act: show, target: f3}
+      - {with: prev, act: show, target: f5}
 
   - id: Close
     say:
