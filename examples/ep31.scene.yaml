@@ -1,9 +1,9 @@
-# 洞察系列 #31 为什么 (x²)′ = 2x（高二）。sums 系列第三集，接 #30、#39。
-# 按脚本 insight/ep31-derivative-x-squared/script.yaml（第 1 轮）写。
+# 洞察系列 #31 为什么 (x²)′ = 2x（高二）。sums 系列第三集，接 #30、#39。第 2 版：两把滚筒刷（2026-10-18 用户定）。
+# 按脚本 insight/ep31-derivative-x-squared/script.yaml（第 2 版）写。
 # 开场就是 #30 的片尾画面（抛物线、P 点、切线，右侧一句「换一个点呢？」，底部导数的定义）；钩子问 (x²)′ 为什么是 2x、停三秒、
-# 说出"角块是硬丢掉的"；x² 画成边长 x 的正方形，边长多长 dx，预测暂停后切出两条 x·dx 的长条和 dx² 的角块；
-# dx 从 1 缩到 0.5、0.1，角块缩得比长条快（0.1 时是长条的 1/40）；非例 dx = x 时角块和长条一样大；落到 (x²)′ = 2x。
-# 片尾画面是 #39 的开头画面。
+# 说出"角块是硬丢掉的"；x² 是边长 x 的正方形草坪，边每秒长 1；右边、上边各一把长 x 的滚筒刷往外推，刷过的就是新面积；
+# 读数：边长 3 每秒刷 6，边长 5 每秒刷 10 → 每秒刷 2x；角上补的小方块放大看，推 dx 时是 dx²，越短小得越快；
+# 非例 dx = x 时角块和长条一样大；落到 (x²)′ = 2x。片尾画面（dx = 0.1 的正方形、底部公式、右侧下一集的问题）和第 1 版一样，#39 接它。
 spec: "0.1"
 
 meta:
@@ -17,9 +17,9 @@ meta:
   license: CC-BY-4.0
 
 pedagogy:
-  insight: x 的平方是边长 x 的正方形面积；边长多长一点 dx，多出两条 x 乘 dx 的长条和一个 dx 乘 dx 的角块；除以 dx 是 2x 加 dx，dx 趋近于零就是 2x
+  insight: 边长 x 的正方形草坪往外长，就像右边、上边各有一把长 x 的滚筒刷往外推；刷过的就是新长的面积，所以面积每秒长 2x；两把刷子在角上补出的小方块，推得越短小得越快
   misconception: 角上那一小块是硬丢掉的，所以 2x 只是个近似
-  non_example: dx 不小的时候角块丢不得：dx 等于 x 时，角块和一条长条一样大
+  non_example: 推得不短的时候角块丢不得：推出 x 那么远，角块和一条一样大
   status: proof
   landing: Landing
 
@@ -78,23 +78,13 @@ objects:
   grow:
     type: text
     text: '$(x+dx)^2-x^2$'
-    below: myth
+    below: rd2x
     gap: lg
   grow2:
     type: text
     text: '[$=$]{#e} [$2x\,dx$]{#s .B} [$+\,dx^2$]{#c .C}'
     below: grow
     gap: sm
-  rate:
-    type: text
-    text: '[$\div dx:$]{#l} [$2x$]{#a .HL} [$+\,dx$]{#d}'
-    below: grow2
-    gap: md
-  ratio:
-    type: text
-    text: '[$dx^2\div(x\,dx)$]{#l} [$=\frac{1}{40}$]{#r .HL}'
-    below: rate
-    gap: md
   nq:
     type: text
     text: '边长只能取整数呢？'
@@ -112,35 +102,6 @@ objects:
     text: '$x=1\ \to\ 2$'
     right_of: law
     gap: lg
-  sq1:
-    widget: dissect
-    role: A
-    in: stage
-    view: [[-1.2, -1.2], [6.8, 5.6]]
-    shapes:
-      S: {rect: [4, 4], label: '$x^2$', edges: [{at: [[0, 0], [4, 0]], text: '$x$'}, {at: [[0, 0], [0, 4]], text: '$x$'}]}
-      R: {rect: [1, 4], at: [4, 0], hidden: true, role: B}
-      T: {rect: [4, 1], at: [0, 4], hidden: true, role: B, label: '$x\,dx$'}
-      C: {rect: [1, 1], at: [4, 4], hidden: true, role: C}
-    guides:
-      dxr: {from: [4, -0.5], to: [5, -0.5], label: '$dx$', role: HL, side: below, solid: true}
-      dxt: {from: [-0.5, 4], to: [-0.5, 5], label: '$dx$', role: HL, side: left, solid: true}
-      b1: {from: [5, 0], to: [5, 5], role: HL}
-      b2: {from: [0, 5], to: [5, 5], role: HL}
-      cl: {from: [5.4, 4], to: [5.4, 5], label: '$dx^2$', role: C, side: right}
-      rl: {from: [5.4, 0], to: [5.4, 4], label: '$x\,dx$', role: B, side: right}
-  sq05:
-    widget: dissect
-    role: A
-    in: stage
-    view: [[-1.2, -1.2], [6.8, 5.6]]
-    shapes:
-      S: {rect: [4, 4], label: '$x^2$'}
-      R: {rect: [0.5, 4], at: [4, 0], role: B}
-      T: {rect: [4, 0.5], at: [0, 4], role: B}
-      C: {rect: [0.5, 0.5], at: [4, 4], role: C}
-    guides:
-      d: {from: [4, -0.5], to: [4.5, -0.5], label: '$dx=0.5$', role: HL, side: below, solid: true}
   sq01:
     widget: dissect
     role: A
@@ -165,6 +126,54 @@ objects:
       C: {rect: [4, 4], at: [4, 4], role: "NO", label: '$dx^2$'}
     guides:
       d: {from: [4, -0.5], to: [8, -0.5], label: '$dx=x$', role: "NO", side: below, solid: true}
+
+  # 本集
+  sq3:
+    widget: dissect
+    role: A
+    in: stage
+    view: [[-1.2, -1.2], [7.6, 7.4]]
+    shapes:
+      S: {rect: [3, 3], label: '$x^2$', edges: [{at: [[0, 0], [3, 0]], text: '$x=3$'}]}
+      R: {rect: [1, 3], at: [3, 0], hidden: true, role: B}
+      T: {rect: [3, 1], at: [0, 3], hidden: true, role: B}
+      C: {rect: [1, 1], at: [3, 3], hidden: true, role: C}
+      RR: {rect: [0.25, 3], at: [3, 0], hidden: true, role: HL}
+      RT: {rect: [3, 0.25], at: [0, 3], hidden: true, role: HL}
+    guides:
+      lr: {from: [3.6, 0], to: [3.6, 3], label: '刷子长 $x$', role: HL, side: right}
+      lt: {from: [0, 3.6], to: [3, 3.6], label: '刷子长 $x$', role: HL, side: above}
+  sq5:
+    widget: dissect
+    role: A
+    in: stage
+    view: [[-1.2, -1.2], [7.6, 7.4]]
+    shapes:
+      S: {rect: [5, 5], label: '$x^2$', edges: [{at: [[0, 0], [5, 0]], text: '$x=5$'}]}
+      R: {rect: [1, 5], at: [5, 0], hidden: true, role: B}
+      T: {rect: [5, 1], at: [0, 5], hidden: true, role: B}
+      C: {rect: [1, 1], at: [5, 5], hidden: true, role: C}
+      RR: {rect: [0.25, 5], at: [5, 0], hidden: true, role: HL}
+      RT: {rect: [5, 0.25], at: [0, 5], hidden: true, role: HL}
+    guides:
+      lr: {from: [5.6, 0], to: [5.6, 5], label: '刷子长 $x$', role: HL, side: right}
+      lt: {from: [0, 5.6], to: [5, 5.6], label: '刷子长 $x$', role: HL, side: above}
+  rd3:
+    type: text
+    text: '[每秒刷]{#l} [$2\times 3=6$]{#r .HL}'
+    below: myth
+    gap: lg
+  rd5:
+    type: text
+    text: '[每秒刷]{#l} [$2\times 5=10$]{#r .HL}'
+    below: myth
+    gap: lg
+  rd2x:
+    type: text
+    text: '[每秒刷]{#l} [$2x$]{#r .HL}'
+    level: title
+    below: rd5
+    gap: sm
 
 beats:
   - id: Hook
@@ -195,71 +204,80 @@ beats:
   - id: Setup
     say:
       - {id: s1, pace: normal, text: "上一集我们在一这个点算出斜率是二，{@v}这次换个看法。", en: "Last time we found the slope at one is two. This time, a different view."}
-      - {id: s2, pace: normal, text: "{@sq}x 的平方，就是边长为 x 的正方形的面积。", en: "x squared is the area of a square with side x."}
-      - {id: s3, pace: normal, text: "让边长多长一点点，{@dx}记作 d x，面积多出多少？", en: "Let the side grow by a tiny bit, call it dx. How much area is added?"}
+      - {id: s2, pace: normal, text: "{@sq}x 的平方，就是一块边长为 x 的正方形草坪的面积。", en: "x squared is the area of a square lawn with side x."}
+      - {id: s3, pace: normal, text: "草坪的边每秒往外长一，面积每秒多出多少？", en: "The lawn's edges move out by one every second. How much area does it gain per second?"}
     do:
       - {at: s1@v, act: hide, target: g}
-      - {at: s2@sq, act: show, target: sq1}
-      - {at: s3@dx, act: show, target: "sq1#dxr"}
-      - {with: prev, act: show, target: "sq1#dxt"}
+      - {at: s2@sq, act: show, target: sq3}
 
   - id: Predict
-    pause: {type: predict, prompt: 多出来的那一圈，是由哪几块拼成的？, hold: 3, app_item: ep31-why-1}
+    pause: {type: predict, prompt: 想象两把滚筒刷推着边往外走，每秒能刷多少？, hold: 3, app_item: ep31-why-1}
     say:
-      - {id: s1, pace: ask, text: "{@b}多出来的那一圈，是由哪几块拼成的？", en: "That extra band around the square: which pieces is it made of?"}
+      - {id: s1, pace: ask, text: "想象{@r}两把滚筒刷推着边往外走，每秒能刷多少？", en: "Picture two paint rollers pushing the edges outward. How much do they cover each second?"}
     do:
-      - {at: s1@b, act: show, target: "sq1#b1"}
-      - {with: prev, act: show, target: "sq1#b2"}
+      - {at: s1@r, act: show, target: "sq3#RR"}
+      - {with: prev, act: show, target: "sq3#RT"}
 
-  - id: Grow
+  - id: Brush
     say:
-      - {id: s1, pace: normal, text: "还记得把长方形切开吗？{@r}右边一条，{@t}上边一条，都是 x 乘 d x。", en: "Remember cutting a rectangle into pieces? One strip on the right, one on top, each x times dx."}
-      - {id: s2, pace: normal, text: "{@c}右上角还剩一小块，d x 乘 d x。", en: "And in the top right corner, one small piece: dx times dx."}
-      - {id: s3, pace: normal, text: "{@g}多出的面积是二 x 乘 d x，加上 d x 的平方。", en: "So the added area is two x dx, plus dx squared."}
-      - {id: s4, pace: normal, text: "再除以 d x，{@r}就是面积长得有多快，二 x 加 d x。", en: "Divide by dx to get how fast the area grows: two x plus dx."}
+      - {id: s1, pace: normal, text: "{@a}右边一把，{@b}上边一把，每把刷子都和边一样长，是 x。", en: "One roller on the right, one on top, each exactly as long as the side: x."}
+      - {id: s2, pace: normal, text: "{@p}刷子往外推，刷过的地方，就是新长出来的草坪。", en: "Push the rollers out, and whatever they sweep is the new lawn."}
+      - {id: s3, pace: normal, text: "边长三的时候，两把各刷三，{@r}每秒刷六。", en: "When the side is three, each roller sweeps three: six per second."}
+      - {id: s4, pace: normal, text: "{@five}边长五的时候，每把刷子长五，{@r}每秒刷十。", en: "When the side is five, each sweeps five: ten per second."}
+      - {id: s5, pace: slow, text: "两把刷子，每把长 x，{@x}所以每秒刷二 x。", en: "Two rollers, each x long, so they cover two x per second."}
     do:
-      - {at: s1, act: hide, target: "sq1#b1"}
-      - {with: prev, act: hide, target: "sq1#b2"}
-      - {at: s1@r, act: show, target: "sq1#R"}
-      - {with: prev, act: show, target: "sq1#rl"}
-      - {at: s1@t, act: show, target: "sq1#T"}
-      - {at: s2@c, act: show, target: "sq1#C"}
-      - {with: prev, act: show, target: "sq1#cl"}
-      - {at: s3@g, act: show, target: grow}
-      - {with: prev, act: show, target: grow2}
-      - {at: s4@r, act: show, target: rate}
+      - {at: s1@a, act: show, target: "sq3#lr"}
+      - {at: s1@b, act: show, target: "sq3#lt"}
+      - {at: s2@p, act: hide, target: "sq3#lr"}
+      - {with: prev, act: hide, target: "sq3#lt"}
+      - {after: prev, act: shift, target: sq3, args: {piece: RR, by: [1, 0]}, dur: 1.2}
+      - {with: prev, act: show, target: "sq3#R", dur: 1.2}
+      - {with: prev, act: shift, target: sq3, args: {piece: RT, by: [0, 1]}, dur: 1.2}
+      - {with: prev, act: show, target: "sq3#T", dur: 1.2}
+      - {at: s3@r, act: show, target: rd3}
+      - {at: s4@five, act: hide, target: sq3}
+      - {with: prev, act: show, target: sq5}
+      - {with: prev, act: show, target: "sq5#RR"}
+      - {with: prev, act: show, target: "sq5#RT"}
+      - {after: prev, act: shift, target: sq5, args: {piece: RR, by: [1, 0]}, dur: 1.0}
+      - {with: prev, act: show, target: "sq5#R", dur: 1.0}
+      - {with: prev, act: shift, target: sq5, args: {piece: RT, by: [0, 1]}, dur: 1.0}
+      - {with: prev, act: show, target: "sq5#T", dur: 1.0}
+      - {at: s4@r, act: hide, target: rd3}
+      - {with: prev, act: show, target: rd5}
+      - {at: s5@x, act: show, target: rd2x}
+      - {after: prev, act: mark, target: "rd2x#r"}
 
-  - id: Shrink
+  - id: Corner
     say:
-      - {id: s1, pace: normal, text: "现在让这一小段 d x 变短，从一，{@h}到零点五，{@t}再到零点一。", en: "Now let dx shrink: from one, to a half, to a tenth."}
-      - {id: s2, pace: normal, text: "长条只是变窄，{@c}角块却缩得快得多，因为它的两条边都在缩。", en: "The strips just get thinner, but the corner shrinks much faster, because both its sides shrink."}
-      - {id: s3, pace: normal, text: "d x 等于零点一时，{@r}角块只有一条长条的四十分之一。", en: "At dx equal to a tenth, the corner is just a fortieth of one strip."}
+      - {id: s1, pace: normal, text: "那角上呢？{@c}两把刷子都没刷到，补出一个小方块。", en: "And the corner? Neither roller sweeps it, so a little square fills the gap."}
+      - {id: s2, pace: normal, text: "{@s}只推一小段 d x，它就是 d x 乘 d x，推得越短，小得越快。", en: "Push only a little dx and it's dx by dx: the shorter the push, the faster it shrinks."}
+      - {id: s3, pace: normal, text: "{@g}两条长条是 x 乘 d x，{@c}角块和它们一比，几乎没有。", en: "The strips are x times dx; next to them the corner is almost nothing."}
     do:
-      - {at: s1@h, act: hide, target: sq1}
-      - {with: prev, act: show, target: sq05}
-      - {with: prev, act: show, target: "sq05#d"}
-      - {at: s1@t, act: hide, target: sq05}
+      - {at: s1, act: unmark, target: "rd2x#r"}
+      - {at: s1@c, act: show, target: "sq5#C"}
+      - {after: prev, act: camera, target: "sq5#C", args: {zoom: 3}, dur: 1.5}
+      - {at: s2@s, act: camera, args: {reset: true}, dur: 1.0}
+      - {after: prev, act: hide, target: sq5}
       - {with: prev, act: show, target: sq01}
       - {with: prev, act: show, target: "sq01#d"}
-      - {at: s2@c, act: mark, target: "grow2#c"}
-      - {at: s3@r, act: unmark, target: "grow2#c"}
-      - {with: prev, act: show, target: ratio}
+      - {at: s3@g, act: show, target: grow}
+      - {with: prev, act: show, target: grow2}
+      - {at: s3@c, act: mark, target: "grow2#c"}
 
   - id: NonExample
     shows: non_example
     say:
-      - {id: s1, pace: normal, text: "可要是 d x 不小，{@big}比如 d x 就等于 x 呢？", en: "But what if dx isn't small, say dx is as big as x?"}
-      - {id: s2, pace: normal, text: "{@c}角块和一条长条一样大，这时候它可就丢不得了。", en: "The corner is as big as a strip. Here you can't drop it at all."}
+      - {id: s1, pace: normal, text: "可要是{@big}一下推出 x 那么远，{@c}角块就和一条一样大，丢不得。", en: "But push all the way out by x in one go and the corner is as big as a strip. You can't drop it."}
     do:
       - {at: s1@big, act: hide, target: sq01}
       - {with: prev, act: show, target: sq4}
       - {with: prev, act: show, target: "sq4#d"}
-      - {at: s2@c, act: mark, target: "grow2#c"}
 
   - id: Landing
     shows: landing
     say:
-      - {id: s1, pace: slow, text: "{@back}d x 趋近于零，{@a}二 x 加 d x 就趋近于二 x。", en: "As dx goes to zero, two x plus dx tends to two x."}
+      - {id: s1, pace: slow, text: "{@back}所以面积长得有多快，{@a}就看两把刷子有多长，二 x。", en: "So how fast the area grows is just how long the two rollers are: two x."}
       - {id: s2, pace: slow, text: "{@law}所以 x 平方的导数是二 x。", en: "So the derivative of x squared is two x."}
       - {id: s3, pace: normal, text: "{@k}代 x 等于一，正好就是上一集算出的斜率二。", en: "Put x equal to one and you get two, the slope we found last time."}
       - {id: s4, pace: normal, text: "角块不是硬丢的，{@x}而是它比长条小得越来越快。", en: "The corner isn't thrown away: it just gets small much faster than the strips."}
@@ -268,7 +286,7 @@ beats:
       - {with: prev, act: hide, target: sq4}
       - {after: prev, act: show, target: sq01}
       - {with: prev, act: show, target: "sq01#d"}
-      - {at: s1@a, act: mark, target: "rate#a"}
+      - {at: s1@a, act: mark, target: "rd2x#r"}
       - {at: s2@law, act: show, target: law}
       - {at: s3@k, act: show, target: chk}
       - {at: s4@x, act: cross, target: "myth#m"}
@@ -279,11 +297,11 @@ beats:
       - {id: s2, pace: ask, text: "{@q}如果边长只能取整数，d x 最小是一，角块还能丢吗？", en: "Next: if the side can only be a whole number, so dx is at least one, can we still drop the corner?"}
     do:
       # 片尾画面：dx = 0.1 的正方形、底部 (x²)′ = 2x 和右侧一句下一集的问题，不留叠加层，#39 开场好还原
-      - {at: s1, act: unmark, target: "rate#a"}
+      - {at: s1, act: unmark, target: "rd2x#r"}
       - {with: prev, act: hide, target: qx}
       - {with: prev, act: hide, target: myth}
+      - {with: prev, act: hide, target: rd5}
+      - {with: prev, act: hide, target: rd2x}
       - {with: prev, act: hide, target: grow}
       - {with: prev, act: hide, target: grow2}
-      - {with: prev, act: hide, target: rate}
-      - {with: prev, act: hide, target: ratio}
       - {at: s2@q, act: show, target: nq}
