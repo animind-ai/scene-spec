@@ -110,10 +110,10 @@ objects:
 
 beats:
   - id: Hook
-    pause: {type: predict, prompt: 6 ÷ 2/3 比 6 大还是小？先猜一下。, hold: 3, app_item: ep09-before-1}
+    pause: {type: predict, prompt: 6 米彩带每 2/3 米一段，比六段多还是少？, hold: 3, app_item: ep09-before-1}
     say:
-      - {id: s1, pace: ask, text: "六除以三分之二，{@q}比六大，还是比六小？", en: "Six divided by two thirds: is it bigger than six, or smaller?"}
-      - {id: s2, pace: normal, text: "先猜一下，想三秒。", en: "Take a guess. Think for three seconds."}
+      - {id: s1, pace: ask, text: "六米长的彩带，每三分之二米剪一段，{@q}能剪几段？", en: "A ribbon six meters long, cut into pieces two thirds of a meter each. How many pieces?"}
+      - {id: s2, pace: normal, text: "比六段多，还是比六段少？你先选一个。", en: "More than six pieces, or fewer? Pick one first."}
     do:
       # 开场：#8 的片尾画面
       - {at: s1, act: show, target: line, dur: 0.01}
@@ -123,7 +123,7 @@ beats:
   - id: Myth
     shows: misconception
     say:
-      - {id: s1, pace: normal, text: "很多人说更小，{@m}因为除法一定让数变小。", en: "Most people say smaller, because dividing always makes things smaller."}
+      - {id: s1, pace: normal, text: "小林摇摇头：{@m}除法会让数变小，肯定不到六段。", en: "Lin shakes their head: dividing makes things smaller, so it's fewer than six."}
     do:
       - {at: s1, act: unmark, target: q0}
       - {after: prev, act: transform, from: q0, to: q}

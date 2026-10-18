@@ -69,24 +69,24 @@ objects:
 
 beats:
   - id: Hook
-    pause: {type: predict, prompt: 二分之一和四分之二，哪个大？先猜一下。, hold: 3, app_item: ep06-before-1}
+    pause: {type: predict, prompt: 哥哥走了二分之一，妹妹走了四分之二，谁走得远？, hold: 3, app_item: ep06-before-1}
     say:
-      - {id: s1, pace: ask, text: "{@q}二分之一和四分之二，哪个大？", en: "Which is bigger: one half or two fourths?"}
-      - {id: s2, pace: normal, text: "先猜一下，想三秒。", en: "Take a guess. Think for three seconds."}
+      - {id: s1, pace: ask, text: "同一条上学的路，哥哥走了{@q}二分之一，妹妹走了四分之二，谁走得远？", en: "On the same road to school, big brother has walked one half and little sister two fourths. Who has gone farther?"}
+      - {id: s2, pace: normal, text: "先别急着下结论，在心里比一比。", en: "Don't decide too fast. Compare them in your head."}
     do:
       - {at: s1@q, act: show, target: hook}
 
   - id: Myth
     shows: misconception
     say:
-      - {id: s1, pace: normal, text: "很多人选四分之二，{@big}因为数字更大。", en: "A lot of people pick two fourths, because its numbers are bigger."}
+      - {id: s1, pace: normal, text: "妹妹很得意：{@big}四分之二，数字更大，我走得更远。", en: "Little sister is proud: two fourths has bigger numbers, so I went farther."}
     do:
       - {at: s1@big, act: focus, target: "hook#r"}
 
   - id: NumberLine
     say:
       - {id: s1, pace: normal, text: "{@l}我们画一条从零到一的数轴，{@cut}切成一样长的两份。", en: "Let's draw a number line from zero to one, and cut it into two equal pieces."}
-      - {id: s2, pace: slow, text: "{@p}正中间就是二分之一。亮的是数，淡的是尺子。", en: "Right in the middle is one half. The bright dot is the number; the faint line is the ruler."}
+      - {id: s2, pace: slow, text: "{@p}正中间这一点就是二分之一，亮的是数，淡的是尺子。", en: "Right in the middle is one half. The bright dot is the number; the faint line is the ruler."}
     do:
       - {at: s1, act: unfocus, target: hook}
       - {with: prev, act: hide, target: hook}

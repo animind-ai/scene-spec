@@ -101,10 +101,10 @@ objects:
 
 beats:
   - id: Hook
-    pause: {type: predict, prompt: 2/3 × 3/4 比 3/4 大还是小？先猜一下。, hold: 3, app_item: ep08-before-1}
+    pause: {type: predict, prompt: 2/3 × 3/4 会比 3/4 大吗？, hold: 3, app_item: ep08-before-1}
     say:
-      - {id: s1, pace: ask, text: "三分之二乘四分之三，{@q}会比四分之三大吗？", en: "Is two thirds times three fourths bigger than three fourths?"}
-      - {id: s2, pace: normal, text: "先猜一下，想三秒。", en: "Take a guess. Think for three seconds."}
+      - {id: s1, pace: ask, text: "数学课上，老师写下{@q}三分之二乘四分之三：结果会比四分之三大吗？", en: "In math class, the teacher writes two thirds times three fourths. Will the answer be bigger than three fourths?"}
+      - {id: s2, pace: normal, text: "你的直觉是什么？先拿个主意。", en: "What does your gut say? Make up your mind first."}
     do:
       # 开场：#7 的片尾画面
       - {at: s1, act: show, target: line, dur: 0.01}
@@ -115,7 +115,7 @@ beats:
   - id: Myth
     shows: misconception
     say:
-      - {id: s1, pace: normal, text: "很多人觉得一定更大，{@m}因为乘法会让数变大。", en: "Plenty of people say bigger, for sure, because multiplying makes things bigger."}
+      - {id: s1, pace: normal, text: "后排有人抢着答：{@m}更大，乘法总会让数变大。", en: "Someone in the back row calls out: bigger! Multiplying always makes things bigger."}
     do:
       - {at: s1, act: unmark, target: q0}
       - {after: prev, act: transform, from: q0, to: q}
