@@ -47,6 +47,12 @@ objects:
     role: "NO"
     level: title
     in: side
+  per:
+    # 开场情境：和 myth 同一个位置，Myth 里换成 myth
+    type: text
+    text: '[平均每人几只？]{#g}'
+    level: title
+    in: side
   avg:
     type: text
     text: '[$(5+2+6+3)\div 4$]{#sum} [$=16\div 4$]{#mid} [$=4$]{#res .HL}'
@@ -65,19 +71,21 @@ objects:
 
 beats:
   - id: Hook
-    pause: {type: predict, prompt: 平均数为什么能代表一组数？先猜一猜。, hold: 3, app_item: ep35-before-1}
+    pause: {type: predict, prompt: 平均每人几只，这个数代表谁？, hold: 3, app_item: ep35-before-1}
     say:
-      - {id: s1, pace: ask, text: "{@q}平均数为什么能代表一组数？", en: "Why can the mean stand for a whole list of numbers?"}
-      - {id: s2, pace: normal, text: "先猜一猜，想三秒。", en: "Take a guess. Think for three seconds."}
+      - {id: s1, pace: ask, text: "{@g}折纸鹤比赛要报一个“平均每人几只”，这个数代表谁呢？", en: "The paper-crane contest wants one number: cranes per person, on average. Whose number is that?"}
+      - {id: s2, pace: ask, text: "停一下，你心里有答案吗？", en: "Pause here. Do you have an answer?"}
     do:
       - {at: s1, act: show, target: bars}
+      - {at: s1@g, act: show, target: per}
 
   - id: Myth
     shows: misconception
     say:
-      - {id: s1, pace: normal, text: "很多人以为，{@m}平均数一定是这几个数里的一个。", en: "Lots of people think the mean has to be one of these numbers."}
+      - {id: s1, pace: normal, text: "组长觉得，{@m}平均数总得和某个人折的一样多吧。", en: "The team leader reckons the mean must be what one of them actually folded."}
     do:
-      - {at: s1@m, act: show, target: myth}
+      - {at: s1@m, act: hide, target: per}
+      - {with: prev, act: show, target: myth}
 
   - id: Setup
     say:

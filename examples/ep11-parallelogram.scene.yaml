@@ -79,6 +79,12 @@ objects:
     role: "NO"
     level: display
     in: side
+  paint:
+    # 开场情境：和 wrong 同一个位置，Myth 里换成 wrong
+    type: text
+    text: '[桌板要刷多少漆？]{#g}'
+    level: title
+    in: side
   law:
     type: text
     text: '[$S$]{#s} [$=$]{#e} [$a$]{#a .HL} [$\times$]{#x} [$h$]{#h .HL}'
@@ -87,19 +93,21 @@ objects:
 
 beats:
   - id: Hook
-    pause: {type: predict, prompt: 平行四边形的面积，底乘高还是底乘斜边？先猜一猜。, hold: 3, app_item: ep11-before-1}
+    pause: {type: predict, prompt: 平行四边形桌板的面积，底乘高还是底乘斜边？, hold: 3, app_item: ep11-before-1}
     say:
-      - {id: s1, pace: ask, text: "{@p}平行四边形的面积，底乘高还是底乘斜边？", en: "Is a parallelogram's area base times height, or base times slanted side?"}
-      - {id: s2, pace: normal, text: "先猜一猜，想三秒。", en: "Take a guess. Think for three seconds."}
+      - {id: s1, pace: ask, text: "{@p}木工师傅给一块平行四边形的桌板刷漆，底和斜边都量好了，面积怎么算？", en: "A carpenter is painting a parallelogram tabletop. The base and the slanted side are measured. How do we get its area?"}
+      - {id: s2, pace: normal, text: "换作是你，先拿个主意。", en: "If it were you, make up your mind first."}
     do:
       - {at: s1@p, act: show, target: para}
+      - {with: prev, act: show, target: paint}
 
   - id: Myth
     shows: misconception
     say:
-      - {id: s1, pace: normal, text: "很多人会说{@w}底乘斜边，就像长方形长乘宽一样。", en: "Lots of people say base times slanted side, just like length times width for a rectangle."}
+      - {id: s1, pace: normal, text: "徒弟抢着说：{@w}底乘斜边嘛，就像长方形长乘宽一样。", en: "The apprentice jumps in: base times slanted side, just like length times width for a rectangle."}
     do:
-      - {at: s1@w, act: show, target: wrong}
+      - {at: s1@w, act: hide, target: paint}
+      - {with: prev, act: show, target: wrong}
 
   - id: Setup
     say:

@@ -1,5 +1,7 @@
 # 洞察系列 #13 圆面积：切开再拼成长方形（六年级）。面积系列（area）第三集，接 #12、#14。
 # 按脚本 insight/ep13-circle-area/script.yaml（第 1 轮）写。演示，不是证明：旁白说"越来越接近""几乎"。
+# 2026-10-18 换成情境开场（试做后转正）：Hook、Myth 两段改成圆形花坛要铺草皮，得先算面积，可圆没有底也没有高。
+# 开头画面仍是 #12 的片尾，片尾画面没动（#14 开头要还原）。
 # 开场就是 #12 的片尾画面（一个圆、右侧 S = a × h 和 S = a × h ÷ 2）；钩子问圆怎么算面积、停三秒、说出"弯的没法算"；
 # 先切四块交错拼，坑坑洼洼；预测暂停后切 8、16、64 块，越来越接近长 πr、高 r 的长方形；
 # 非例：切多少块边上都还有一点弯；落到 S = πr × r = πr²。
@@ -135,6 +137,13 @@ objects:
     level: title
     below: law2
     gap: md
+  lawn:
+    # 开场情境：和 myth13 同一个位置，Myth 里换成 myth13
+    type: text
+    text: '[花坛要铺多少草皮？]{#g}'
+    level: title
+    below: law2
+    gap: md
   circ:
     type: text
     text: '$C=2\pi r$'
@@ -148,10 +157,10 @@ objects:
 
 beats:
   - id: Hook
-    pause: {type: predict, prompt: 圆没有底也没有高，它的面积怎么算？先猜一猜。, hold: 3, app_item: ep13-before-1}
+    pause: {type: predict, prompt: 圆形花坛没有底也没有高，面积怎么算？, hold: 3, app_item: ep13-before-1}
     say:
-      - {id: s1, pace: ask, text: "{@q}圆没有底也没有高，它的面积怎么算？", en: "A circle has no base and no height. How do we find its area?"}
-      - {id: s2, pace: normal, text: "先猜一猜，想三秒。", en: "Take a guess. Think for three seconds."}
+      - {id: s1, pace: ask, text: "{@g}这个圆形花坛要铺草皮，可圆没有底也没有高，面积该怎么算？", en: "This round flower bed needs new turf. But a circle has no base and no height, so how do we find its area?"}
+      - {id: s2, pace: ask, text: "要是交给你，你会怎么办？", en: "If it were your job, what would you do?"}
     do:
       # 开场：一下子摆出 #12 的片尾画面
       - {at: s1, act: show, target: law0, dur: 0.01}
@@ -159,15 +168,17 @@ beats:
       - {with: prev, act: hide, target: "myth0#m", dur: 0.01}
       - {with: prev, act: show, target: law20, dur: 0.01}
       - {with: prev, act: show, target: circle0, dur: 0.01}
+      - {at: s1@g, act: show, target: lawn}
 
   - id: Myth
     shows: misconception
     say:
-      - {id: s1, pace: normal, text: "很多人觉得，{@m}圆是弯的，没法像长方形那样算面积。", en: "Lots of people think a circle is curved, so you can't work it out like a rectangle."}
+      - {id: s1, pace: normal, text: "{@m}边都是弯的，好像没法像长方形那样，量一量、乘一乘就出来。", en: "The edge is all curved, so it seems you can't just measure and multiply like a rectangle."}
     do:
       - {at: s1, act: transform, from: circle0, to: circle, dur: 0.6}
       - {with: prev, act: hide, target: circle0}
-      - {at: s1@m, act: show, target: myth13}
+      - {at: s1@m, act: hide, target: lawn}
+      - {with: prev, act: show, target: myth13}
 
   - id: Setup
     say:

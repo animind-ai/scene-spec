@@ -26,7 +26,7 @@ style:
   theme: paper
   canvas: "16:9"
   voice:
-    persona: peer-ms
+    persona: teacher-hs
     speed: 1.0
   segmented: true
   step_hold: 1.0
@@ -41,6 +41,13 @@ objects:
     type: text
     text: '[等于一？]{#m}'
     role: "NO"
+    level: title
+    right_of: q
+    gap: lg
+  temp:
+    # 开场情境：和 myth 同一个位置，Myth 里换成 myth
+    type: text
+    text: '[升了 $5$ 度]{#g}'
     level: title
     right_of: q
     gap: lg
@@ -99,20 +106,22 @@ objects:
 
 beats:
   - id: Hook
-    pause: {type: predict, prompt: 三减负二为什么等于五？先猜一猜。, hold: 3, app_item: ep16-before-1}
+    pause: {type: predict, prompt: 三减负二为什么等于五？, hold: 3, app_item: ep16-before-1}
     say:
-      - {id: s1, pace: ask, text: "{@q}三减负二，为什么等于五？", en: "Three minus negative two: why is it five?"}
-      - {id: s2, pace: normal, text: "先猜一猜，想三秒钟。", en: "Take a guess. Think for three seconds."}
+      - {id: s1, pace: normal, text: "{@q}早上零下二度，中午三度，{@g}气温升了五度，算式是三减负二。", en: "It was minus two degrees this morning and three at noon: the temperature rose five degrees, and the sum is three minus negative two."}
+      - {id: s2, pace: normal, text: "可它为什么等于五？给自己三秒钟。", en: "But why is that five? Give yourself three seconds."}
     do:
       - {at: s1@q, act: show, target: q}
       - {with: prev, act: show, target: line}
+      - {at: s1@g, act: show, target: temp}
 
   - id: Myth
     shows: misconception
     say:
-      - {id: s1, pace: normal, text: "很多人会算成一，因为{@m}三减二是一，负号好像没什么用。", en: "Lots of people get one: three minus two is one, and the minus sign seems to do nothing."}
+      - {id: s1, pace: normal, text: "小宇却算成了一：{@m}三减二是一，负号好像没什么用。", en: "Xiaoyu works it out as one: three minus two is one, and the minus sign seems to do nothing."}
     do:
-      - {at: s1@m, act: show, target: myth}
+      - {at: s1@m, act: hide, target: temp}
+      - {with: prev, act: show, target: myth}
 
   - id: Setup
     say:
@@ -169,7 +178,7 @@ beats:
     shows: non_example
     say:
       - {id: s1, pace: normal, text: "那个一是从哪里来的？{@a}其实一是三加负二的答案。", en: "So where did the one come from? One is actually the answer to three plus negative two."}
-      - {id: s2, pace: normal, text: "{@l}加负二是从三往左走两格，{@p}停在一，问的是另一件事。", en: "Adding negative two means two steps left from three, stopping at one. That's a different question."}
+      - {id: s2, pace: normal, text: "{@l}加负二是从三往左走两格，{@p}停在一，问的是另一个问题。", en: "Adding negative two means two steps left from three, stopping at one. That's a different question."}
     do:
       - {at: s1, act: unmark, target: "r3#all"}
       - {with: prev, act: unmark, target: "r4#q"}

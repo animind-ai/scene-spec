@@ -58,6 +58,12 @@ objects:
     role: "NO"
     level: title
     in: side
+  wall:
+    # 开场情境：和 myth 同一个位置，Myth 里换成 myth
+    type: text
+    text: '[放大两倍贴墙上]{#g}'
+    level: title
+    in: side
   r1:
     type: text
     text: '$3:2$'
@@ -81,19 +87,21 @@ objects:
 
 beats:
   - id: Hook
-    pause: {type: predict, prompt: 照片放大以后，为什么形状没变？先猜一猜。, hold: 3, app_item: ep10-before-1}
+    pause: {type: predict, prompt: 照片放大两倍，形状会变吗？, hold: 3, app_item: ep10-before-1}
     say:
-      - {id: s1, pace: ask, text: "{@q}照片放大以后，为什么形状一点都没变？", en: "When a photo is enlarged, why doesn't its shape change at all?"}
-      - {id: s2, pace: normal, text: "先猜一猜，想三秒。", en: "Take a guess. Think for three seconds."}
+      - {id: s1, pace: ask, text: "{@g}小美想把这张小照片放大两倍，贴到墙上，形状会变吗？", en: "Xiaomei wants to blow this small photo up to twice the size for the wall. Will its shape change?"}
+      - {id: s2, pace: normal, text: "你觉得呢？先在脑子里放大看看。", en: "What do you think? Picture it bigger in your head first."}
     do:
-      - {at: s1@q, act: show, target: small}
+      - {at: s1, act: show, target: small}
+      - {at: s1@g, act: show, target: wall}
 
   - id: Myth
     shows: misconception
     say:
-      - {id: s1, pace: normal, text: "很多人以为{@m}放大两倍，什么都跟着变两倍，面积也一样。", en: "Lots of people think that if you scale by two, everything doubles, the area too."}
+      - {id: s1, pace: normal, text: "小美觉得{@m}放大两倍，什么都跟着变两倍，面积也一样。", en: "Xiaomei reckons that scaling by two doubles everything, the area too."}
     do:
-      - {at: s1@m, act: show, target: myth}
+      - {at: s1@m, act: hide, target: wall}
+      - {with: prev, act: show, target: myth}
 
   - id: Setup
     say:

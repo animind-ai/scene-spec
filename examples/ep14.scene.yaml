@@ -83,6 +83,12 @@ objects:
     role: "NO"
     level: title
     in: side
+  cup:
+    # 开场情境：盖在 myth13 的位置上（over 不算进侧栏叠放高度；挂 below 会把 #13 的那一叠顶高，开头对不上 #13 的末帧）
+    type: text
+    text: '[冰淇淋杯装多少？]{#g}'
+    level: title
+    over: myth13
   four:
     widget: solid
     in: stage
@@ -123,10 +129,10 @@ objects:
 
 beats:
   - id: Hook
-    pause: {type: predict, prompt: 圆锥的体积为什么是圆柱的三分之一？先猜一猜。, hold: 3, app_item: ep14-before-1}
+    pause: {type: predict, prompt: 同底同高的圆锥杯，能装圆柱杯的多少？, hold: 3, app_item: ep14-before-1}
     say:
-      - {id: s1, pace: ask, text: "{@q}圆锥的体积，为什么是圆柱的三分之一？", en: "Why is a cone's volume one third of a cylinder's?"}
-      - {id: s2, pace: normal, text: "先猜一猜，想三秒钟。", en: "Take a guess. Think for three seconds."}
+      - {id: s1, pace: ask, text: "冰淇淋店的圆锥杯和圆柱杯{@g}一样高、口一样大，圆锥杯能装多少？", en: "At the ice-cream shop, a cone cup and a cylinder cup are just as tall and just as wide at the top. How much does the cone cup hold?"}
+      - {id: s2, pace: normal, text: "动手算之前，先凭感觉说个数。", en: "Before working anything out, name a number on gut feeling."}
     do:
       # 开场：一下子摆出 #13 的片尾画面
       - {at: s1, act: show, target: law, dur: 0.01}
@@ -139,15 +145,17 @@ beats:
       - {after: prev, act: show, target: "c64#hgt", dur: 0.01}
       - {with: prev, act: show, target: "c64#len", dur: 0.01}
       - {with: prev, act: cross, target: "myth13#m", dur: 0.01}
+      - {at: s1@g, act: hide, target: myth13}
+      - {with: prev, act: show, target: cup}
 
   - id: Myth
     shows: misconception
     say:
-      - {id: s1, pace: normal, text: "很多人觉得是一半，{@m}尖尖的圆锥，看上去像少了一半。", en: "Lots of people think it's half: a pointed cone looks like half is missing."}
+      - {id: s1, pace: normal, text: "{@m}尖尖的圆锥看上去少了一半，好像就该装一半。", en: "The pointed cone looks like it's missing half, so it seems it should hold half."}
     do:
       - {at: s1, act: hide, target: law}
       - {with: prev, act: hide, target: law2}
-      - {with: prev, act: hide, target: myth13}
+      - {with: prev, act: hide, target: cup}
       - {at: s1@m, act: show, target: myth14}
 
   - id: Setup

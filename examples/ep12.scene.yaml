@@ -72,6 +72,13 @@ objects:
     level: title
     below: law
     gap: md
+  flag:
+    # 开场情境：和 myth 同一个位置，Myth 里换成 myth
+    type: text
+    text: '[彩旗要多少布？]{#g}'
+    level: title
+    below: law
+    gap: md
   law2:
     type: text
     text: '[$S=a\times h$]{#ah} [$\div 2$]{#half .HL}'
@@ -135,10 +142,10 @@ objects:
 
 beats:
   - id: Hook
-    pause: {type: predict, prompt: 三角形的面积为什么要除以二？先猜一猜。, hold: 3, app_item: ep12-before-1}
+    pause: {type: predict, prompt: 三角形的面积为什么要除以二？, hold: 3, app_item: ep12-before-1}
     say:
-      - {id: s1, pace: ask, text: "{@q}三角形的面积，为什么要除以二？", en: "Why does a triangle's area have a divide-by-two in it?"}
-      - {id: s2, pace: normal, text: "先猜一猜，想三秒。", en: "Take a guess. Think for three seconds."}
+      - {id: s1, pace: normal, text: "班里做三角形小彩旗，{@g}老师说面积是底乘高再除以二。", en: "Our class is making little triangle flags, and the teacher says the area is base times height, divided by two."}
+      - {id: s2, pace: normal, text: "为什么偏偏要除以二？先自己琢磨一下。", en: "Why divide by two, of all things? Mull it over first."}
     do:
       # 开场：一下子摆出 #11 的片尾画面
       - {at: s1, act: show, target: para, dur: 0.01}
@@ -148,15 +155,18 @@ beats:
       - {after: prev, act: merge, target: para, args: {name: R}, dur: 0.01}
       - {with: prev, act: show, target: "para#h", dur: 0.01}
       - {with: prev, act: show, target: "para#base", dur: 0.01}
+      # 情境：S = a × h 换成同样的 law（下面挂着 flag / myth / law2），再出 flag
+      - {at: s1@g, act: transform, from: law0, to: law, dur: 0.6}
+      - {with: prev, act: hide, target: law0}
+      - {with: prev, act: show, target: flag}
 
   - id: Myth
     shows: misconception
     say:
-      - {id: s1, pace: normal, text: "很多人说，{@m}除以二是规定的，背下来就行。", en: "Lots of people say dividing by two is just a rule you memorise."}
+      - {id: s1, pace: normal, text: "旁边的同学说：{@m}规定的呗，背下来就行。", en: "The kid next to you says: it's just the rule, memorise it."}
     do:
-      - {at: s1, act: transform, from: law0, to: law, dur: 0.6}
-      - {with: prev, act: hide, target: law0}
-      - {at: s1@m, act: show, target: myth}
+      - {at: s1@m, act: hide, target: flag}
+      - {with: prev, act: show, target: myth}
 
   - id: Setup
     say:

@@ -26,7 +26,7 @@ style:
   theme: paper
   canvas: "16:9"
   voice:
-    persona: peer-ms
+    persona: teacher-hs
     speed: 1.0
   segmented: true
   step_hold: 1.0
@@ -46,6 +46,13 @@ objects:
     type: text
     text: '[填 $7$？]{#m}'
     role: "NO"
+    level: title
+    right_of: q
+    gap: lg
+  hw:
+    # 开场情境：和 myth 同一个位置，Myth 里换成 myth
+    type: text
+    text: '[表弟的作业]{#g}'
     level: title
     right_of: q
     gap: lg
@@ -85,23 +92,25 @@ objects:
 
 beats:
   - id: Hook
-    pause: {type: predict, prompt: 3 + 4 = □ + 5，空格里填几？先猜一猜。, hold: 3, app_item: ep19-before-1}
+    pause: {type: predict, prompt: 3 + 4 = □ + 5，空格里填几？, hold: 3, app_item: ep19-before-1}
     say:
-      - {id: s1, pace: ask, text: "{@q}三加四等于空格加五，空格里应该填几？", en: "Three plus four equals blank plus five. What goes in the blank?"}
-      - {id: s2, pace: normal, text: "先猜一猜，想三秒钟。", en: "Take a guess. Think for three seconds."}
+      - {id: s1, pace: normal, text: "帮表弟检查作业，碰到这一题：{@q}三加四等于空格加五。", en: "Checking your little cousin's homework, you hit this one: three plus four equals blank plus five."}
+      - {id: s2, pace: normal, text: "空格里该填几？你先在心里填一个。", en: "What goes in the blank? Fill one in in your head first."}
     do:
       - {at: s1@q, act: show, target: q}
+      - {with: prev, act: show, target: hw}
 
   - id: Myth
     shows: misconception
     say:
-      - {id: s1, pace: normal, text: "很多人会填七，{@m}因为觉得等号后面就是写答案的地方。", en: "Lots of people write seven: isn't the equals sign where the answer goes?"}
+      - {id: s1, pace: normal, text: "表弟填的是七，{@m}他觉得等号后面就是写答案的地方。", en: "Your cousin wrote seven. He thinks the equals sign is where the answer goes."}
     do:
-      - {at: s1@m, act: show, target: myth}
+      - {at: s1@m, act: hide, target: hw}
+      - {with: prev, act: show, target: myth}
 
   - id: Setup
     say:
-      - {id: s1, pace: normal, text: "我们一起看。{@b}把等号想成一架天平，两边必须一样重。", en: "Let's look together. Think of the equals sign as a balance: both sides must weigh the same."}
+      - {id: s1, pace: normal, text: "{@b}把等号想成一架天平，两边必须一样重。", en: "Think of the equals sign as a balance: both sides must weigh the same."}
       - {id: s2, pace: normal, text: "左盘放三块{@f}再放四块，一共七块；右盘放一个盒子和五块。", en: "On the left pan, three blocks and then four, seven in all. On the right, a box and five blocks."}
       - {id: s3, pace: normal, text: "等式成立，就是说七块和盒子加五块一样重，{@l}天平是平的。", en: "The equation being true means seven blocks weigh the same as the box plus five: the balance is level."}
     do:
@@ -171,6 +180,6 @@ beats:
   - id: Close
     say:
       - {id: s1, pace: normal, text: "等号的意思不是写答案，{@x}而是两边一样重。", en: "The equals sign isn't where the answer goes. It says: both sides weigh the same."}
-      - {id: s2, pace: ask, text: "{@q}为什么 a 加 b 的平方，会多出两个 a 乘 b？", en: "Next: why does a plus b, squared, have two extra a-times-b's?"}
+      - {id: s2, pace: normal, text: "{@q}下一集看看，a 加 b 的平方为什么会多出两块 a 乘 b 的面积。", en: "Next time: why a plus b, squared, picks up two extra a-times-b pieces of area."}
     do:
       - {at: s1@x, act: cross, target: "myth#m"}
