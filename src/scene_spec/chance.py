@@ -106,7 +106,8 @@ def register(registry: dict, Widget, Exposed, unknown_args) -> None:  # noqa: N8
 
     registry["coin_flips"] = Widget(
         "coin_flips",
-        params={"n": (True, pos_int), "seed": (True, nonneg_int), "p": (False, prob), "runs": (False, nonneg_int)},
+        params={"n": (True, pos_int), "seed": (True, nonneg_int), "p": (False, prob), "runs": (False, nonneg_int),
+                "heads_text": (False, lambda v: None if isinstance(v, str) and v else "应为非空字符串")},
         expose=coin_expose,
         actions={"flip": flip, "runs": runs, "band": band},
     )

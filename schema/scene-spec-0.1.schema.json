@@ -57,6 +57,36 @@
       "items": {
         "$ref": "#/$defs/beat"
       }
+    },
+    "i18n": {
+      "description": "其他语言版本画面上的字：{en: {meta, style, objects, beats}}，按 id 深合并进文档；旁白写在每句的 en 里",
+      "type": "object",
+      "propertyNames": {
+        "enum": [
+          "en"
+        ]
+      },
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "meta": {
+            "type": "object"
+          },
+          "style": {
+            "type": "object"
+          },
+          "objects": {
+            "type": "object"
+          },
+          "beats": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object"
+            }
+          }
+        }
+      }
     }
   },
   "$defs": {
@@ -291,6 +321,13 @@
           "type": "integer",
           "minimum": 12,
           "maximum": 96
+        },
+        "lang": {
+          "description": "旁白和画面文字的语言：zh（默认）| en。一般不手写，由 localize(doc, \"en\") 设上",
+          "enum": [
+            "zh",
+            "en"
+          ]
         }
       }
     },
@@ -635,7 +672,7 @@
           "minLength": 1
         },
         "en": {
-          "description": "这句的英文字幕（双语字幕的第二行；不念，不影响配音）",
+          "description": "这句的英文：中文版里是双语字幕的第二行（不念）；英文版（localize 成 en）里是要念的旁白，书签要和 text 一致",
           "type": "string",
           "minLength": 1
         }

@@ -26,7 +26,7 @@ NEEDS_TARGET = BUILTIN_ACTS - {"transform", "camera", "hold", "tween"} - segment
 READOUT_KEYS = ("value", "label", "digits", "format")
 KNOWN_THEMES = {"paper", "chalk", "jade", "xuan", "blueprint", "riso"}
 LAYOUT_REFS = ("below", "above", "left_of", "right_of", "within", "over")
-DEMO_WORDS = ("演示", "不是证明", "不算证明", "并非证明")
+DEMO_WORDS = ("演示", "不是证明", "不算证明", "并非证明", "demonstration", "not a proof")  # 后两个给英文版（localize 成 en）
 CAMERA_ARGS = {"zoom", "fit", "margin", "reset"}
 CAMERA_EXEMPT_REGIONS = ("top", "footer")  # 这些区域和钉住的对象不跟镜头走
 

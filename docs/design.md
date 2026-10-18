@@ -387,7 +387,7 @@ SS469 预留。动作的多余参数报 SS281。完整的例子见 `animind/scen
 - `{@d0}` 是**词级书签**。`voice` 合成后用 Whisper 时间戳算出它的时刻，动作可以挂在书签上，比"第几句"更精确。
 - 旁白文本就是读法。需要显示和读法不同时，在 `say` 里写读法，在对象里写显示：例如对象显示 `$A_8$`，旁白写"A 八"。也可以在旁白里写 `$A_8$`，交给读法规则自动转换。
 - 句子可以不写 `id`，此时按下标引用；建议给会被动作引用的句子写 `id`，插句子时不会错位。
-- `en`（可选）：这句的英文字幕。写了就出中英双语字幕（每条两行，中文在上）；不念、不影响配音和音频缓存。
+- `en`（可选）：这句的英文。中文版里是双语字幕的第二行（每条两行，中文在上），不念、不影响配音和音频缓存；英文版里就是要念的旁白（§7.7）。
 
 ### 7.2 动作
 
@@ -599,6 +599,29 @@ style: {segmented: true, step_hold: 1.0}
 参数类型（`place` 枚举、`scale` / `opacity` / `hold` 范围、`pin` / `unghost` 不带参数）由 JSON Schema 检查（SS100）。
 
 ---
+
+### 7.7 其他语言版本（i18n）
+
+同一个场景出英文配音版：画面、时间线、动作都不变，只换旁白和画面上的字。2026-10-18 起洞察 39 集都有英文版。
+
+- 旁白：每句的 `en` 就是英文版要念的话，**书签要和 `text` 一样**——每个 `{@名}` 放在动作要落上的那个英文词前面（`check` 报 SS503：书签不一致；SS504：顺序不同）。中文版里 `en` 仍是双语字幕的第二行，书签不显示。
+- 画面上的字写在顶层 `i18n.en`，键和文档本身一样，按 id 深合并（映射逐键合并，列表整个替换）：
+
+```yaml
+i18n:
+  en:
+    meta: {title: "The Pythagorean Theorem: Rearrange and See"}
+    objects:
+      wrong: {text: '[$a+b=c$]{#w}?'}          # 片段 id、公式原样保留，只译字
+      practice: {lines: ["[Try it]{.HL}", "Short sides $3$ and $4$", "Long side $=$ ?"]}
+    beats:
+      Hook: {pause: {prompt: "How is the ladder c related to a and b?"}}
+      Level: {do: {3: {args: {label: 'mean $4$'}}}}   # 动作参数里的字：按 do 的下标，只能改 args
+```
+
+- `say` 不能在 `i18n` 里覆盖。组件自带的中文默认字要在对象里写明：graph 割线读数 `readout_text`、复平面 `axis_labels`、coin_flips 的 `heads_text`。
+- `scene_spec.localize(doc, "en")` 得到一份普通的英文场景（`say[].text` = 英文句、`style.lang: en`、没有 `i18n`）；`check` 会把它也完整查一遍（问题标 `[en]`），本地化后画面上还剩中文报 SS507。
+- 工具：`animind-voice synth|align|pitch --lang en`（英文合成指令、en-US、英文听写，数字拼成单词再对齐），`animind-kit render|inspect --lang en`（字幕只有英文一行，按小句切条）。英文版用单独的音频目录。
 
 ## 8. 检查规则（渲染前）
 
