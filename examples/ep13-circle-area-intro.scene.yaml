@@ -1,0 +1,240 @@
+# 洞察系列 #13 圆面积：切开再拼成长方形（六年级）。面积系列（area）第三集，接 #12、#14。
+# 按脚本 insight/ep13-circle-area/script.yaml（第 1 轮）写。演示，不是证明：旁白说"越来越接近""几乎"。
+# 情境开场版（2026-10-18 试做），按 script-intro.yaml 写；和 ep13.scene.yaml 只差开场两段（Hook、Myth）：圆形花坛要铺草皮，
+# 得先算面积，可圆没有底也没有高。开头画面仍是 #12 的片尾，片尾画面没动（#14 开头要还原）。
+# 开场就是 #12 的片尾画面（一个圆、右侧 S = a × h 和 S = a × h ÷ 2）；钩子问圆怎么算面积、停三秒、说出"弯的没法算"；
+# 先切四块交错拼，坑坑洼洼；预测暂停后切 8、16、64 块，越来越接近长 πr、高 r 的长方形；
+# 非例：切多少块边上都还有一点弯；落到 S = πr × r = πr²。
+spec: "0.1"
+
+meta:
+  id: ep13-intro
+  title: 圆面积：切开再拼成长方形
+  line: insight
+  units: [H7]
+  episode: 13
+  grade: 六年级
+  author: Boxi Yu
+  license: CC-BY-4.0
+
+pedagogy:
+  insight: 把圆切成很多小扇形交错拼起来，越切越细就越接近一个长方形：高是半径 r，长是半个圆周 πr，所以面积是 πr²
+  misconception: 圆是弯的，没法像长方形那样算面积；切成六十四块就真的变成长方形了
+  non_example: 只切四块时拼出来坑坑洼洼；切多少块，边上都还有一点弯，它只是越来越接近长方形
+  status: demo
+  landing: Landing
+
+style:
+  theme: paper
+  canvas: "16:9"
+  voice:
+    persona: friend-ps
+    speed: 1.0
+  segmented: true
+  step_hold: 1.0
+
+objects:
+  # 开场：#12 的片尾（同样的定义；myth 只为占住 law2 的位置，本集不显示）
+  law:
+    type: text
+    text: '[$S$]{#s} [$=$]{#e} [$a$]{#a .HL} [$\times$]{#x} [$h$]{#h .HL}'
+    level: display
+    in: side
+  myth:
+    type: text
+    text: '[规定的？]{#m}'
+    role: "NO"
+    level: title
+    below: law
+    gap: md
+  law2:
+    type: text
+    text: '[$S=a\times h$]{#ah} [$\div 2$]{#half .HL}'
+    level: display
+    below: myth
+    gap: md
+  circle0:
+    # #12 片尾的圆（同样的定义）：那时底栏没人用，主讲区大一点，圆的位置偏下。Myth 里变成下面会切开的 circle
+    widget: dissect
+    role: A
+    in: stage
+    view: [[-2.6, -2.6], [10, 2.6]]
+    shapes:
+      C:
+        circle: 2
+    guides:
+      r: {from: [0, 0], to: [2, 0], label: '$r$', role: HL}
+  circle:
+    widget: dissect
+    role: A
+    in: stage
+    view: [[-2.6, -2.6], [10, 2.6]]
+    shapes:
+      C:
+        circle: 2
+    cuts:
+      c4: {piece: C, sectors: 4, into: a}
+    guides:
+      r: {from: [0, 0], to: [2, 0], label: '$r$', role: HL}
+  c8:
+    widget: dissect
+    role: A
+    in: stage
+    view: [[-2.6, -2.6], [10, 2.6]]
+    shapes:
+      C:
+        circle: 2
+    cuts:
+      k: {piece: C, sectors: 8, into: b}
+  c16:
+    widget: dissect
+    role: A
+    in: stage
+    view: [[-2.6, -2.6], [10, 2.6]]
+    shapes:
+      C:
+        circle: 2
+    cuts:
+      k: {piece: C, sectors: 16, into: d}
+  c64:
+    widget: dissect
+    role: A
+    in: stage
+    view: [[-2.6, -2.6], [10, 2.6]]
+    shapes:
+      C:
+        circle: 2
+    cuts:
+      k: {piece: C, sectors: 64, into: e}
+    guides:
+      hgt: {from: [2.85, -1], to: [2.85, 1], label: '高 $r$', role: HL, side: left}
+      len: {from: [3.16, -1.3], to: [9.44, -1.3], label: '长 $\pi r$', role: HL, side: below}
+  myth13:
+    type: text
+    text: '[弯的，没法算？]{#m}'
+    role: "NO"
+    level: title
+    below: law2
+    gap: md
+  lawn:
+    # 开场情境：和 myth13 同一个位置，Myth 里换成 myth13
+    type: text
+    text: '[花坛要铺多少草皮？]{#g}'
+    level: title
+    below: law2
+    gap: md
+  circ:
+    type: text
+    text: '$C=2\pi r$'
+    level: title
+    in: footer
+  law3:
+    type: text
+    text: '[$S=\pi r\times r$]{#pr} [$=\pi r^2$]{#r2 .HL}'
+    level: title
+    in: footer
+
+beats:
+  - id: Hook
+    pause: {type: predict, prompt: 圆形花坛没有底也没有高，面积怎么算？, hold: 3, app_item: ep13-before-1}
+    say:
+      - {id: s1, pace: ask, text: "{@g}这个圆形花坛要铺草皮，可圆没有底也没有高，面积该怎么算？", en: "This round flower bed needs new turf. But a circle has no base and no height, so how do we find its area?"}
+      - {id: s2, pace: ask, text: "要是交给你，你会怎么办？", en: "If it were your job, what would you do?"}
+    do:
+      # 开场：一下子摆出 #12 的片尾画面
+      - {at: s1, act: show, target: law, dur: 0.01}
+      - {with: prev, act: show, target: law2, dur: 0.01}
+      - {with: prev, act: show, target: circle0, dur: 0.01}
+      - {at: s1@g, act: show, target: lawn}
+
+  - id: Myth
+    shows: misconception
+    say:
+      - {id: s1, pace: normal, text: "{@m}边都是弯的，好像没法像长方形那样，量一量、乘一乘就出来。", en: "The edge is all curved, so it seems you can't just measure and multiply like a rectangle."}
+    do:
+      - {at: s1, act: transform, from: circle0, to: circle, dur: 0.6}
+      - {with: prev, act: hide, target: circle0}
+      - {at: s1@m, act: hide, target: lawn}
+      - {with: prev, act: show, target: myth13}
+
+  - id: Setup
+    say:
+      - {id: s1, pace: normal, text: "我们一起看。{@r}这个圆的半径是 r，绕一圈的长度是周长。", en: "Let's look together. This circle has radius r, and the distance around it is the circumference."}
+      - {id: s2, pace: normal, text: "{@c}圆周长等于二派 r，派大约是三点一四，比三多一点。", en: "The circumference is two pi r, and pi is about three point one four, a bit more than three."}
+    do:
+      - {at: s1@r, act: mark, target: "circle#r"}
+      - {at: s2@c, act: show, target: circ}
+
+  - id: Four
+    shows: non_example
+    say:
+      - {id: s1, pace: normal, text: "{@cut}先把圆切成四块，{@go}一块朝上一块朝下，交错着拼起来。", en: "First cut the circle into four pieces, then fit them together, one pointing up, one pointing down."}
+      - {id: s2, pace: normal, text: "{@b}拼出来边上坑坑洼洼的，确实一点也不像长方形。", en: "The edges are all bumps. It really doesn't look like a rectangle."}
+    do:
+      - {at: s1, act: unmark, target: "circle#r"}
+      - {with: prev, act: hide, target: "circle#r"}
+      - {at: s1@cut, act: cut, target: circle, args: {cut: c4}, dur: 0.8}
+      - {at: s1@go, act: arrange, target: circle, args: {cut: c4, layout: alternate, at: [6.3, 0]}, dur: fit}
+      - {at: s2@b, act: focus, target: circle}
+      - {after: prev, act: unfocus, target: circle}
+
+  - id: Predict
+    pause: {type: predict, prompt: 越切越细，拼出来会像什么？, hold: 3, app_item: ep13-predict-1}
+    say:
+      - {id: s1, pace: ask, text: "{@q}要是切成更多块，越切越细，拼出来会像什么？", en: "What if we cut more and more, thinner and thinner? What will it look like?"}
+
+  - id: Finer
+    say:
+      - {id: s1, pace: normal, text: "{@e}那就切成八块，{@go}再像刚才那样交错拼一拼。", en: "So cut it into eight and fit them together the same way."}
+      - {id: s2, pace: normal, text: "{@s}切成十六块，{@go}上下的边越来越平，越来越直。", en: "Sixteen pieces: the top and bottom edges get flatter and straighter."}
+      - {id: s3, pace: brisk, text: "{@f}切成六十四块，{@go}看起来几乎就是一个长方形了。", en: "Sixty-four pieces, and it looks almost exactly like a rectangle."}
+    do:
+      - {at: s1@e, act: hide, target: circle}
+      - {with: prev, act: show, target: c8}
+      - {after: prev, act: cut, target: c8, args: {cut: k}, dur: 0.5}
+      - {at: s1@go, act: arrange, target: c8, args: {cut: k, layout: alternate, at: [6.3, 0]}, dur: fit}
+      - {at: s2@s, act: hide, target: c8}
+      - {with: prev, act: show, target: c16}
+      - {after: prev, act: cut, target: c16, args: {cut: k}, dur: 0.5}
+      - {at: s2@go, act: arrange, target: c16, args: {cut: k, layout: alternate, at: [6.3, 0]}, dur: fit}
+      - {at: s3@f, act: hide, target: c16}
+      - {with: prev, act: show, target: c64}
+      - {after: prev, act: cut, target: c64, args: {cut: k}, dur: 0.5}
+      - {at: s3@go, act: arrange, target: c64, args: {cut: k, layout: alternate, at: [6.3, 0]}, dur: fit}
+
+  - id: Reveal
+    say:
+      - {id: s1, pace: slow, text: "{@h}这个长方形的高，就是圆的半径 r。", en: "This rectangle's height is the circle's radius r."}
+      - {id: s2, pace: normal, text: "每一小块扇形，都是从圆心到圆边，一条半径那么长。", en: "Each little wedge reaches from the centre to the edge, one radius long."}
+      - {id: s3, pace: normal, text: "{@l}长方形的长，是圆周的一半，也就是派乘 r。", en: "The rectangle's length is half the circumference, which is pi times r."}
+      - {id: s4, pace: normal, text: "因为上下两条边，各用掉了一半的圆周。", en: "Because the top and bottom edges each use up half of the circle's edge."}
+      - {id: s5, pace: normal, text: "{@n}这是演示，不是证明：它没有真的变成长方形，边上还有一点点弯。", en: "This is a demonstration, not a proof: it hasn't truly become a rectangle. The edges still curve a tiny bit."}
+      - {id: s6, pace: normal, text: "切得越细，就越接近，面积却始终是这个圆的面积。", en: "The finer we cut, the closer it gets, but the area is always the circle's area."}
+    do:
+      - {at: s1@h, act: show, target: "c64#hgt"}
+      - {at: s2, act: step}
+      - {at: s3@l, act: show, target: "c64#len"}
+      - {at: s5@n, act: focus, target: c64}
+      - {at: s6, act: unfocus, target: c64}
+
+  - id: Landing
+    shows: landing
+    say:
+      - {id: s1, pace: slow, text: "{@law}所以圆的面积是长乘高，派乘半径再乘半径，{@sq}也就是派乘半径的平方。", en: "So the circle's area is length times height, pi r times r, which is pi r squared."}
+      - {id: s2, pace: normal, text: "{@l}长方形的长对着半个圆周，{@h}高对着半径，一个都没少。", en: "The length matches half the circumference, the height matches the radius, and nothing is left out."}
+    do:
+      - {at: s1@law, act: hide, target: circ}
+      - {after: prev, act: show, target: law3}
+      - {at: s1@sq, act: mark, target: "law3#r2"}
+      - {at: s2@l, act: mark, target: "c64#len"}
+      - {at: s2@h, act: mark, target: "c64#hgt"}
+
+  - id: Close
+    say:
+      - {id: s1, pace: normal, text: "圆是弯的，可是切得够细，{@x}照样能拼成长方形来算面积。", en: "A circle is curved, but cut finely enough, it still lines up into a rectangle for its area."}
+      - {id: s2, pace: ask, text: "{@q}圆锥的体积，为什么是圆柱的三分之一？", en: "So why is a cone's volume one third of a cylinder's?"}
+    do:
+      - {at: s1, act: unmark, target: "law3#r2"}
+      - {with: prev, act: unmark, target: "c64#len"}
+      - {with: prev, act: unmark, target: "c64#hgt"}
+      - {at: s1@x, act: cross, target: "myth13#m"}

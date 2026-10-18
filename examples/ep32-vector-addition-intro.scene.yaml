@@ -1,0 +1,167 @@
+# 洞察系列 #32 向量加法：首尾相接（高一）。单集。情境开场版（2026-10-18 试做），按 insight/ep32-vector-addition/script-intro.yaml 写；
+# 和 ep32.scene.yaml 只差开场两段（Hook、Myth）和 Setup 第一句时收起路线：从家出门往东 4 公里、往北 3 公里，离家多远？
+# 一个洞察：向量只管长度和方向，平移不变，所以 a+b 是"先走 a 再走 b"——b 的尾巴接到 a 的头上（组件 plane 的 slide copy）。
+# 钩子问和的长度是不是长度相加、停三秒、说出"4+3=7"；a=(4,0)、b=(0,3) 首尾相接，和 (4,3)；预测暂停"有多长"；
+# 勾股定理得 5 ≠ 7；斜的一对 a=(3,1)、b=(1,2) 两种顺序拼成平行四边形，对角线是和；
+# 非例：方向相同时 (3,0)+(2,0) 长度才正好相加；落到坐标相加 (3,1)+(1,2)=(4,3)；埋 #33（转 90° 是乘法）。
+spec: "0.1"
+
+meta:
+  id: ep32-intro
+  title: 向量加法：首尾相接
+  line: insight
+  units: [S8]
+  episode: 32
+  grade: 高一
+  author: Boxi Yu
+  license: CC-BY-4.0
+
+pedagogy:
+  insight: 向量只管长度和方向，平移到哪里都是同一个；a 加 b 就是先走 a 再接着走 b，两种顺序拼成平行四边形，对角线就是和
+  misconception: 和的长度等于长度的和：一支长四、一支长三，加起来长七
+  non_example: 只有方向相同时长度才正好相加；一拐弯，直着走过去就比七短
+  status: proof
+  landing: Landing
+
+style:
+  theme: paper
+  canvas: "16:9"
+  voice:
+    persona: teacher-hs
+    speed: 1.0
+  segmented: true
+  step_hold: 1.0
+
+objects:
+  q:
+    type: text
+    text: '$|\vec a+\vec b|=|\vec a|+|\vec b|\ ?$'
+    level: title
+    in: top
+  plane:
+    widget: plane
+    x: [0, 5]
+    y: [0, 4]
+    numbers: false
+    in: stage
+  myth:
+    type: text
+    text: '[$4+3=7$ ?]{#m}'
+    role: "NO"
+    level: title
+    right_of: q
+    gap: lg
+  len:
+    type: text
+    text: '[$|\vec a+\vec b|=5$]{#l} [$\ne 7$]{#r .NO}'
+    level: title
+    in: side
+  sum:
+    type: text
+    text: '[$(3,1)$]{#a} [$+$]{#p} [$(1,2)$]{#b} [$=(4,3)$]{#s .HL}'
+    level: title
+    in: side
+
+beats:
+  # 开场情境：平面当地图，原点旁的第一格里一座小房子是家，一格一公里；路线用虚线画，Setup 第一句收起，换成正式的向量 a、b。
+  # plane 的标签只排公式（中文排不出），所以家画成房子形状、路线标 km
+  - id: Hook
+    pause: {type: predict, prompt: 往东走 4 公里、再往北走 3 公里，离家多远？, hold: 3, app_item: ep32-before-1}
+    say:
+      - {id: s1, pace: ask, text: "{@h}你从家出门，{@e}往东走四公里，{@n}再往北走三公里，现在离家多远？", en: "You leave home, walk four kilometres east, then three kilometres north. How far are you from home now?"}
+      - {id: s2, pace: normal, text: "{@q}先别急着算，在心里估一估。", en: "Don't work it out yet. Just estimate it in your head."}
+    do:
+      - {at: s1@h, act: show, target: plane}
+      - {after: prev, act: shape, target: plane, args: {name: home, points: [[0.08, 0.08], [0.52, 0.08], [0.52, 0.36], [0.3, 0.6], [0.08, 0.36]], role: C}}
+      - {at: s1@e, act: vector, target: plane, args: {name: w1, v: [4, 0], role: DIM, label: '4\ \mathrm{km}', dashed: true}}
+      - {at: s1@n, act: vector, target: plane, args: {name: w2, v: [0, 3], at: [4, 0], role: DIM, label: '3\ \mathrm{km}', side: r, dashed: true}}
+      - {at: s2@q, act: show, target: q}
+
+  - id: Myth
+    shows: misconception
+    say:
+      - {id: s1, pace: normal, text: "路一共走了七公里，{@m}离家好像也该是七公里。", en: "You walked seven kilometres in all, so it seems you should be seven kilometres from home."}
+    do:
+      - {at: s1@m, act: show, target: myth}
+
+  - id: Setup
+    say:
+      - {id: s1, pace: normal, text: "我们一起看。向量就是一支箭头，只管多长、朝哪边。", en: "Let's look together. A vector is an arrow that only cares how long it is and which way it points."}
+      - {id: s2, pace: normal, text: "{@a}向量 a 向右四格，{@b}向量 b 向上三格。", en: "Vector a goes four squares right, vector b goes three squares up."}
+      - {id: s3, pace: normal, text: "{@m}把箭头平移到别处，长度方向都没变，还是同一个向量。", en: "Slide an arrow somewhere else: same length, same direction, still the same vector."}
+    do:
+      - {at: s1, act: remove, target: plane, args: {name: [w1, w2, home]}}
+      - {at: s2@a, act: vector, target: plane, args: {name: a, v: [4, 0], label: '\vec a'}}
+      - {at: s2@b, act: vector, target: plane, args: {name: b, v: [0, 3], role: C, label: '\vec b', side: r}}
+      - {at: s3@m, act: slide, target: plane, args: {name: b, at: [4, 0], copy: b2}, dur: 1.4}
+
+  - id: TipToTail
+    say:
+      - {id: s1, pace: normal, text: "a 加 b 的意思是：{@a}先走 a，{@b}再接着走 b。", en: "a plus b means: walk along a, then carry on along b."}
+      - {id: s2, pace: normal, text: "{@s}从起点直接指到终点，这一支就是 a 加 b。", en: "The arrow straight from the start to the end is a plus b."}
+    do:
+      - {at: s1@a, act: mark, target: plane.items}
+      - {at: s2@s, act: unmark, target: plane.items}
+      - {with: prev, act: vector, target: plane, args: {name: s, v: [4, 3], role: HL, label: '\vec a+\vec b', side: r, along: 0.72}}
+
+  - id: Predict
+    pause: {type: predict, prompt: 这支和的箭头有多长？, hold: 3, app_item: ep32-why-1}
+    say:
+      - {id: s1, pace: ask, text: "这支和的箭头有多长？真的是七吗？", en: "How long is the sum arrow? Is it really seven?"}
+
+  - id: Answer
+    say:
+      - {id: s1, pace: normal, text: "三支箭头围成直角三角形，{@g}直角边是四和三。", en: "The three arrows make a right triangle with legs four and three."}
+      - {id: s2, pace: normal, text: "{@p}由勾股定理，斜边是五，{@n}不是七：拐弯走了冤枉路。", en: "By Pythagoras, the long side is five, not seven: the corner made the walk longer."}
+    do:
+      - {at: s1@g, act: mark, target: plane.items}
+      - {at: s2@p, act: unmark, target: plane.items}
+      - {with: prev, act: show, target: len}
+      - {at: s2@n, act: cross, target: "myth#m"}
+
+  - id: Parallelogram
+    say:
+      - {id: s1, pace: normal, text: "{@c}换两支斜着的箭头，{@a}a 是三、一，{@b}b 是一、二。", en: "Now two slanted arrows: a is three, one and b is one, two."}
+      - {id: s2, pace: normal, text: "{@w}先走 a 再走 b，把 b 接到 a 的头上。", en: "Walk a, then b: put b on the tip of a."}
+      - {id: s3, pace: normal, text: "{@w}先走 b 再走 a，终点还是同一个点。", en: "Walk b, then a: you end at the very same point."}
+      - {id: s4, pace: slow, text: "两条路围成平行四边形，{@d}对角线就是 a 加 b。", en: "The two paths make a parallelogram, and its diagonal is a plus b."}
+      - {id: s5, pace: normal, text: "所以平行四边形法则，就是两次首尾相接拼在一起。", en: "So the parallelogram rule is just tip-to-tail done twice, side by side."}
+    do:
+      - {at: s1@c, act: remove, target: plane}
+      - {with: prev, act: hide, target: len}
+      - {with: prev, act: hide, target: myth}
+      - {at: s1@a, act: vector, target: plane, args: {name: a1, v: [3, 1], label: '\vec a', side: r}}
+      - {at: s1@b, act: vector, target: plane, args: {name: b1, v: [1, 2], role: C, label: '\vec b'}}
+      - {at: s2@w, act: slide, target: plane, args: {name: b1, at: [3, 1], copy: b1c}, dur: 1.2}
+      - {at: s3@w, act: slide, target: plane, args: {name: a1, at: [1, 2], copy: a1c}, dur: 1.2}
+      - {at: s4@d, act: vector, target: plane, args: {name: s1, v: [4, 3], role: HL, label: '\vec a+\vec b', along: 0.62}}
+      - {at: s5, act: step}
+
+  - id: NonExample
+    shows: non_example
+    say:
+      - {id: s1, pace: normal, text: "{@c}长度什么时候才能直接相加？{@s}方向相同的时候。", en: "When do lengths simply add? When the arrows point the same way."}
+      - {id: s2, pace: normal, text: "{@a}向右三格{@b}再向右两格，一共五格，路一点也不拐弯。", en: "Three right, then two right: five in all, no corner at all."}
+    do:
+      - {at: s1@c, act: remove, target: plane}
+      - {at: s2@a, act: vector, target: plane, args: {name: c, v: [3, 0], at: [0, 3.5], label: '3'}}
+      - {at: s2@b, act: vector, target: plane, args: {name: d, v: [2, 0], at: [3, 3.5], role: C, label: '2'}}
+
+  - id: Landing
+    shows: landing
+    say:
+      - {id: s1, pace: slow, text: "{@c}在坐标里，首尾相接就是{@x}横的加横的、竖的加竖的。", en: "In coordinates, tip-to-tail means across plus across, and up plus up."}
+      - {id: s2, pace: normal, text: "{@a}三加一是四，一加二是三，{@e}正好指到四、三。", en: "Three plus one is four, one plus two is three: it lands right on four, three."}
+    do:
+      - {at: s1@c, act: remove, target: plane}
+      - {after: prev, act: vector, target: plane, args: {name: a2, v: [3, 1], label: '\vec a', side: r}}
+      - {with: prev, act: vector, target: plane, args: {name: b2, v: [1, 2], at: [3, 1], role: C, label: '\vec b', side: r}}
+      - {at: s1@x, act: show, target: sum}
+      - {at: s2@a, act: mark, target: "sum#s"}
+      - {at: s2@e, act: vector, target: plane, args: {name: s2, v: [4, 3], role: HL, label: '\vec a+\vec b', along: 0.45}}
+      - {with: prev, act: point, target: plane, args: {name: e, at: [4, 3], label: '(4,3)', dir: r}}
+
+  - id: Close
+    say:
+      - {id: s1, pace: normal, text: "和的长度不会超过长度的和，因为两点之间直着走最近。", en: "The sum is never longer than the lengths added up, because straight is the shortest way between two points."}
+      - {id: s2, pace: ask, text: "把一支箭头转九十度，能不能也写成一次乘法？", en: "Turning an arrow by ninety degrees: could that be a multiplication too?"}
