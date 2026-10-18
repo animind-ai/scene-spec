@@ -57,29 +57,29 @@ objects:
     type: text
     text: '[$M=$]{#n} [$\begin{pmatrix}2&1\\0&1\end{pmatrix}$]{#m}'
     level: title
-    in: footer
+    in: side
   calc:
     type: text
     text: '[$1\cdot(2,0)+2\cdot(1,1)$]{#l} [$=(4,2)$]{#r .HL}'
     level: title
-    in: footer
+    in: side
   det:
     type: text
     text: '[$\det M=2\times 1-1\times 0$]{#l} [$=2$]{#r .HL}'
     level: title
-    in: footer
+    in: side
   oa:
     type: text
     text: '先转再拉：$(0,1)$'
     level: title
-    in: footer
+    in: side
   ob:
     type: text
     text: '先拉再转：$(0,2)$'
     role: "NO"
     level: title
-    right_of: oa
-    gap: lg
+    below: oa
+    gap: md
 
 beats:
   - id: Hook

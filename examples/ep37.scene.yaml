@@ -57,17 +57,23 @@ objects:
     type: text
     text: '$P$(都是男孩) $=\tfrac{1}{4}$'
     level: title
-    in: footer
+    in: side
   p1:
     type: text
     text: '[$P$(都是男孩 | 有男孩)]{#l} [$=\tfrac{1}{3}$]{#r .HL}'
     level: title
-    in: footer
+    in: side
   p2:
     type: text
-    text: '[$P$(都是男孩 | 老大是男孩)]{#l} [$=\tfrac{1}{2}$]{#r}'
+    text: '[$P$(都是男孩 | 老大是男孩)]{#l}'
     level: title
-    in: footer
+    in: side
+  p2b:
+    type: text
+    text: '[$=\tfrac{1}{2}$]{#r}'
+    level: title
+    below: p2
+    gap: sm
 
 beats:
   - id: Hook
@@ -144,6 +150,7 @@ beats:
       - {at: s2@f, act: frame, target: grid, args: {cells: [男男, 男女]}}
       - {at: s3@p, act: hide, target: p1}
       - {with: prev, act: show, target: p2}
+      - {with: prev, act: show, target: p2b}
 
   - id: Landing
     shows: landing
@@ -154,6 +161,7 @@ beats:
       - {at: s1@c, act: restore, target: grid}
       - {with: prev, act: unframe, target: grid}
       - {with: prev, act: hide, target: p2}
+      - {with: prev, act: hide, target: p2b}
       - {with: prev, act: show, target: p1}
       - {at: s1@x, act: strike, target: grid, args: {cells: [女女]}}
       - {at: s1@f, act: frame, target: grid, args: {cells: [男男, 男女, 女男]}}

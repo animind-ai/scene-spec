@@ -2,7 +2,7 @@
 # 一个洞察：概率 1/2 说的是抛得越多、频率越稳在 1/2 附近；前面的偏差被次数冲淡，不是后面去补（组件 coin_flips，seed 8770）。
 # 钩子问十次不一定五次、那 1/2 指什么，停三秒，说出"连着五次反面该轮到正面"；前十次 7 正；第 10–14 次连 5 反、第 15 次还是反；
 # 频率折线 10 → 50 → 100 次（46 正）；预测暂停"一千次时在哪"；1000 次 498 正；另四条折线、1/2 ± 1/√k 的漏斗；
-# 非例：连 5 反之后 31 回、下一次正面 15 回；落到"频率 = 正面次数 ÷ 抛的次数 → 1/2"，说明这是演示；埋 #38（高尔顿板）。
+# 非例：连 5 反之后 31 回、下一次正面 15 回；落到"频率 = 正面次数 ÷ 总次数 → 1/2"，说明这是演示；埋 #38（高尔顿板）。
 spec: "0.1"
 
 meta:
@@ -52,39 +52,64 @@ objects:
     in: stage
   seq:
     type: text
-    text: '前十次：[正正正正]{#a .A}反反[正正正]{#b .A}反'
+    text: '前十次：'
     level: title
-    in: footer
+    in: side
+  seq2:
+    type: text
+    text: '[正正正正]{#a .A}反反[正正正]{#b .A}反'
+    level: title
+    below: seq
+    gap: sm
   f10:
     type: text
     text: '$7\div 10=0.7$'
     level: title
-    in: footer
+    in: side
   streak:
     type: text
-    text: '第 10–14 次：[反反反反反]{#s .NO}　第 15 次：[？]{#q}'
+    text: '第 10–14 次：[反反反反反]{#s .NO}'
     level: title
-    in: footer
-  streak2:
+    in: side
+  next15:
     type: text
-    text: '第 10–14 次：[反反反反反]{#s .NO}　第 15 次：[反]{#q .NO}'
+    text: '第 15 次：[？]{#q}'
     level: title
-    in: footer
+    below: streak
+    gap: sm
+  next15b:
+    type: text
+    text: '第 15 次：[反]{#q .NO}'
+    level: title
+    below: streak
+    gap: sm
   f1000:
     type: text
     text: '[$498\div 1000$]{#l} [$=0.498$]{#r .HL}'
     level: title
-    in: footer
+    in: side
   after:
     type: text
-    text: '[连着五次反面之后：31 回]{#a}，[下一次正面：15 回]{#b .HL}'
+    text: '[连着五次反面之后：31 回]{#a}'
     level: title
-    in: footer
+    in: side
+  after2:
+    type: text
+    text: '[下一次正面：15 回]{#b .HL}'
+    level: title
+    below: after
+    gap: sm
   law:
     type: text
-    text: '[频率 = 正面次数 ÷ 抛的次数]{#l} [$\to\dfrac{1}{2}$]{#r .HL}'
+    text: '[频率 = 正面次数 ÷ 总次数]{#l}'
     level: title
-    in: footer
+    in: side
+  law2:
+    type: text
+    text: '[$\to\dfrac{1}{2}$]{#r .HL}'
+    level: title
+    below: law
+    gap: sm
 
 beats:
   - id: Hook
@@ -110,7 +135,9 @@ beats:
       - {id: s3, pace: normal, text: "{@d}七除以十是零点七，离二分之一还差得远。", en: "Seven divided by ten is zero point seven, far from one half."}
     do:
       - {at: s2@s, act: show, target: seq}
+      - {with: prev, act: show, target: seq2}
       - {at: s3@d, act: hide, target: seq}
+      - {with: prev, act: hide, target: seq2}
       - {with: prev, act: show, target: f10}
 
   - id: Streak
@@ -120,8 +147,9 @@ beats:
     do:
       - {at: s1@s, act: hide, target: f10}
       - {with: prev, act: show, target: streak}
-      - {at: s2@r, act: hide, target: streak}
-      - {with: prev, act: show, target: streak2}
+      - {with: prev, act: show, target: next15}
+      - {at: s2@r, act: hide, target: next15}
+      - {with: prev, act: show, target: next15b}
 
   - id: Chart
     say:
@@ -129,7 +157,8 @@ beats:
       - {id: s2, pace: normal, text: "{@f}开头几次，折线上下乱跳。", en: "At first, the line jumps up and down."}
       - {id: s3, pace: normal, text: "{@f}一百次里正面有四十六次，所以频率是零点四六。", en: "By a hundred flips: forty-six heads, a frequency of zero point four six."}
     do:
-      - {at: s1@c, act: hide, target: streak2}
+      - {at: s1@c, act: hide, target: streak}
+      - {with: prev, act: hide, target: next15b}
       - {at: s1@f, act: flip, target: chart, args: {to: 10, expect: 7}, dur: 1.2}
       - {at: s2@f, act: flip, target: chart, args: {to: 50, expect: 24}, dur: 1.4}
       - {at: s3@f, act: flip, target: chart, args: {to: 100, expect: 46}, dur: 1.2}
@@ -158,7 +187,8 @@ beats:
     do:
       - {at: s1@a, act: hide, target: f1000}
       - {with: prev, act: show, target: after}
-      - {at: s2@b, act: mark, target: "after#b"}
+      - {with: prev, act: show, target: after2}
+      - {at: s2@b, act: mark, target: "after2#b"}
       - {at: s2@x, act: cross, target: "myth#m"}
 
   - id: Landing
@@ -168,9 +198,11 @@ beats:
       - {id: s2, pace: normal, text: "这是演示，不是证明：我们看见的是次数多了，频率才稳。", en: "This is a demonstration, not a proof: what we see is that with more flips, the frequency steadies."}
       - {id: s3, pace: normal, text: "频率变稳，靠的是次数多，不是后面去补前面。", en: "It steadies because of the sheer number of flips, not because later flips make up for earlier ones."}
     do:
-      - {at: s1@l, act: unmark, target: "after#b"}
+      - {at: s1@l, act: unmark, target: "after2#b"}
       - {with: prev, act: hide, target: after}
+      - {with: prev, act: hide, target: after2}
       - {with: prev, act: show, target: law}
+      - {with: prev, act: show, target: law2}
 
   - id: Close
     say:

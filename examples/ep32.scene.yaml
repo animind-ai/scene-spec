@@ -54,12 +54,12 @@ objects:
     type: text
     text: '[$|\vec a+\vec b|=5$]{#l} [$\ne 7$]{#r .NO}'
     level: title
-    in: footer
+    in: side
   sum:
     type: text
     text: '[$(3,1)$]{#a} [$+$]{#p} [$(1,2)$]{#b} [$=(4,3)$]{#s .HL}'
     level: title
-    in: footer
+    in: side
 
 beats:
   - id: Hook

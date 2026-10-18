@@ -54,7 +54,7 @@ objects:
     type: text
     text: '[$128\times 20\div 64$]{#l} [$=40$]{#r .HL}'
     level: title
-    in: footer
+    in: side
 
 beats:
   - id: Hook

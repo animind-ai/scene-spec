@@ -58,18 +58,24 @@ objects:
     type: text
     text: '$3\times(-1)=-3$'
     level: title
-    in: footer
+    in: side
   law:
     type: text
     text: '[$i\times i=-1$]{#l}'
     role: HL
     level: title
-    in: footer
+    in: side
   f2:
     type: text
-    text: '[$(3+i)\times i$]{#l} [$=3i+i^2$]{#m} [$=-1+3i$]{#r .HL}'
+    text: '[$(3+i)\times i$]{#l}'
     level: title
-    in: footer
+    in: side
+  f2b:
+    type: text
+    text: '[$=3i+i^2$]{#m} [$=-1+3i$]{#r .HL}'
+    level: title
+    below: f2
+    gap: sm
 
 beats:
   - id: Hook
@@ -136,13 +142,14 @@ beats:
       - {with: prev, act: hide, target: law}
       - {at: s1@z, act: vector, target: plane, args: {name: z, v: [3, 1], label: '3+i'}}
       - {at: s2@m, act: show, target: f2}
-      - {at: s2@r, act: mark, target: "f2#r"}
-      - {at: s3@t, act: unmark, target: "f2#r"}
+      - {with: prev, act: show, target: f2b}
+      - {at: s2@r, act: mark, target: "f2b#r"}
+      - {at: s3@t, act: unmark, target: "f2b#r"}
       - {with: prev, act: show, target: plane.mesh}
       - {after: prev, act: rotate, target: plane, args: {angle: 90}, dur: 2.0}
       - {at: s4@l, act: relabel, target: plane, args: {name: z, label: '-1+3i'}}
       - {with: prev, act: point, target: plane, args: {name: e, at: [-1, 3]}}
-      - {at: s4@e, act: mark, target: "f2#r"}
+      - {at: s4@e, act: mark, target: "f2b#r"}
 
   - id: NonExample
     shows: non_example
@@ -153,6 +160,7 @@ beats:
       - {at: s1@c, act: hide, target: plane.mesh}
       - {with: prev, act: remove, target: plane}
       - {with: prev, act: hide, target: f2}
+      - {with: prev, act: hide, target: f2b}
       - {after: prev, act: vector, target: plane, args: {name: z0, v: [3, 1], label: '3+i', side: r}}
       - {at: s2@u, act: vector, target: plane, args: {name: up, v: [0, 1], at: [3, 1], role: C, label: '+i', side: r}}
       - {at: s2@s, act: vector, target: plane, args: {name: z2, v: [3, 2], role: "NO", label: '3+2i'}}
