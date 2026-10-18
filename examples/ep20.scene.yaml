@@ -1,18 +1,19 @@
-# 第 2 版（三角形折叠），2026-10-18 用户反馈「我没能理解」，换成 ep20.scene.yaml 的"找尺子"版；留档。
-# 洞察系列 #20 √2 为什么不是分数（八年级），三角形折叠版。按脚本 insight/ep20-sqrt2-irrational/archive/script-v2-fold.yaml 写；
-# 正方形版（Tennenbaum）是 ep20.scene.yaml，两版并排出片给用户选。
+# 洞察系列 #20 √2 为什么不是分数（八年级）。单集。三角形折叠版 + 情境开场（2026-10-18 用户定：「换回三角形折叠版，改成情境开场」）。
+# 按脚本 insight/ep20-sqrt2-irrational/script.yaml 写。留档：第 1 版正方形 ep20-v1-squares，第 3 版找尺子 ep20-v3-ruler。
+# 开场：边长为一的正方形纸沿对角线对折（dissect 的 fold），折痕长 √2；问它能不能正好写成分数，停三秒；同桌拿尺子量 1.414，
+# 说"量得再细点，总能凑出一个分数"（迷思）。对折后的纸就是后面的等腰直角三角形，同一个 view、同一个位置。
 # 一个洞察（几何无穷递降）：假设 √2 = a/b、b 最小，a² = b² + b²：直角边 b、斜边 a 的等腰直角三角形；沿上面那个角的平分线
-# 把左边的直角边折到斜边上（dissect 的 fold），斜边剩 a − b，右下角切出直角边 a − b、斜边 2b − a 的小等腰直角三角形；
+# 把左边的直角边折到斜边上，斜边剩 a − b，右下角切出直角边 a − b、斜边 2b − a 的小等腰直角三角形；
 # 1 < √2 < 2 ⇒ b < a < 2b，新边长是更小的正整数，矛盾。再折一次表示一直缩小。
 # 画法：直角在 C(0,0)，B(5,0)，A(0,5)（b = 5 个图形单位），D = (5√2 − 5, 0)，C 折到 E = (5/√2, 5 − 5/√2)；
 # 第二次在 △DEB 里沿 D 角的平分线折，折痕 D→F，E 落到 G = (2·DE, 0) = F 的正下方。
-# 钩子问有没有分数平方正好是 2、停三秒、说出"差不多就是分数"；预测暂停"边长还是整数吗"；非例 7/5：49 和 50 差 1；
-# 落到 √2 是无理数，说明这是证明；结尾问 √2 的小数会不会循环（不问 √3：这个折法对 √3 不能照搬）。
+# 预测暂停"边长还是整数吗"；非例 7/5：49 和 50 差 1；落到 √2 是无理数，说明这是证明；
+# 结尾问 √2 的小数会不会循环（不问 √3：这个折法对 √3 不能照搬）。
 spec: "0.1"
 
 meta:
-  id: ep20-fold
-  title: √2 为什么不是分数（折叠版）
+  id: ep20
+  title: √2 为什么不是分数
   line: insight
   units: [J5]
   episode: 20
@@ -39,16 +40,29 @@ style:
 objects:
   q:
     type: text
-    text: '$\left(\dfrac{a}{b}\right)^2=2\ ?$'
+    text: '$\sqrt{2}=\dfrac{?}{?}$'
     level: title
     in: top
   myth:
     type: text
-    text: '[差不多就是？]{#m}'
+    text: '[量细点总能凑出分数？]{#m}'
     role: "NO"
     level: title
     right_of: q
     gap: lg
+  # 开场的纸：正方形沿对角线对折，折好就是后面 tri 的三角形（同一个 view，换对象时位置不动）
+  paper:
+    widget: dissect
+    role: A
+    over: tri
+    view: [[-0.7, -0.75], [5.8, 5.15]]
+    shapes:
+      S: {rect: [5, 5]}
+    cuts:
+      d: {piece: S, line: [[0, 5], [5, 0]], into: [half, top]}
+    guides:
+      one: {from: [0, 0], to: [5, 0], label: '$1$', side: below, solid: true}
+      diag: {from: [0, 5], to: [5, 0], label: '折痕 $\sqrt{2}$', role: HL, solid: true, side: right}
   tri:
     widget: dissect
     role: A
@@ -120,17 +134,21 @@ objects:
 
 beats:
   - id: Hook
-    pause: {type: predict, prompt: 有没有一个分数，平方以后正好等于二？先猜一猜。, hold: 3, app_item: ep20-before-1}
+    pause: {type: predict, prompt: 折痕长根号二，它能正好写成一个分数吗？, hold: 3, app_item: ep20-before-1}
     say:
-      - {id: s1, pace: ask, text: "{@q}有没有一个分数，平方以后正好等于二？", en: "Is there a fraction whose square is exactly two?"}
-      - {id: s2, pace: normal, text: "先猜一猜，想三秒钟。", en: "Take a guess. Think for three seconds."}
+      - {id: s1, pace: normal, text: "{@p}边长为一的正方形纸，{@f}沿对角线对折，{@c}折痕长根号二。", en: "A square sheet of paper with side one: fold it along the diagonal. The crease is root two long."}
+      - {id: s2, pace: ask, text: "{@q}先别急，心里站个队：它能正好写成一个分数吗？", en: "Don't rush; pick a side in your head: can it be written exactly as a fraction?"}
     do:
-      - {at: s1@q, act: show, target: q}
+      - {at: s1@p, act: show, target: paper}
+      - {with: prev, act: show, target: "paper#one"}
+      - {at: s1@f, act: fold, target: paper, args: {cut: d, flap: top, back: C}, dur: 1.6}
+      - {at: s1@c, act: show, target: "paper#diag"}
+      - {at: s2@q, act: show, target: q}
 
   - id: Myth
     shows: misconception
     say:
-      - {id: s1, pace: normal, text: "很多人觉得，{@m}分数能无限接近根号二，差不多就是分数了。", en: "Lots of people think fractions get so close to root two that it's basically a fraction."}
+      - {id: s1, pace: normal, text: "同桌拿尺子一量，一点四一四，{@m}说量得再细点，总能凑出一个分数。", en: "Your deskmate measures it with a ruler, gets one point four one four, and says: measure finely enough and some fraction will fit."}
     do:
       - {at: s1@m, act: show, target: myth}
 
@@ -146,7 +164,8 @@ beats:
       - {with: prev, act: mark, target: fmin}
       - {at: s3@s, act: unmark, target: fmin}
       - {with: prev, act: show, target: f2}
-      - {at: s4@t, act: show, target: tri}
+      - {at: s4@t, act: hide, target: paper, dur: 0.3}
+      - {with: prev, act: show, target: tri, dur: 0.3}
 
   - id: Fold
     say:

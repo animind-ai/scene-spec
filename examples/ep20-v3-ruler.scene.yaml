@@ -1,5 +1,6 @@
+# 第 3 版（找尺子），2026-10-18 用户看过后换回三角形折叠版（ep20.scene.yaml，加情境开场）；留档。脚本在 insight/ep20-sqrt2-irrational/archive/script-v3-ruler.yaml。
 # 洞察系列 #20 √2 为什么不是分数（八年级）。单集。第 3 版：找一把能同时量完的尺子（2026-10-18 用户定）。
-# 按脚本 insight/ep20-sqrt2-irrational/script.yaml 写；第 1 版正方形留在 ep20-v1-squares.scene.yaml，第 2 版折叠留在 ep20-fold.scene.yaml。
+# 按脚本 insight/ep20-sqrt2-irrational/script.yaml 写；第 1 版正方形留在 ep20-v1-squares.scene.yaml，第 2 版折叠后来加了情境开场，接替了 ep20.scene.yaml。
 # 一个洞察：√2 = a/b 就是"有一把尺子能同时量完正方形的边和对角线"。拿边量对角线（dissect 的 fold：直角边转到斜边上）剩一截；
 # 拿这截量边（底边量掉一截，cut 切出小三角形），剩下的是更小正方形的对角线：又回到开头。再量一轮（第二次 fold + cut），
 # 镜头推近到小三角形、更小的三角形（放大 √2 + 1 倍一层），一层套一层；整数格不能一直变小，所以尺子不存在。
@@ -9,7 +10,7 @@
 spec: "0.1"
 
 meta:
-  id: ep20
+  id: ep20-v3-ruler
   title: √2 为什么不是分数
   line: insight
   units: [J5]
