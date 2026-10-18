@@ -1,8 +1,9 @@
-# 洞察系列 #29 等差数列求和：倒过来再加一遍（高一 / 高二）。sums 系列第一集，接 #30。
-# 按脚本 insight/ep29-arithmetic-sum/script.yaml（第 1 轮）写。
-# 一个洞察：和画成台阶点阵，复制一份转半圈拼上就是长方形；钩子问 1 + … + 100 为什么是 5050、停三秒、说出"只对从 1 开始管用"；
-# 1..5：复制、预测暂停、转半圈推过来，5 排 × 6；推到 100 × 101 ÷ 2；迷思：3 + 5 + 7 + 9 + 11 照样拼成 5 排 × 14；
-# 非例：1 + 2 + 4 + 8 拼上后各排 9、6、6、9，中间有空；落到 S = n(a₁ + aₙ) ÷ 2。片尾画面是 #30 的开头画面。
+# 洞察系列 #29 等差数列求和（高一 / 高二）。sums 系列第一集，接 #30。第 2 版：削峰填谷（2026-10-18 用户定）。
+# 按脚本 insight/ep29-arithmetic-sum/script.yaml（第 2 版）写。
+# 一个洞察：和摞成积木台阶，像 #35 削峰填谷那样把高的那头匀给矮的那头，摊成平墙，高度 = (首项 + 末项) ÷ 2；
+# 钩子用情境（孩子张口说出 5050）、停三秒、同桌说"只对从 1 开始管用"；1..5 摊成 3，5 × 3 = 15；1..100 摊成 50.5；
+# 迷思：3..11 照样摊成 7；非例 1、2、4、8：首尾平均 4.5，真摊平只有 3.75；落到 S = n(a₁ + aₙ) ÷ 2，
+# 再用一句话接回"倒过来拼成长方形"。片尾画面（长方形、底部公式、右侧下一集的问题）和第 1 版完全一样，#30 接它。
 spec: "0.1"
 
 meta:
@@ -16,9 +17,9 @@ meta:
   license: CC-BY-4.0
 
 pedagogy:
-  insight: 把一个和画成一级一级的台阶，再复制一份转半圈拼上，就是一个长方形；每排都是首项加末项，一共项数那么多排，所以和是项数乘首项加末项再除以二
+  insight: 把等差数列摞成积木台阶，像削峰填谷那样把高的那头匀给矮的那头，台阶摊成一面平墙，高度正好是首项加末项的一半；所以和等于项数乘这个平均高度
   misconception: 首尾配对这招只对从一开始的数列管用，比如一加到一百
-  non_example: 一加二加四加八每级多得不一样，转半圈拼上，有的排九个点、有的排六个点，拼不成长方形
+  non_example: 一、二、四、八每级多得不一样：首尾平均是四点五，可摊平只有三点七五
   status: proof
   landing: Landing
 
@@ -43,48 +44,12 @@ objects:
     level: title
     below: q1
     gap: sm
-  q3:
-    type: text
-    text: '[$=100\times 101\div 2$]{#m} [$=5050$]{#r .HL}'
-    below: q1
-    gap: sm
   myth:
     type: text
     text: '[只对从 1 开始管用？]{#m}'
     role: "NO"
     below: q2
     gap: md
-  a5:
-    type: text
-    text: '$1+2+3+4+5$'
-    below: myth
-    gap: lg
-  b5:
-    type: text
-    text: '[$=5\times 6\div 2$]{#m} [$=15$]{#r .HL}'
-    below: a5
-    gap: sm
-  a35:
-    type: text
-    text: '$3+5+7+9+11$'
-    below: myth
-    gap: lg
-  b35:
-    type: text
-    text: '[$=5\times 14\div 2$]{#m} [$=35$]{#r .HL}'
-    below: a35
-    gap: sm
-  ag:
-    type: text
-    text: '$1+2+4+8$'
-    below: myth
-    gap: lg
-  bg:
-    type: text
-    text: '每排 9、6、6、9 个'
-    role: "NO"
-    below: ag
-    gap: sm
   nq:
     type: text
     text: '曲线每一点涨得多快？'
@@ -96,23 +61,6 @@ objects:
     text: '[$S=$]{#s} [$n(a_1+a_n)$]{#nw .HL} [$\div 2$]{#h}'
     level: display
     in: footer
-  st5:
-    widget: dissect
-    role: A
-    in: stage
-    view: [[-1.4, -0.8], [12.6, 5.6]]
-    shapes:
-      D:
-        dots: {rows: [1, 2, 3, 4, 5]}
-    copies:
-      E: D
-    pieces:
-      E: {role: B}
-    guides:
-      rows: {from: [-0.7, 0], to: [-0.7, 4], label: '5 排', role: HL, side: left}
-      cols: {from: [0, 4.7], to: [5, 4.7], label: '每排 6 个', role: HL, side: above}
-      p0: {from: [5.6, -0.3], to: [5.6, 0.3], label: '$1+5$', role: HL, side: right}
-      p1: {from: [5.6, 0.7], to: [5.6, 1.3], label: '$2+4$', role: HL, side: right}
   odd:
     widget: dissect
     role: A
@@ -130,27 +78,67 @@ objects:
       cols: {from: [0, 4.7], to: [13, 4.7], label: '每排 $3+11=14$ 个', role: HL, side: above}
       n: {from: [-0.7, 0], to: [-0.7, 4], label: '$n$ 排', role: HL, side: left}
       w: {from: [0, 4.7], to: [13, 4.7], label: '每排 $a_1+a_n$ 个', role: HL, side: above}
-  geo:
-    widget: dissect
+  q3:
+    type: text
+    text: '[$=100\times 50.5$]{#m} [$=5050$]{#r .HL}'
+    below: q1
+    gap: sm
+  a5:
+    type: text
+    text: '$1+2+3+4+5$'
+    below: myth
+    gap: lg
+  s5:
+    type: text
+    text: '[$=5\times 3$]{#m} [$=15$]{#r .HL}'
+    below: a5
+    gap: sm
+  a35:
+    type: text
+    text: '$3+5+7+9+11$'
+    below: myth
+    gap: lg
+  s35:
+    type: text
+    text: '[$=5\times 7$]{#m} [$=35$]{#r .HL}'
+    below: a35
+    gap: sm
+  ag:
+    type: text
+    text: '$1+2+4+8$'
+    below: myth
+    gap: lg
+  sg:
+    type: text
+    text: '[$15\div 4=3.75$]{#r}'
+    below: ag
+    gap: sm
+  bars5:
+    widget: block_bars
     role: A
     in: stage
-    view: [[-1.0, -0.8], [9.0, 8.4]]
-    shapes:
-      D:
-        dots: {rows: [1, 2, 4, 8]}
-    copies:
-      E: D
-    pieces:
-      E: {role: B}
-    guides:
-      g1: {from: [1.6, 1], to: [4.4, 1], role: "NO", solid: true}
-      g2: {from: [3.6, 2], to: [6.4, 2], role: "NO", solid: true}
+    heights: [1, 2, 3, 4, 5]
+    room: 5
+    numbers: true
+  bars35:
+    widget: block_bars
+    role: A
+    in: stage
+    heights: [3, 5, 7, 9, 11]
+    room: 11
+    numbers: true
+  bars8:
+    widget: block_bars
+    role: A
+    in: stage
+    heights: [1, 2, 4, 8]
+    room: 8
 
 beats:
   - id: Hook
-    pause: {type: predict, prompt: 一加到一百为什么等于五千零五十？先猜一猜。, hold: 3, app_item: ep29-before-1}
+    pause: {type: predict, prompt: 一加到一百，他怎么张口就说五千零五十？先猜一猜。, hold: 3, app_item: ep29-before-1}
     say:
-      - {id: s1, pace: ask, text: "{@q}从一加到一百，为什么等于五千零五十？", en: "One plus two, all the way up to a hundred: why is it five thousand and fifty?"}
+      - {id: s1, pace: ask, text: "{@q}一个孩子张口就说五千零五十，他怎么算的？", en: "A kid called out five thousand and fifty straight away. How did he work it out?"}
       - {id: s2, pace: normal, text: "先猜一猜，想三秒。", en: "Take a guess. Think for three seconds."}
     do:
       - {at: s1@q, act: show, target: q1}
@@ -159,116 +147,101 @@ beats:
   - id: Myth
     shows: misconception
     say:
-      - {id: s1, pace: normal, text: "很多人记得首尾配对，却以为{@m}这招只对从一开始的数列管用。", en: "Lots of people remember pairing first with last, but think it only works for sums that start at one."}
+      - {id: s1, pace: normal, text: "同桌不服气：{@m}首尾配对这招，只对从一开始的数管用。", en: "His deskmate wasn't impressed: pairing first with last only works when you start at one."}
     do:
       - {at: s1@m, act: show, target: myth}
 
   - id: Setup
     say:
-      - {id: s1, pace: normal, text: "我们先看小一点的：{@a}一加到五，{@d}每个数画成一排点。", en: "Let's start smaller: one up to five, each number drawn as a row of dots."}
-      - {id: s2, pace: normal, text: "一个、两个、三个，一直到五个，像一级一级的台阶。", en: "One, two, three, up to five: it looks like a staircase."}
+      - {id: s1, pace: normal, text: "先看小的：{@a}一加到五，{@b}每个数摞成一列积木，像一级级台阶。", en: "Start small: one to five, each number stacked as a column of blocks, like a staircase."}
+      - {id: s2, pace: normal, text: "还记得削峰填谷吗？高的削下来填到矮的上，摊平的高度就是平均数。", en: "Remember levelling peaks into valleys? Shave the tall ones, fill the short ones, and the flat height is the mean."}
     do:
       - {at: s1@a, act: show, target: a5}
-      - {at: s1@d, act: show, target: st5}
+      - {at: s1@b, act: show, target: bars5}
 
   - id: Predict
-    pause: {type: predict, prompt: 再复制一份台阶，转半圈拼上去，会拼成什么形状？, hold: 3, app_item: ep29-why-1}
+    pause: {type: predict, prompt: 把高的那头往矮的那头匀，最后摊平，会有多高？, hold: 3, app_item: ep29-why-1}
     say:
-      - {id: s1, pace: ask, text: "{@c}再复制一份台阶，转半圈拼上去，会拼成什么形状？", en: "Copy the staircase, turn the copy half a turn and fit it on. What shape do we get?"}
-    do:
-      - {at: s1@c, act: copy, target: st5, args: {piece: E, by: [7, 0]}}
+      - {id: s1, pace: ask, text: "把高的那头往矮的那头匀，最后摊平，会有多高？", en: "Pour the tall end into the short end until it's flat. How high will it be?"}
 
-  - id: Flip
+  - id: Level
     say:
-      - {id: s1, pace: normal, text: "{@r}把这份复制转半圈，{@s}再推过来，贴住原来的台阶。", en: "Turn the copy half a turn, then slide it over against the first staircase."}
-      - {id: s2, pace: normal, text: "严丝合缝，拼成一个长方形：{@rows}五排，{@cols}每排六个点。", en: "A perfect fit: a rectangle, five rows of six dots."}
-      - {id: s3, pace: normal, text: "每一排都是首尾配对：{@p0}一加五，{@p1}二加四，都等于六。", en: "Each row is a first-and-last pair: one plus five, two plus four, all six."}
-      - {id: s4, pace: normal, text: "两份台阶一共五乘六，三十个点，{@r}一份就是十五。", en: "Two staircases make five times six, thirty dots, so one is fifteen."}
-      - {id: s5, pace: normal, text: "换成一百级台阶，就是一百排，每排一百零一个点。", en: "With a hundred steps, there are a hundred rows of a hundred and one dots."}
-      - {id: s6, pace: slow, text: "{@h}一份是一百乘一百零一的一半，正好五千零五十。", en: "One staircase is half of a hundred times a hundred and one: exactly five thousand and fifty."}
+      - {id: s1, pace: normal, text: "{@a}最高的五分两块给最矮的一，{@b}四再分一块给二。", en: "The tallest, five, gives two blocks to the shortest, one. Four gives one block to two."}
+      - {id: s2, pace: slow, text: "{@l}台阶变成了一面平墙，每列都是三块。", en: "The staircase becomes a flat wall, three blocks in every column."}
+      - {id: s3, pace: normal, text: "三正好是一和五的平均：高出来的，正好填上缺的。", en: "Three is exactly the average of one and five: what sticks out exactly fills what's missing."}
+      - {id: s4, pace: normal, text: "所以和就是列数乘平均高度，{@r}五乘三，十五。", en: "So the sum is the number of columns times the average height: five times three, fifteen."}
+      - {id: s5, pace: normal, text: "一加到一百也一样：一百列，摊平后高五十点五。", en: "One to a hundred works the same way: a hundred columns, levelled to fifty and a half."}
+      - {id: s6, pace: slow, text: "{@h}一百乘五十点五，正好五千零五十。", en: "A hundred times fifty and a half: exactly five thousand and fifty."}
     do:
-      - {at: s1@r, act: rotate, target: st5, args: {piece: E, angle: 180}, dur: fit}
-      - {at: s1@s, act: shift, target: st5, args: {piece: E, to: [3.666667, 1.333333]}, dur: fit}
-      - {at: s2@rows, act: show, target: "st5#rows"}
-      - {at: s2@cols, act: show, target: "st5#cols"}
-      - {at: s3@p0, act: show, target: "st5#p0"}
-      - {at: s3@p1, act: show, target: "st5#p1"}
-      - {at: s4, act: show, target: b5}
-      - {at: s4@r, act: mark, target: "b5#r"}
+      - {at: s1@a, act: transfer, target: bars5, args: {from: 4, to: 0, count: 2}, dur: fit}
+      - {at: s1@b, act: transfer, target: bars5, args: {from: 3, to: 1}, dur: fit}
+      - {at: s2@l, act: level, target: bars5, args: {at: 3, label: '$(1+5)\div 2=3$', role: HL}}
+      - {at: s4@r, act: show, target: s5}
+      - {after: prev, act: mark, target: "s5#r"}
       - {at: s6@h, act: hide, target: q2}
       - {with: prev, act: show, target: q3}
       - {after: prev, act: mark, target: "q3#r"}
 
   - id: Try
     say:
-      - {id: s1, pace: normal, text: "那不从一开始呢？{@a}试试三加五加七加九加十一。", en: "What if we don't start at one? Try three plus five plus seven plus nine plus eleven."}
-      - {id: s2, pace: normal, text: "台阶每级多两个点。{@c}照样复制一份，{@r}转半圈拼上。", en: "Each step is two dots longer. Copy it, turn it half a turn and fit it on, same as before."}
-      - {id: s3, pace: normal, text: "还是长方形：{@rows}五排，{@cols}每排三加十一，十四个点。", en: "Still a rectangle: five rows, each three plus eleven, fourteen dots."}
-      - {id: s4, pace: normal, text: "{@b}所以和是五乘十四除以二，{@x}等于三十五。", en: "So the sum is five times fourteen over two, thirty-five."}
+      - {id: s1, pace: normal, text: "那不从一开始呢？{@a}试试三、五、七、九、十一。", en: "What if we don't start at one? Try three, five, seven, nine, eleven."}
+      - {id: s2, pace: normal, text: "{@a}十一匀四块给三，{@b}九匀两块给五，{@l}全都摊成七。", en: "Eleven passes four blocks to three, nine passes two to five, and everything levels at seven."}
+      - {id: s3, pace: normal, text: "七还是首尾的平均，{@r}和是五乘七，三十五。", en: "Seven is still the average of first and last, and the sum is five times seven, thirty-five."}
     do:
       - {at: s1, act: unmark, target: "q3#r"}
-      - {with: prev, act: hide, target: st5}
+      - {with: prev, act: unmark, target: "s5#r"}
+      - {with: prev, act: hide, target: bars5}
       - {with: prev, act: hide, target: a5}
-      - {with: prev, act: hide, target: b5}
+      - {with: prev, act: hide, target: s5}
       - {at: s1@a, act: show, target: a35}
-      - {with: prev, act: show, target: odd}
-      - {at: s2@c, act: copy, target: odd, args: {piece: E, by: [0, 5.5]}}
-      - {at: s2@r, act: rotate, target: odd, args: {piece: E, angle: 180}, dur: 1.0}
-      - {after: prev, act: shift, target: odd, args: {piece: E, to: [9.428571, 1.428571]}, dur: fit}
-      - {at: s3@rows, act: show, target: "odd#rows"}
-      - {at: s3@cols, act: show, target: "odd#cols"}
-      - {at: s4@b, act: show, target: b35}
-      - {at: s4@x, act: mark, target: "b35#r"}
+      - {with: prev, act: show, target: bars35}
+      - {at: s2@a, act: transfer, target: bars35, args: {from: 4, to: 0, count: 4}, dur: fit}
+      - {at: s2@b, act: transfer, target: bars35, args: {from: 3, to: 1, count: 2}, dur: fit}
+      - {at: s2@l, act: level, target: bars35, args: {at: 7, label: '$(3+11)\div 2=7$', role: HL}}
+      - {at: s3@r, act: show, target: s35}
+      - {after: prev, act: mark, target: "s35#r"}
       - {with: prev, act: cross, target: "myth#m"}
 
   - id: NonExample
     shows: non_example
     say:
-      - {id: s1, pace: normal, text: "要是每级多得不一样呢？{@a}比如一加二加四加八。", en: "And if the steps grow by different amounts? Say one plus two plus four plus eight."}
-      - {id: s2, pace: normal, text: "{@c}转半圈拼上，{@b}有的排九个，有的排六个，{@g}拼不成长方形。", en: "Flip and fit: some rows have nine, some have six. No rectangle."}
+      - {id: s1, pace: normal, text: "可要是{@a}一、二、四、八，每级多得不一样呢？", en: "But what about one, two, four, eight, where the steps grow by different amounts?"}
+      - {id: s2, pace: normal, text: "{@x}首尾平均是四点五，{@t}可一共十五块，{@l}摊平只有三点七五。", en: "The first-and-last average is four and a half, but there are fifteen blocks, so the level is only three and three quarters."}
     do:
-      - {at: s1, act: unmark, target: "b35#r"}
-      - {with: prev, act: hide, target: odd}
+      - {at: s1, act: unmark, target: "s35#r"}
+      - {with: prev, act: hide, target: bars35}
       - {with: prev, act: hide, target: a35}
-      - {with: prev, act: hide, target: b35}
+      - {with: prev, act: hide, target: s35}
       - {at: s1@a, act: show, target: ag}
-      - {with: prev, act: show, target: geo}
-      - {at: s2@c, act: copy, target: geo, args: {piece: E, by: [0, 4.5]}}
-      - {after: prev, act: rotate, target: geo, args: {piece: E, angle: 180}, dur: 0.8}
-      - {after: prev, act: shift, target: geo, args: {piece: E, to: [5.666667, 0.733333]}, dur: 1.0}
-      - {at: s2@b, act: show, target: bg}
-      - {at: s2@g, act: show, target: "geo#g1"}
-      - {with: prev, act: show, target: "geo#g2"}
+      - {with: prev, act: show, target: bars8}
+      - {at: s2@x, act: level, target: bars8, args: {at: 4.5, label: '$(1+8)\div 2=4.5$？', role: "NO"}}
+      - {at: s2@t, act: show, target: sg}
+      - {at: s2@l, act: level, target: bars8, args: {at: 3.75, label: '$3.75$', role: HL}}
 
   - id: Landing
     shows: landing
     say:
-      - {id: s1, pace: slow, text: "{@back}所以等差数列的和，{@law}是项数乘首项加末项，再除以二。", en: "So an arithmetic series adds up to the number of terms times first plus last, divided by two."}
-      - {id: s2, pace: normal, text: "首项是几都行，{@w}要紧的是每一级多出来的一样多。", en: "The first term can be anything. What matters is that every step grows by the same amount."}
+      - {id: s1, pace: slow, text: "{@law}所以等差数列的和，是项数乘首项加末项，再除以二。", en: "So an arithmetic series adds up to the number of terms times first plus last, divided by two."}
+      - {id: s2, pace: normal, text: "{@d}两份台阶倒过来一拼，每排都是首项加末项，{@f}也是这个道理。", en: "Flip a second staircase onto the first and every row is first plus last: the same idea."}
     do:
-      - {at: s1@back, act: hide, target: geo}
-      - {with: prev, act: hide, target: ag}
-      - {with: prev, act: hide, target: bg}
-      - {after: prev, act: show, target: odd}
-      - {with: prev, act: show, target: a35}
-      - {with: prev, act: show, target: b35}
-      - {with: prev, act: hide, target: "odd#rows"}
-      - {with: prev, act: hide, target: "odd#cols"}
-      - {with: prev, act: show, target: "odd#n"}
-      - {with: prev, act: show, target: "odd#w"}
       - {at: s1@law, act: show, target: law}
-      - {at: s2@w, act: underline, target: law}
+      - {at: s2@d, act: hide, target: bars8}
+      - {with: prev, act: hide, target: ag}
+      - {with: prev, act: hide, target: sg}
+      - {after: prev, act: show, target: odd}
+      - {after: prev, act: copy, target: odd, args: {piece: E, by: [0, 5.5]}}
+      - {after: prev, act: rotate, target: odd, args: {piece: E, angle: 180}, dur: 0.8}
+      - {after: prev, act: shift, target: odd, args: {piece: E, to: [9.428571, 1.428571]}, dur: 0.8}
+      - {at: s2@f, act: show, target: "odd#n"}
+      - {with: prev, act: show, target: "odd#w"}
 
   - id: Close
     say:
       - {id: s1, pace: normal, text: "这种一级一级的台阶，讲差分的时候还会再见到。", en: "We'll meet this staircase again when we get to finite differences."}
       - {id: s2, pace: ask, text: "{@q}一条曲线在每一点涨得有多快，又该怎么看出来？", en: "Next: how can we see how fast a curve is rising at each point?"}
     do:
-      # 片尾画面：长方形、底部公式和右侧一句下一集的问题，不留叠加层（划线、叉），#30 开场好还原
-      - {at: s1, act: clear, target: law}
-      - {with: prev, act: hide, target: q1}
+      # 片尾画面：长方形、底部公式和右侧一句下一集的问题，不留叠加层，#30 开场好还原
+      - {at: s1, act: hide, target: q1}
       - {with: prev, act: hide, target: q3}
       - {with: prev, act: hide, target: myth}
-      - {with: prev, act: hide, target: a35}
-      - {with: prev, act: hide, target: b35}
       - {at: s2@q, act: show, target: nq}
