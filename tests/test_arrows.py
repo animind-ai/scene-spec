@@ -37,3 +37,15 @@ def test_two_turns_land_on_plus_six(example):
 def test_arrows_are_checked(example, obj, actions, code):
     result = add(example, {**NL, **obj}, *actions)
     assert code in result, result
+
+
+def test_eight_points_before_erase(example):
+    # 差分 #39 的路标：0、1、4、9、16、25 六个点；最多八个，point[7] 能点名，point[8] 不能
+    road = {"widget": "number_line", "range": [0, 25], "measures": ["1"]}
+    assert add(example, road, *[("mark_point", {"at": at}) for at in (0, 1, 4, 9, 16, 25)]) == []
+    doc = example
+    do = next(b for b in doc["beats"] if b["id"] == "Down")["do"]
+    do.append({"after": "prev", "act": "hide", "target": "w.point[7]"})
+    assert not [c for c in check(doc).codes() if c.startswith("SS3")]
+    do[-1]["target"] = "w.point[8]"
+    assert [c for c in check(doc).codes() if c.startswith("SS3")]

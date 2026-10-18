@@ -450,7 +450,7 @@ REGISTRY: dict[str, Widget] = {
 # ---------- 数轴（分数除法：里面有几个）----------
 # 自成一节，登记在下面一行；跳几次、剩多少按 fractions.Fraction 精确算，和 kit 的 mx/numberline.py 一致。
 
-NUMBER_LINE_POINTS = 4  # mark_point 最多点几个（erase 后重新计数）
+NUMBER_LINE_POINTS = 8  # mark_point 最多点几个（erase 后重新计数）
 
 
 def _nl_frac(value: object):
