@@ -9,8 +9,9 @@
 坐标约定：对象里写的所有坐标都是"图形坐标"（y 向上，单位任意，kit 按画面自动缩放）。
 每一块记住自己"出生时"的坐标（剪出来的块就是被剪那块的原坐标）；动作里 edge / vertex 用块的原坐标点名，
 其余坐标（shift 的 to、rotate 的 about、flip 的 axis）是当前的图形坐标。
+fold 沿某个 line 切法的切线翻折（折痕跟着块当前的位姿走），没切过就先切。
 
-错误码 SS420–SS439（见设计稿 §6.6）。
+错误码 SS420–SS439（见设计稿 §6.6；SS438 是 fold）。
 """
 
 from __future__ import annotations
@@ -439,6 +440,7 @@ class Cut:
     into: list[str]
     lines: list[tuple[Pt, Pt]] = field(default_factory=list)  # 切口线段（被切那块的原坐标），画虚线用
     sectors: int = 0
+    crease: tuple[Pt, Pt] | None = None  # line 切法的两点（被切那块的原坐标）：fold 沿这条直线翻折
 
 
 @dataclass
@@ -592,12 +594,15 @@ def _cut_pieces(plan: Plan, name: str, spec: dict, parent: Piece, path: str) -> 
         if len(groups) < 2:
             plan.error("SS423", f"{path}.line", f"切线没有把 {parent.name} 分开：所有点都在同一边")
             return None
+        plan.cuts[name].crease = (a, b)
         return [(g, "dots") for g in groups]
     faces, used = split_polygon(parent.points, pts, infinite=kind == "line")
     if len(faces) < 2:
         plan.error("SS423", f"{path}.{kind}", f"切线没有把 {parent.name} 切开（只得到 1 块）；折线两端要落在边上或边外")
         return None
     plan.cuts[name].lines = used
+    if kind == "line":
+        plan.cuts[name].crease = (pts[0], pts[1])
     return [(f, "poly") for f in faces]
 
 
@@ -832,6 +837,7 @@ ACTION_ARGS = {
     "shift": {"piece", "by", "to"},
     "rotate": {"piece", "angle", "about"},
     "flip": {"piece", "axis"},
+    "fold": {"cut", "flap", "back"},
     "snap": {"piece", "edge", "vertex", "to", "to_edge", "to_vertex"},
     "copy": {"piece", "by"},
     "merge": {"name"},
@@ -922,6 +928,9 @@ def check_action(act: str, args: dict, state: State, report, path: str) -> None:
         state.alive.add(name)
         state.done.add(f"copy:{name}")
         return
+    if act == "fold":
+        _check_fold(args, state, report, a)
+        return
     if act in ("merge", "unmerge"):
         name = args.get("name")
         if name not in plan.merges:
@@ -997,6 +1006,42 @@ def check_action(act: str, args: dict, state: State, report, path: str) -> None:
         return
     if act == "snap":
         _check_snap(args, piece, state, report, a)
+
+
+def _check_fold(args: dict, state: State, report, a: str) -> None:
+    """fold：沿一刀直线切法的切线，把 flap 那几块翻到另一侧；切法还没切过时先切。"""
+    plan = state.plan
+    name = args.get("cut")
+    if name not in plan.cuts:
+        report.error("SS422", f"{a}.cut", f"没有切法 {name!r}（在对象的 cuts 里定义，用 line 写折痕）")
+        return
+    cut = plan.cuts[name]
+    if cut.crease is None:
+        report.error("SS438", f"{a}.cut", f"切法 {name} 不是一刀直线：fold 的折痕要用 line（过两点的直线）切")
+        return
+    if "back" in args and args["back"] not in ROLES:
+        report.error("SS438", f"{a}.back", f"back（翻过去以后露出的背面颜色）应为 {' / '.join(ROLES)} 之一")
+    flap = args.get("flap")
+    flaps = [flap] if isinstance(flap, str) else flap
+    if not (isinstance(flaps, list) and flaps and all(isinstance(f, str) for f in flaps)):
+        report.error("SS438", f"{a}.flap", f"fold 需要 flap：翻过去的块名（或块名列表），从 {'、'.join(cut.into)} 里选")
+        return
+    stray = [f for f in flaps if f not in cut.into]
+    if stray:
+        report.error("SS438", f"{a}.flap", f"{'、'.join(stray)} 不是切法 {name} 切出的块（有 {'、'.join(cut.into)}）")
+        return
+    if set(cut.into) <= set(flaps):
+        report.error("SS438", f"{a}.flap", "切出的块全翻过去就没有不动的一边了；整块翻用 flip")
+        return
+    if f"cut:{name}" not in state.done:
+        if _alive(state, cut.piece, f"{a}.cut", report) is None:
+            return
+        state.alive.discard(cut.piece)
+        state.alive |= set(cut.into)
+        state.done.add(f"cut:{name}")
+        return
+    for f in flaps:
+        _alive(state, f, f"{a}.flap", report)
 
 
 def _check_snap(args: dict, piece: Piece | None, state: State, report, a: str) -> None:

@@ -288,3 +288,64 @@ def test_sector_episode_snippet_passes():
         {"after": "prev", "act": "shift", "target": "pizza", "args": {"piece": "s3", "by": [0, 1]}},
     ]
     assert codes(doc) == []
+
+
+# ---------- fold：沿一刀直线的切线把一侧翻过去（SS438） ----------
+
+# 等腰直角三角形，直角在原点；沿 A 角的角平分线折，直角边 AC 落到斜边 AB 上
+R2 = math.sqrt(2)
+TRI = {
+    "widget": "dissect", "in": "stage",
+    "shapes": {"T": {"polygon": [[0, 0], [5, 0], [0, 5]]}},
+    "cuts": {
+        "f1": {"piece": "T", "line": [[0, 5], [5 * (R2 - 1), 0]], "into": ["flap", "rest"]},
+        "c2": {"piece": "rest", "path": [[3, -1], [3, 1], [6, 1]], "into": ["x", "y"]},
+    },
+}
+
+
+def fold_doc(*acts) -> dict:
+    doc = copy.deepcopy(load_file(EP11))
+    doc["objects"]["sheet"] = copy.deepcopy(TRI)
+    beat(doc, "Close")["do"] += [{"after": "prev", "act": "fold", "target": "sheet", "args": a} for a in acts]
+    return doc
+
+
+def test_line_cut_records_its_crease():
+    plan = G.plan_of(TRI)
+    assert plan.problems == []
+    assert plan.cuts["f1"].crease == ((0.0, 5.0), (5 * (R2 - 1), 0.0))
+    assert set(plan.cuts["f1"].into) == {"flap", "rest"}
+
+
+def test_fold_cuts_first_then_flap_can_fold_back():
+    doc = fold_doc({"cut": "f1", "flap": "flap", "back": "B"}, {"cut": "f1", "flap": "flap"})
+    assert codes(doc) == []
+    beat(doc, "Close")["do"].append({"after": "prev", "act": "shift", "target": "sheet", "args": {"piece": "T", "by": [1, 0]}})
+    assert codes(doc) == ["SS427"]  # fold 已经把 T 切开了
+
+
+def test_fold_needs_a_straight_line_cut():
+    doc = fold_doc({"cut": "c2", "flap": "x"})
+    assert codes(doc) == ["SS438"]
+    assert codes(fold_doc({"cut": "nope", "flap": "x"})) == ["SS422"]
+
+
+@pytest.mark.parametrize("args", [
+    {"cut": "f1"},
+    {"cut": "f1", "flap": "x"},
+    {"cut": "f1", "flap": ["flap", "rest"]},
+    {"cut": "f1", "flap": "flap", "back": "red"},
+])
+def test_bad_fold_args(args):
+    assert codes(fold_doc(args)) == ["SS438"]
+
+
+def test_fold_of_a_piece_already_gone():
+    doc = fold_doc({"cut": "f1", "flap": "flap"})
+    doc["objects"]["sheet"]["cuts"]["c3"] = {"piece": "flap", "line": [[0, 1], [1, 1]], "into": ["p", "q"]}
+    beat(doc, "Close")["do"] += [
+        {"after": "prev", "act": "cut", "target": "sheet", "args": {"cut": "c3"}},
+        {"after": "prev", "act": "fold", "target": "sheet", "args": {"cut": "f1", "flap": "flap"}},
+    ]
+    assert codes(doc) == ["SS427"]

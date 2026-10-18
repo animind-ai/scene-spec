@@ -274,6 +274,7 @@ para:
 | `shift` | `piece`, `by: [dx, dy]` 或 `to: [x, y]` | 平移（`to` 是重心的目标位置） |
 | `rotate` | `piece`, `angle`, `about?` | 绕点转（逆时针为正）；`about` 是 `center`（默认）、`[x, y]` 或 `{vertex: [x, y]}` |
 | `flip` | `piece`, `axis` | 关于直线翻折，画面上是"翻过去"；`axis` 是两点或 `{edge: [[x,y],[x,y]]}`（沿块自己的边翻） |
+| `fold` | `cut`, `flap`, `back?` | 折纸：沿 `cut`（必须是 `line` 切法）的切线，把 `flap`（切出的块名或列表，不能是全部）翻到另一侧；没切过就先切。翻的过程在垂直于折痕的方向从 1 压到 −1、中途变暗，`back` 是翻过来露出的背面颜色角色；翻过来的块放到最上层（仍在参考线下面）。折痕跟着块当前的位姿走，同一个切法可以再 `fold` 一次翻回来 |
 | `snap` | `piece`, `edge` + `to` + `to_edge`，或 `vertex` + `to` + `to_vertex` | 吸附：按两条边（或两个点）算出刚体变换，边对边时端点按书写顺序对齐；`to` 也可以是参考线或一个点 |
 | `copy` | `piece`, `by?` | 复制品出现在原块当前位置，可以顺手挪开 |
 | `merge` / `unmerge` | `name` | 画出 / 去掉拼合外轮廓 |
@@ -306,9 +307,10 @@ para:
 | SS435 | 复制品没在 `copies` 里声明、被复制的块不存在、复制两次 |
 | SS436 | 动作有多余参数、`labels` 缺 `show` |
 | SS437 | 参考线写错（缺端点、两端重合、`side` 不对） |
+| SS438 | `fold` 写错：切法不是一刀 `line`、没写 `flap`、`flap` 不是这个切法切出的块、全部块都翻、`back` 不是角色 |
 | SS439 | `pieces` / 图形里的样式写错：块不存在、角色不对、边长标签指向不存在的边 |
 
-SS438 预留。完整的例子见 `animind/scene-spec/examples/ep11.scene.yaml`（平行四边形面积）和 `ep18.scene.yaml`（平方差）。
+完整的例子见 `animind/scene-spec/examples/ep11.scene.yaml`（平行四边形面积）、`ep18.scene.yaml`（平方差）和 `ep20-fold.scene.yaml`（折纸）。
 
 ### 6.7 立体组件 solid：轴测图、剖成三块、截面比大小
 
