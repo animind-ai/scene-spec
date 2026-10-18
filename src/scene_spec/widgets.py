@@ -1269,6 +1269,75 @@ REGISTRY["balance"] = Widget(
     validate=_validate_balance,
 )
 
+# ---------- 钱包（wallet）：现金和欠条，余额条 ----------
+# kit 的 mx/wallet.py：两排卡片（现金 cash、欠条 iou），每张若干元；余额 = 现金 − 欠条。按动作顺序推演两排各有哪些卡片：
+# take 不能拿走比那一排多的卡片，put 不能超过 slots，余额不能超出余额条的 range。
+
+
+def _expose_wallet(definition: dict, data: dict) -> Exposed:
+    value = definition.get("value", 3)
+    rows = {k: [value] * definition.get(k, 0) if isinstance(definition.get(k, 0), int) else [] for k in ("cash", "iou")}
+    return Exposed(parts={"cash": 1, "iou": 1, "balance": 1}, state={"rows": rows})
+
+
+def _wallet_range_check(ctx: WidgetContext, report: Report, path: str) -> None:
+    rows, rng = ctx.exposed.state["rows"], ctx.definition.get("range", 12)
+    total = sum(rows["cash"]) - sum(rows["iou"])
+    if isinstance(rng, int) and abs(total) > rng:
+        report.error("SS262", path, f"余额 {total} 超出余额条的 range {rng}；在 {ctx.obj_id} 上写 range: {abs(total)}")
+
+
+def _validate_wallet(ctx: WidgetContext, report: Report, path: str) -> None:
+    slots = ctx.definition.get("slots", 4)
+    for kind in ("cash", "iou"):
+        n = ctx.definition.get(kind, 0)
+        if isinstance(n, int) and isinstance(slots, int) and n > slots:
+            report.error("SS262", f"{path}.{kind}", f"{kind} 一开始有 {n} 张，一排只有 {slots} 个位置")
+    _wallet_range_check(ctx, report, path)
+
+
+def _wallet_change(act: str):
+    def check(args: dict, ctx: WidgetContext, report: Report, path: str) -> None:
+        kind = args.get("kind")
+        if kind not in ("cash", "iou"):
+            report.error("SS281", f"{path}.args.kind", f"{act} 需要 kind：cash（现金）或 iou（欠条）")
+            return
+        n = args.get("count", 1)
+        if _positive_int(n):
+            report.error("SS281", f"{path}.args.count", "count 应为正整数（几张，默认 1）")
+            return
+        allowed = {"kind", "count", "value"} if act == "put" else {"kind", "count", "quiet"}
+        if "quiet" in args and not isinstance(args["quiet"], bool):
+            report.error("SS281", f"{path}.args.quiet", "quiet 应为 true / false（true：原地淡出，不演拿走）")
+        _unknown_args(args, allowed, act, report, path)
+        rows, slots = ctx.exposed.state["rows"], ctx.definition.get("slots", 4)
+        if act == "put":
+            value = args.get("value", ctx.definition.get("value", 3))
+            if _positive_int(value):
+                report.error("SS281", f"{path}.args.value", "value 应为正整数（每张多少元）")
+                return
+            if isinstance(slots, int) and len(rows[kind]) + n > slots:
+                report.error("SS262", path, f"{kind} 那一排已经有 {len(rows[kind])} 张，放不下 {n} 张（slots {slots}）")
+                return
+            rows[kind] += [value] * n
+        else:
+            if len(rows[kind]) < n:
+                report.error("SS261", path, f"{kind} 那一排只有 {len(rows[kind])} 张，拿不走 {n} 张")
+                return
+            del rows[kind][len(rows[kind]) - n:]
+        _wallet_range_check(ctx, report, path)
+    return check
+
+
+REGISTRY["wallet"] = Widget(
+    "wallet",
+    params={"value": (False, _positive_int), "cash": (False, _nonneg_int), "iou": (False, _nonneg_int),
+            "slots": (False, _positive_int), "range": (False, _positive_int)},
+    expose=_expose_wallet,
+    actions={"put": _wallet_change("put"), "take": _wallet_change("take")},
+    validate=_validate_wallet,
+)
+
 # ---------- 函数图像（graph）：坐标轴、曲线、点、割线、切线 ----------
 # 函数写成白名单表达式字符串（见 expr.py），这里检查语法、点是否在定义域里、切线处左右导数是否相等。
 
