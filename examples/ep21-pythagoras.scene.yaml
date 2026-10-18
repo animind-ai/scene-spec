@@ -26,7 +26,7 @@ style:
   theme: paper
   canvas: "16:9"
   voice:
-    persona: peer-ms
+    persona: teacher-hs
     speed: 1.0
   segmented: true
   step_hold: 1.0
@@ -68,23 +68,23 @@ objects:
 
 beats:
   - id: Hook
-    pause: {type: predict, prompt: 斜边 c 和两条直角边 a、b 是什么关系？先猜一猜。, hold: 3, app_item: ep21-before-1}
+    pause: {type: predict, prompt: 梯脚离墙 a、梯顶高 b，梯子 c 和 a、b 什么关系？, hold: 3, app_item: ep21-before-1}
     say:
-      - {id: s1, pace: ask, text: "{@tri}斜边 c 和两条直角边 a、b，是什么关系？", en: "How is the long side c related to the two short sides a and b?"}
-      - {id: s2, pace: normal, text: "先猜一猜，想三秒钟。", en: "Take a guess. Think for three seconds."}
+      - {id: s1, pace: normal, text: "{@tri}师傅要把梯子斜靠在墙上，梯脚离墙 a，梯顶要够到 b 高。", en: "A builder leans a ladder against a wall: its foot is a from the wall, and its top must reach a height of b."}
+      - {id: s2, pace: ask, text: "梯子长 c，它和 a、b 什么关系？你是师傅，会怎么估？", en: "The ladder is c long. How is c related to a and b? If you were the builder, how would you estimate it?"}
     do:
       - {at: s1@tri, act: show, target: one}
 
   - id: Myth
     shows: misconception
     say:
-      - {id: s1, pace: normal, text: "很多人会猜，斜边就等于两条直角边加起来，{@w}a 加 b。", en: "Lots of people guess the long side is the two short sides added up: a plus b."}
+      - {id: s1, pace: normal, text: "徒弟抢着说：{@w}那就买 a 加 b 那么长的。", en: "The apprentice jumps in: just buy one that's a plus b long."}
     do:
       - {at: s1@w, act: show, target: wrong}
 
   - id: Setup
     say:
-      - {id: s1, pace: normal, text: "我们一起看。这个三角形，{@a}直角边 a 是二，{@b}b 是三。", en: "Let's look together. In this triangle, side a is two and side b is three."}
+      - {id: s1, pace: normal, text: "{@a}这个三角形的直角边 a 是二，{@b}b 是三。", en: "In this triangle, side a is two and side b is three."}
       - {id: s2, pace: normal, text: "{@c}斜边 c 是最长的一条，比 a 长，也比 b 长。", en: "The long side c is the longest, longer than a and longer than b."}
     do:
       - {at: s1@a, act: mark, target: "one.side[0]"}

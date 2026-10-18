@@ -102,18 +102,19 @@ objects:
 
 beats:
   - id: Hook
-    pause: {type: predict, prompt: log₂ 8 到底在问什么？先想一想。, hold: 3, app_item: ep27-before-1}
+    pause: {type: predict, prompt: log₂ 8 在回答什么问题？先琢磨一下。, hold: 3, app_item: ep27-before-1}
     say:
-      - {id: s1, pace: ask, text: "{@q}以二为底八的对数，到底在问一个什么问题？", en: "Log base two of eight: what question is it actually asking?"}
-      - {id: s2, pace: normal, text: "先想一想，三秒。", en: "Think about it for three seconds."}
+      - {id: s1, pace: normal, text: "计算器上有个对数键，按一下，跳出来一个数。", en: "A calculator has a log key. Press it and a number pops up."}
+      - {id: s2, pace: ask, text: "{@q}比如以二为底八的对数，它在回答什么问题？", en: "Take log base two of eight: what question is it answering?"}
+      - {id: s3, pace: normal, text: "先自己琢磨一下。", en: "Mull it over yourself first."}
     do:
       - {at: s1, act: show, target: g.axes}
-      - {at: s1@q, act: show, target: q}
+      - {at: s2@q, act: show, target: q}
 
   - id: Myth
     shows: misconception
     say:
-      - {id: s1, pace: normal, text: "很多人还会顺手写，{@w}二加四的对数，等于二的对数加四的对数。", en: "And lots of people will happily write that the log of two plus four is the log of two plus the log of four."}
+      - {id: s1, pace: normal, text: "草稿纸上还有人写：{@w}二加四的对数，等于二的对数加四的对数。", en: "And on someone's scrap paper: the log of two plus four equals the log of two plus the log of four."}
     do:
       - {at: s1@w, act: show, target: wrong}
 

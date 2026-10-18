@@ -1,6 +1,6 @@
 # 洞察系列 #17 完全平方公式：多出来的 2ab（七至八年级）。squares 系列第一集，接 #18、#23。
 # 按脚本 insight/ep17-square-of-sum/script.yaml（第 1 轮）写。
-# 钩子问 (a+b)² 等于多少、停三秒、说出 a² + b²；边长 a + b 的大正方形里先只放 a² 和 b²，另外两个角空着（非例画在屏幕上），
+# 开场（2026-10-18 改情境式）：表弟家的正方形菜园每边加 b 米，面积多少，停三秒，表弟说出 a² + b²；边长 a + b 的大正方形里先只放 a² 和 b²，另外两个角空着（非例画在屏幕上），
 # 代数 3、2：25 对 13；预测暂停后空白换成两条 ab；a = b 时四块一样大，照样是两个 ab；落到 (a+b)² = a² + 2ab + b²，
 # 回访 #4（横竖各切一刀）、#5（12 × 12 = 100 + 2 × 20 + 4）。结尾留一个挖掉一角的正方形（#18 的开头画面）。
 spec: "0.1"
@@ -26,7 +26,7 @@ style:
   theme: paper
   canvas: "16:9"
   voice:
-    persona: peer-ms
+    persona: teacher-hs
     speed: 1.0
   segmented: true
   step_hold: 1.0
@@ -141,17 +141,17 @@ objects:
 
 beats:
   - id: Hook
-    pause: {type: predict, prompt: (a+b)² 等于多少？先猜一猜。, hold: 3, app_item: ep17-before-1}
+    pause: {type: predict, prompt: 边长 a 的正方形每边加 b，面积 (a+b)² 是多少？, hold: 3, app_item: ep17-before-1}
     say:
-      - {id: s1, pace: ask, text: "{@q}a 加 b 的平方，等于多少？", en: "What is a plus b, squared?"}
-      - {id: s2, pace: normal, text: "先猜一猜，想三秒钟。", en: "Take a guess. Think for three seconds."}
+      - {id: s1, pace: ask, text: "表弟家的菜园是边长 a 米的正方形，每边再加 b 米，{@q}面积是多少？", en: "Your cousin's vegetable patch is a square, a metres on a side. Each side grows by b metres. What's the new area?"}
+      - {id: s2, pace: normal, text: "先自己定个答案，再往下看。", en: "Settle on an answer before you read on."}
     do:
       - {at: s1@q, act: show, target: q}
 
   - id: Myth
     shows: misconception
     say:
-      - {id: s1, pace: normal, text: "很多人会说，{@w}平方就各自平方，a 方加 b 方。", en: "Lots of people say you just square each part: a squared plus b squared."}
+      - {id: s1, pace: normal, text: "表弟张口就答：{@w}平方就各自平方，a 方加 b 方。", en: "Your cousin answers straight away: squaring squares each part, a squared plus b squared."}
     do:
       - {at: s1@w, act: show, target: wrong}
 
@@ -174,7 +174,7 @@ beats:
       - {id: s1, pace: normal, text: "要是它等于 a 方加 b 方，{@a}正方形里就只有{@b}这两块。", en: "If it equalled a squared plus b squared, the square would hold just these two pieces."}
       - {id: s2, pace: normal, text: "可是另外两个角上{@g}还空着两块，正方形根本没填满。", en: "But two pieces in the other corners are still empty. The square isn't filled."}
       - {id: s3, pace: normal, text: "代个数试试，a 是三，b 是二，{@n}五的平方是二十五。", en: "Try numbers: a is three and b is two, so five squared is twenty-five."}
-      - {id: s4, pace: normal, text: "{@n}三方加二方只有十三，{@x}差了整整十二。", en: "Three squared plus two squared is only thirteen, a whole twelve short."}
+      - {id: s4, pace: normal, text: "{@n}三的平方加二的平方只有十三，{@x}差了整整十二。", en: "Three squared plus two squared is only thirteen, a whole twelve short."}
     do:
       - {at: s1, act: unmark, target: "sq#S"}
       - {at: s1@a, act: show, target: "sq#A2"}
@@ -198,7 +198,7 @@ beats:
       - {id: s1, pace: normal, text: "{@p}左下这块，长是 a，{@w}宽是 b，它的面积是 a 乘 b。", en: "The bottom-left piece is a long and b wide, so its area is a times b."}
       - {id: s2, pace: normal, text: "{@p}右上这块也是 a 乘 b，两块一模一样。", en: "The top-right piece is a times b too. The two are exactly the same."}
       - {id: s3, pace: slow, text: "所以多出来的是{@two}两个 a b，也就是二 a b。", en: "So the extra part is two a b's: two a b."}
-      - {id: s4, pace: normal, text: "{@n}差的那十二，正好是两个三乘二，就是这两条长条。", en: "The missing twelve is exactly two lots of three times two: these two strips."}
+      - {id: s4, pace: normal, text: "{@n}差的这十二正好是两个三乘二，就是这两条长条。", en: "The missing twelve is exactly two lots of three times two: these two strips."}
     do:
       - {at: s1@p, act: unmark, target: "sq#G1"}
       - {with: prev, act: unmark, target: "sq#G2"}

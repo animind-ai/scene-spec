@@ -123,19 +123,20 @@ objects:
 
 beats:
   - id: Hook
-    pause: {type: predict, prompt: 正弦函数的图像为什么是波浪？先想一想。, hold: 3, app_item: ep28-before-1}
+    pause: {type: predict, prompt: 正弦来自圆，它的图像凭什么是波浪？, hold: 3, app_item: ep28-before-1}
     say:
-      - {id: s1, pace: ask, text: "{@w}正弦函数的图像，为什么偏偏是一条波浪？", en: "Why is the graph of the sine function a wave, of all things?"}
-      - {id: s2, pace: normal, text: "先想一想，三秒。", en: "Think about it for three seconds."}
+      - {id: s1, pace: normal, text: "海浪一起一伏，画成图就是一条波浪线。", en: "Sea waves rise and fall, and drawn as a graph they make a wavy line."}
+      - {id: s2, pace: ask, text: "{@w}正弦来自圆，它的图像凭什么也是波浪？", en: "Sine comes from a circle, so why is its graph a wave too?"}
+      - {id: s3, pace: normal, text: "停一停，先想个理由。", en: "Pause, and think of a reason first."}
     do:
       - {at: s1, act: show, target: g.axes}
-      - {at: s1@w, act: draw, target: g, args: {plot: 0}}
+      - {at: s2@w, act: draw, target: g, args: {plot: 0}}
       - {with: prev, act: draw, target: g, args: {plot: 1}}
 
   - id: Myth
     shows: misconception
     say:
-      - {id: s1, pace: normal, text: "很多人觉得，{@w}弧度只是度数换了个写法，和弧长没有关系。", en: "Lots of people think radians are just degrees written differently, with nothing to do with arc length."}
+      - {id: s1, pace: normal, text: "学长还补了一句：{@w}弧度只是度数换了个写法，和弧长没关系。", en: "An older student adds: radians are just degrees written differently, nothing to do with arc length."}
     do:
       - {at: s1@w, act: show, target: wrong}
 

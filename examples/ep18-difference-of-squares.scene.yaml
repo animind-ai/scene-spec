@@ -27,7 +27,7 @@ style:
   theme: paper
   canvas: "16:9"
   voice:
-    persona: peer-ms
+    persona: teacher-hs
     speed: 1.0
   segmented: true
   step_hold: 1.0
@@ -140,12 +140,12 @@ objects:
 
 beats:
   - id: Hook
-    pause: {type: predict, prompt: a² − b² 能写成谁乘谁？先猜一猜。, hold: 3, app_item: ep18-before-1}
+    pause: {type: predict, prompt: 角落立着方柱的正方形房间，地板 a² − b² 能写成谁乘谁？, hold: 3, app_item: ep18-before-1}
     say:
-      - {id: s1, pace: ask, text: "挖掉一角，{@q}剩下的 a 方减 b 方，能写成谁乘谁？", en: "Cut a corner out of a square. What's left is a squared minus b squared. What times what is it?"}
-      - {id: s2, pace: normal, text: "先猜一猜，想三秒钟。", en: "Take a guess. Think for three seconds."}
+      - {id: s1, pace: normal, text: "边长 a 的正方形房间，角落里立着边长 b 的方柱。", en: "A square room with side a has a square pillar with side b standing in one corner."}
+      - {id: s2, pace: ask, text: "{@q}要铺的地板是 a 方减 b 方，凭直觉猜，能写成谁乘谁？", en: "The floor to cover is a squared minus b squared. Go with your gut: what times what is it?"}
     do:
-      # 开场：一下子摆出 #17 的片尾画面
+      # 开场：一下子摆出 #17 的片尾画面（挖掉的角就是方柱）
       - {at: s1, act: show, target: "dsq#S", dur: 0.01}
       - {with: prev, act: show, target: "dsq#ba", dur: 0.01}
       - {with: prev, act: show, target: law0, dur: 0.01}
@@ -153,13 +153,13 @@ beats:
       - {after: prev, act: hide, target: "dsq#B2", dur: 0.01}
       - {with: prev, act: labels, target: dsq, args: {piece: L, show: false}, dur: 0.01}
       - {with: prev, act: show, target: "dsq#hb", dur: 0.01}
-      - {at: s1@q, act: hide, target: law0}
+      - {at: s2@q, act: hide, target: law0}
       - {with: prev, act: labels, target: dsq, args: {piece: L, show: true}}
 
   - id: Myth
     shows: misconception
     say:
-      - {id: s1, pace: normal, text: "很多人会说，{@w}减法也照搬，就是 a 减 b 的平方。", en: "Lots of people say subtraction works the same: it's a minus b, squared."}
+      - {id: s1, pace: normal, text: "装修师傅随口说：{@w}减法也照搬，就是 a 减 b 的平方。", en: "The builder says offhand: subtraction works the same, so it's a minus b, squared."}
     do:
       - {at: s1@w, act: show, target: wrong}
 

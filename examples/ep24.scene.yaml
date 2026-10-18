@@ -124,10 +124,11 @@ objects:
 
 beats:
   - id: Hook
-    pause: {type: predict, prompt: y = (x − 1)² 的顶点在哪里？先猜一猜。, hold: 3, app_item: ep24-before-1}
+    pause: {type: predict, prompt: U 形池像 y = (x − 1)²，池底最低点在哪？, hold: 3, app_item: ep24-before-1}
     say:
-      - {id: s1, pace: ask, text: "{@f}抛物线 y 等于 x 减一的平方的顶点在哪里？", en: "y equals x minus one, squared. Where is the vertex of this parabola?"}
-      - {id: s2, pace: normal, text: "先猜一猜，想三秒。", en: "Take a guess. Think for three seconds."}
+      - {id: s1, pace: normal, text: "滑板场 U 形池的截面，像抛物线{@f} y 等于 x 减一的平方。", en: "The cross-section of a skate park's U-ramp looks like the parabola y equals x minus one, squared."}
+      - {id: s2, pace: ask, text: "池底最低点，也就是顶点，在哪？", en: "Where is the lowest point of the ramp, the vertex?"}
+      - {id: s3, pace: normal, text: "先别画图，在心里选一个点。", en: "Don't draw it yet. Choose a point in your head."}
     do:
       - {at: s1, act: show, target: g.axes}
       - {at: s1@f, act: show, target: f1}
@@ -135,7 +136,7 @@ beats:
   - id: Myth
     shows: misconception
     say:
-      - {id: s1, pace: normal, text: "很多人看到减一，{@w}就说顶点在 x 等于负一。", en: "Lots of people see the minus one and say the vertex is at x equals minus one."}
+      - {id: s1, pace: normal, text: "朋友瞄了一眼减一，{@w}就说池底在 x 等于负一。", en: "A friend glances at the minus one and says the bottom is at x equals minus one."}
     do:
       - {at: s1@w, act: show, target: wrong}
 

@@ -26,7 +26,7 @@ style:
   theme: paper
   canvas: "16:9"
   voice:
-    persona: peer-ms
+    persona: teacher-hs
     speed: 1.0
   segmented: true
   step_hold: 1.0
@@ -123,10 +123,11 @@ objects:
 
 beats:
   - id: Hook
-    pause: {type: predict, prompt: y = kx + b 里的 k 到底是什么？先猜一猜。, hold: 3, app_item: ep22-before-1}
+    pause: {type: predict, prompt: y = kx + b 里的 k 管的是什么？, hold: 3, app_item: ep22-before-1}
     say:
-      - {id: s1, pace: ask, text: "{@line}y 等于 k x 加 b 里的这个 k 到底是什么？", en: "In the line y equals k x plus b, what exactly is k?"}
-      - {id: s2, pace: normal, text: "先猜一猜，想三秒。", en: "Take a guess. Think for three seconds."}
+      - {id: s1, pace: normal, text: "老师在黑板上{@line}画了一条直线，写下它的式子。", en: "The teacher draws a straight line on the board and writes its equation."}
+      - {id: s2, pace: ask, text: "她只问了一句：式子里这个 k，管的是什么？", en: "She asks just one thing: what does this k in the equation control?"}
+      - {id: s3, pace: normal, text: "你会怎么回答？先想好。", en: "How would you answer? Decide first."}
     do:
       - {at: s1, act: show, target: g.axes}
       - {at: s1@line, act: draw, target: g, args: {plot: 0}}
@@ -135,7 +136,7 @@ beats:
   - id: Myth
     shows: misconception
     say:
-      - {id: s1, pace: normal, text: "很多人说，{@w1}k 是直线和 x 轴的交点，{@w2}或者是直线的长度。", en: "Lots of people say k is where the line meets the x-axis, or how long the line is."}
+      - {id: s1, pace: normal, text: "底下吵成一片：{@w1}有人说 k 是和 x 轴的交点，{@w2}有人说是直线的长度。", en: "The class erupts: some say k is where the line meets the x-axis, others say it's how long the line is."}
     do:
       - {at: s1@w1, act: show, target: wrong_x}
       - {at: s1@w2, act: show, target: wrong_len}

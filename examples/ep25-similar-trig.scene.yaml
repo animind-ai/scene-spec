@@ -26,7 +26,7 @@ style:
   theme: paper
   canvas: "16:9"
   voice:
-    persona: peer-ms
+    persona: teacher-hs
     speed: 1.0
   segmented: true
   step_hold: 1.0
@@ -100,10 +100,11 @@ objects:
 
 beats:
   - id: Hook
-    pause: {type: predict, prompt: 三角形画大一点，sin30° 会变大吗？先猜一猜。, hold: 3, app_item: ep25-before-1}
+    pause: {type: predict, prompt: 三十度的直角三角形画大一点，sin30° 会变大吗？, hold: 3, app_item: ep25-before-1}
     say:
-      - {id: s1, pace: ask, text: "{@q}三十度的直角三角形画大一点，sin 会变大吗？", en: "Draw a thirty-degree right triangle bigger. Does the sine get bigger too?"}
-      - {id: s2, pace: normal, text: "先猜一猜，想三秒钟。", en: "Take a guess. Think for three seconds."}
+      - {id: s1, pace: normal, text: "两个同学各画了一个{@q}三十度的直角三角形，一小一大。", en: "Two classmates each draw a thirty-degree right triangle, one small and one big."}
+      - {id: s2, pace: ask, text: "大的那个，sin 三十度会变大吗？", en: "For the big one, does sine of thirty degrees get bigger?"}
+      - {id: s3, pace: normal, text: "你站哪一边？先想想。", en: "Whose side are you on? Think first."}
     do:
       - {at: s1@q, act: show, target: g.axes}
       - {after: prev, act: draw, target: g, args: {plot: 0}}
@@ -114,7 +115,7 @@ beats:
   - id: Myth
     shows: misconception
     say:
-      - {id: s1, pace: normal, text: "很多人觉得会：{@m}三角形越大，边越长，sin 也越大。", en: "Lots of people think so: a bigger triangle has longer sides, so a bigger sine."}
+      - {id: s1, pace: normal, text: "画大的那位很得意，{@m}说自己的边更长，sin 肯定也更大。", en: "The one with the big triangle is pleased, saying their sides are longer, so their sine must be bigger."}
     do:
       - {at: s1@m, act: show, target: wrong}
 

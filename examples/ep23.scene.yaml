@@ -27,7 +27,7 @@ style:
   theme: paper
   canvas: "16:9"
   voice:
-    persona: peer-ms
+    persona: teacher-hs
     speed: 1.0
   segmented: true
   step_hold: 1.0
@@ -114,10 +114,10 @@ objects:
 
 beats:
   - id: Hook
-    pause: {type: predict, prompt: x² + 4x = 45，x 是多少？先猜一猜。, hold: 3, app_item: ep23-before-1}
+    pause: {type: predict, prompt: x² + 4x = 45，没有求根公式，你会从哪下手？, hold: 3, app_item: ep23-before-1}
     say:
-      - {id: s1, pace: ask, text: "{@q}x 方加四 x 等于四十五，x 是多少？", en: "x squared plus four x equals forty-five. What is x?"}
-      - {id: s2, pace: normal, text: "先猜一猜，想三秒钟。", en: "Take a guess. Think for three seconds."}
+      - {id: s1, pace: normal, text: "一千多年前，花拉子米的书里就有这样一道题。", en: "Over a thousand years ago, al-Khwarizmi's book already had a problem like this."}
+      - {id: s2, pace: ask, text: "{@q}x 方加四 x 等于四十五，要是没有公式，你从哪下手？", en: "x squared plus four x equals forty-five. With no formula, where would you start?"}
     do:
       # 开场：一下子摆出 #18 的片尾画面
       - {at: s1, act: show, target: xsq0, dur: 0.01}
@@ -125,19 +125,19 @@ beats:
       - {with: prev, act: show, target: "xsq0#tb", dur: 0.01}
       - {with: prev, act: show, target: "xsq0#lx", dur: 0.01}
       - {with: prev, act: show, target: law0, dur: 0.01}
-      - {at: s1@q, act: hide, target: law0}
+      - {at: s2@q, act: hide, target: law0}
       - {after: prev, act: show, target: eq}
 
   - id: Myth
     shows: misconception
     say:
-      - {id: s1, pace: normal, text: "很多人会说，{@m}这得背求根公式，套进去才算得出。", en: "Lots of people say you need the quadratic formula: memorise it and plug in."}
+      - {id: s1, pace: normal, text: "同桌直摇头：{@m}这得背求根公式，套进去才算得出。", en: "Your deskmate shakes their head: you need the quadratic formula, memorised and plugged in."}
     do:
       - {at: s1@m, act: show, target: myth}
 
   - id: Setup
     say:
-      - {id: s1, pace: normal, text: "我们一起看。{@x}x 方是边长 x 的正方形，{@b}四 x 是宽四的长条。", en: "Let's look together. x squared is a square with side x, and four x is a strip four wide."}
+      - {id: s1, pace: normal, text: "我们一起看图。{@x}这块 x 方是边长 x 的正方形，{@b}四 x 是宽四的长条。", en: "Let's look together. x squared is a square with side x, and four x is a strip four wide."}
       - {id: s2, pace: normal, text: "要是能把整块补成正方形，开个方就解出来了。", en: "If we could make the whole thing into a square, one square root would solve it."}
     do:
       - {at: s1, act: hide, target: xsq0}

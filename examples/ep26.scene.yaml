@@ -128,10 +128,11 @@ objects:
 
 beats:
   - id: Hook
-    pause: {type: predict, prompt: y = f(x + 2) 的图像为什么往左移？先想一想。, hold: 3, app_item: ep26-before-1}
+    pause: {type: predict, prompt: 口诀说 y = f(x + 2) 往左移，加号凭什么往左？, hold: 3, app_item: ep26-before-1}
     say:
-      - {id: s1, pace: ask, text: "{@f}y 等于 f 括号 x 加二，图像为什么是往左移？", en: "Why does the graph of y equals f of x plus two move to the left?"}
-      - {id: s2, pace: normal, text: "先想一想，三秒。", en: "Think about it for three seconds."}
+      - {id: s1, pace: normal, text: "背口诀的时候，{@f}y 等于 f 括号 x 加二，记作往左移两格。", en: "When you learn the rule, y equals f of x plus two gets filed as two units to the left."}
+      - {id: s2, pace: ask, text: "口诀背熟了，可加号凭什么往左？", en: "You know the rule by heart, but why should a plus sign mean left?"}
+      - {id: s3, pace: normal, text: "换你来讲，会怎么解释？", en: "If you had to explain it, what would you say?"}
     do:
       - {at: s1, act: show, target: g.axes}
       - {at: s1@f, act: show, target: fx}
@@ -139,7 +140,7 @@ beats:
   - id: Myth
     shows: misconception
     say:
-      - {id: s1, pace: normal, text: "很多人觉得，{@w}加二就该往右移两格。", en: "Lots of people feel that plus two should mean two units to the right."}
+      - {id: s1, pace: normal, text: "后排有人小声嘀咕：{@w}加二，明明该往右移两格。", en: "Someone at the back mutters: plus two should obviously mean two units to the right."}
     do:
       - {at: s1@w, act: show, target: wrong}
 
