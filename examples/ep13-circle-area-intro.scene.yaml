@@ -34,7 +34,28 @@ style:
   step_hold: 1.0
 
 objects:
-  # 开场：#12 的片尾（同样的定义；myth 只为占住 law2 的位置，本集不显示）
+  # 开场：#12 片尾的侧栏（同样的定义）。#12 里 law 下面整叠是 myth + law2，本集的 law 下面是 law2 + myth13，
+  # 叠高差 0.0135，按叠高居中会高出半个像素。开场用这三个复刻 #12：myth0 显示但把唯一的片段藏起来，
+  # 只占位置不出字；留到 Setup 底栏出现 circ 以后（和 #12 的 law 一样算底栏占用），Four 开头再变成 law、law2
+  law0:
+    type: text
+    text: '[$S$]{#s} [$=$]{#e} [$a$]{#a .HL} [$\times$]{#x} [$h$]{#h .HL}'
+    level: display
+    in: side
+  myth0:
+    type: text
+    text: '[规定的？]{#m}'
+    role: "NO"
+    level: title
+    below: law0
+    gap: md
+  law20:
+    type: text
+    text: '[$S=a\times h$]{#ah} [$\div 2$]{#half .HL}'
+    level: display
+    below: myth0
+    gap: md
+  # 本集侧栏（#14 开场照抄这几个定义；myth 只为占住 law2 的位置，不显示）
   law:
     type: text
     text: '[$S$]{#s} [$=$]{#e} [$a$]{#a .HL} [$\times$]{#x} [$h$]{#h .HL}'
@@ -142,8 +163,10 @@ beats:
       - {id: s2, pace: ask, text: "要是交给你，你会怎么办？", en: "If it were your job, what would you do?"}
     do:
       # 开场：一下子摆出 #12 的片尾画面
-      - {at: s1, act: show, target: law, dur: 0.01}
-      - {with: prev, act: show, target: law2, dur: 0.01}
+      - {at: s1, act: show, target: law0, dur: 0.01}
+      - {with: prev, act: show, target: myth0, dur: 0.01}
+      - {with: prev, act: hide, target: "myth0#m", dur: 0.01}
+      - {with: prev, act: show, target: law20, dur: 0.01}
       - {with: prev, act: show, target: circle0, dur: 0.01}
       - {at: s1@g, act: show, target: lawn}
 
@@ -173,6 +196,11 @@ beats:
     do:
       - {at: s1, act: unmark, target: "circle#r"}
       - {with: prev, act: hide, target: "circle#r"}
+      - {at: s1, act: transform, from: law0, to: law, dur: 0.6}
+      - {with: prev, act: hide, target: law0}
+      - {with: prev, act: transform, from: law20, to: law2, dur: 0.6}
+      - {with: prev, act: hide, target: law20}
+      - {with: prev, act: hide, target: myth0}
       - {at: s1@cut, act: cut, target: circle, args: {cut: c4}, dur: 0.8}
       - {at: s1@go, act: arrange, target: circle, args: {cut: c4, layout: alternate, at: [6.3, 0]}, dur: fit}
       - {at: s2@b, act: focus, target: circle}
