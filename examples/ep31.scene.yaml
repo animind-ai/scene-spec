@@ -158,6 +158,20 @@ objects:
     guides:
       lr: {from: [5.6, 0], to: [5.6, 5], label: '刷子长 $x$', role: HL, side: right}
       lt: {from: [0, 5.6], to: [5, 5.6], label: '刷子长 $x$', role: HL, side: above}
+  zc:
+    widget: dissect
+    role: A
+    in: stage
+    view: [[-1.9, -1.9], [1.9, 1.9]]
+    shapes:
+      S: {rect: [1.5, 1.5], at: [-1.5, -1.5]}
+      R: {rect: [1, 1.5], at: [0, -1.5], role: B}
+      T: {rect: [1.5, 1], at: [-1.5, 0], role: B}
+      C: {rect: [1, 1], at: [0, 0], role: C, label: '$dx^2$'}
+    guides:
+      dxr: {from: [0, -1.7], to: [1, -1.7], label: '$dx$', role: HL, side: below, solid: true}
+      dxt: {from: [1.2, 0], to: [1.2, 1], label: '$dx$', role: HL, side: right, solid: true}
+      mag: {from: [-1.5, 1.4], to: [0.6, 1.4], label: '角上放大', role: HL, side: above}
   rd3:
     type: text
     text: '[每秒刷]{#l} [$2\times 3=6$]{#r .HL}'
@@ -256,9 +270,12 @@ beats:
     do:
       - {at: s1, act: unmark, target: "rd2x#r"}
       - {at: s1@c, act: show, target: "sq5#C"}
-      - {after: prev, act: camera, target: "sq5#C", args: {zoom: 3}, dur: 1.5}
-      - {at: s2@s, act: camera, args: {reset: true}, dur: 1.0}
       - {after: prev, act: hide, target: sq5}
+      - {with: prev, act: show, target: zc}
+      - {with: prev, act: show, target: "zc#dxr"}
+      - {with: prev, act: show, target: "zc#dxt"}
+      - {with: prev, act: show, target: "zc#mag"}
+      - {at: s2@s, act: hide, target: zc}
       - {with: prev, act: show, target: sq01}
       - {with: prev, act: show, target: "sq01#d"}
       - {at: s3@g, act: show, target: grow}
