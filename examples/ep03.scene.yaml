@@ -90,10 +90,10 @@ objects:
 
 beats:
   - id: Hook
-    pause: {type: predict, prompt: 九的口诀有什么规律？先猜一猜。, hold: 3, app_item: ep03-before-1}
+    pause: {type: predict, prompt: 九的口诀这一列数，有什么规律？, hold: 3, app_item: ep03-before-1}
     say:
-      - {id: s1, pace: ask, text: "{@q}九的口诀，你发现什么规律了吗？", en: "In the nines table, have you spotted a pattern?"}
-      - {id: s2, pace: normal, text: "先猜一猜，想三秒钟。", en: "Have a guess. Think for three seconds."}
+      - {id: s1, pace: ask, text: "{@q}姐姐背到九的口诀，卡住了：这列数有规律吗？", en: "Big sister got stuck on her nines table. Is there a pattern in this column?"}
+      - {id: s2, pace: normal, text: "你盯着这列数，先找一找。", en: "Look hard at the column and hunt for it first."}
     do:
       # 开场：#2 的片尾画面
       - {at: s1, act: show, target: array, dur: 0.01}
@@ -104,7 +104,7 @@ beats:
   - id: Myth
     shows: misconception
     say:
-      - {id: s1, pace: normal, text: "{@m}很多人说，口诀没什么道理，只能死记硬背。", en: "Lots of people say times tables make no sense, so you just learn them by heart."}
+      - {id: s1, pace: normal, text: "{@m}姐姐叹气：口诀没道理，只能死记硬背。", en: "She sighs: times tables make no sense, you just learn them by heart."}
     do:
       - {at: s1@m, act: show, target: myth}
 

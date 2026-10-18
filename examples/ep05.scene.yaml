@@ -110,10 +110,10 @@ objects:
 
 beats:
   - id: Hook
-    pause: {type: predict, prompt: 竖式里为什么要错一位？先猜一猜。, hold: 3, app_item: ep05-before-1}
+    pause: {type: predict, prompt: 竖式第二行对齐还是错开？, hold: 3, app_item: ep05-before-1}
     say:
-      - {id: s1, pace: ask, text: "{@q}为什么二十三乘十四的竖式里，要错一位？", en: "Twenty-three times fourteen: why does long multiplication shift a row over?"}
-      - {id: s2, pace: normal, text: "先猜一猜，想三秒钟。", en: "Have a guess. Think for three seconds."}
+      - {id: s1, pace: ask, text: "{@q}礼堂每排二十三座，有十四排，共几座？", en: "The hall has twenty-three seats in each row and fourteen rows. How many seats?"}
+      - {id: s2, pace: normal, text: "列竖式时，第二行对齐还是错开？你选哪个？", en: "In long multiplication, does the second row line up or shift over? Which do you pick?"}
     do:
       # 开场：#4 的片尾画面
       - {at: s1, act: show, target: rect, dur: 0.01}
@@ -127,7 +127,7 @@ beats:
   - id: Myth
     shows: misconception
     say:
-      - {id: s1, pace: normal, text: "{@m}有人算二十乘十加三乘四，得二百一十二。", en: "Some people work out twenty times ten plus three times four, and get two hundred and twelve."}
+      - {id: s1, pace: normal, text: "{@m}表哥图省事：二十乘十加三乘四，二百一十二。", en: "Our cousin takes a shortcut: twenty times ten plus three times four, two hundred and twelve."}
     do:
       - {at: s1@m, act: show, target: myth}
 

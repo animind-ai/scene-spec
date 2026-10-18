@@ -85,10 +85,10 @@ objects:
 
 beats:
   - id: Hook
-    pause: {type: predict, prompt: 八加五等于几？先猜一猜。, hold: 3, app_item: ep01-before-1}
+    pause: {type: predict, prompt: 蛋盒里八个蛋又来五个，一共几个？, hold: 3, app_item: ep01-before-1}
     say:
-      - {id: s1, pace: ask, text: "{@q}八加五，等于几？你能一眼看出来吗？", en: "Eight plus five. What is it? Can you see it in one look?"}
-      - {id: s2, pace: normal, text: "先猜一猜，想三秒钟。", en: "Have a guess. Think for three seconds."}
+      - {id: s1, pace: ask, text: "{@q}蛋盒里放了八个蛋，又拿来五个，一共几个？", en: "There are eight eggs in the egg box, and here come five more. How many in all?"}
+      - {id: s2, pace: normal, text: "先别数，在心里估一估。", en: "Don't count yet. Just make a guess in your head."}
     do:
       - {at: s1, act: show, target: frame}
       - {with: prev, act: fill, target: frame, args: {count: 8}, dur: 1.2}
@@ -98,8 +98,8 @@ beats:
   - id: Myth
     shows: misconception
     say:
-      - {id: s1, pace: normal, text: "很多人会从八开始，一个一个往上数。", en: "A lot of people start at eight and count up one at a time."}
-      - {id: s2, pace: normal, text: "{@w}还有人担心，把五拆开，就会少掉几个。", en: "Some worry that breaking the five apart will lose a few."}
+      - {id: s1, pace: normal, text: "弟弟要从八开始，一个一个往上数。", en: "Little brother wants to start at eight and count up one at a time."}
+      - {id: s2, pace: normal, text: "{@w}妹妹担心，把五拆开，会少掉几个。", en: "Little sister worries that breaking the five apart will lose a few."}
     do:
       - {at: s2@w, act: show, target: myth}
 

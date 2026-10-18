@@ -114,10 +114,10 @@ objects:
 
 beats:
   - id: Hook
-    pause: {type: predict, prompt: 两排五个和五排两个一样多吗？先猜一猜。, hold: 3, app_item: ep02-before-1}
+    pause: {type: predict, prompt: 两排五个人换成五排两个，人数变吗？, hold: 3, app_item: ep02-before-1}
     say:
-      - {id: s1, pace: ask, text: "{@q}两排五个，和五排两个，一样多吗？", en: "Two rows of five, or five rows of two. Are they the same?"}
-      - {id: s2, pace: normal, text: "先猜一猜，想三秒钟。", en: "Have a guess. Think for three seconds."}
+      - {id: s1, pace: ask, text: "{@q}排队时两排五个人，换成五排两个，人数变吗？", en: "We line up in two rows of five, then switch to five rows of two. Does the number of kids change?"}
+      - {id: s2, pace: normal, text: "你先想一想，变还是不变？", en: "Think about it first: does it change or not?"}
     do:
       # 开场：一下子摆出 #1 的片尾画面
       - {at: s1, act: show, target: frame, dur: 0.01}
@@ -128,7 +128,7 @@ beats:
   - id: Myth
     shows: misconception
     say:
-      - {id: s1, pace: normal, text: "{@m}很多人觉得，两个五和五个二，是两回事。", en: "Lots of people think two fives and five twos are different things."}
+      - {id: s1, pace: normal, text: "{@m}有同学嘀咕：两个五和五个二，是两回事。", en: "One kid mutters: two fives and five twos are different things."}
     do:
       - {at: s1@m, act: show, target: myth}
 
@@ -171,7 +171,7 @@ beats:
     say:
       - {id: s1, pace: slow, text: "{@r}转一下，就成了四排，每排三个点。", en: "Turn it, and it becomes four rows, three dots in each."}
       - {id: s2, pace: normal, text: "{@s}三加三加三加三，还是十二个，一个也不少。", en: "Three plus three plus three plus three: still twelve, not one missing."}
-      - {id: s3, pace: normal, text: "{@b}点一个没加，一个没拿，只是换了一个方向。", en: "Nothing added, nothing taken away. It just faces a new way."}
+      - {id: s3, pace: normal, text: "{@b}一个点没加，一个点没拿，只是换了一个方向。", en: "Nothing added, nothing taken away. It just faces a new way."}
     do:
       - {at: s1, act: recolor, target: array, args: {role: A}}
       - {with: prev, act: hide, target: lab34}
