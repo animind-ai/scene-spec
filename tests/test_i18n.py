@@ -89,3 +89,30 @@ def test_action_args_can_be_patched_by_index(ep21):
     ep21["i18n"]["en"]["beats"]["Myth"] = {"do": {0: {"target": "one"}}}
     with pytest.raises(LocalizeError):
         localize(ep21, "en")
+
+
+def english_first() -> dict:
+    """直接用英文写的场景：style.lang: en，句子只有 text。"""
+    doc = copy.deepcopy(load_file(ROOT / "examples" / "s67-p01.scene.yaml"))
+    doc.setdefault("style", {})["lang"] = "en"
+    for beat in doc["beats"]:
+        for s in beat.get("say", []):
+            s.pop("en", None)
+    return doc
+
+
+def test_english_first_file_localizes_to_itself():
+    doc = english_first()
+    en = localize(doc, "en")
+    assert en["beats"] == doc["beats"] and en["style"]["lang"] == "en"
+
+
+def test_english_first_file_has_no_chinese_version():
+    with pytest.raises(LocalizeError):
+        localize(english_first(), "zh")
+
+
+def test_english_first_file_rejects_i18n_en():
+    doc = english_first()
+    doc["i18n"] = {"en": {}}
+    assert "SS501" in check(doc).codes()

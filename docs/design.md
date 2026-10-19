@@ -621,6 +621,7 @@ i18n:
 
 - `say` 不能在 `i18n` 里覆盖。组件自带的中文默认字要在对象里写明：graph 割线读数 `readout_text`、复平面 `axis_labels`、coin_flips 的 `heads_text`。
 - `scene_spec.localize(doc, "en")` 得到一份普通的英文场景（`say[].text` = 英文句、`style.lang: en`、没有 `i18n`）；`check` 会把它也完整查一遍（问题标 `[en]`），本地化后画面上还剩中文报 SS507。
+- 直接用英文写的场景（English-first）：写 `style: {lang: en}`，句子只写 `text`，不需要 `en` 和 `i18n.en`；`localize(doc, "en")` 原样返回，`scene_spec.source_lang(doc)` 给出文件的源语言（`style.lang`，默认 `zh`）。
 - 工具：`animind-voice synth|align|pitch --lang en`（英文合成指令、en-US、英文听写，数字拼成单词再对齐），`animind-kit render|inspect --lang en`（字幕只有英文一行，按小句切条）。英文版用单独的音频目录。
 
 ## 8. 检查规则（渲染前）
