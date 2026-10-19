@@ -24,7 +24,7 @@ BUILTIN_ACTS = {
 } | segments.ACTS
 NEEDS_TARGET = BUILTIN_ACTS - {"transform", "camera", "hold", "tween"} - segments.NO_TARGET
 READOUT_KEYS = ("value", "label", "digits", "format")
-KNOWN_THEMES = {"paper", "chalk", "jade", "xuan", "blueprint", "riso"}
+KNOWN_THEMES = {"paper", "chalk", "jade", "xuan", "blueprint", "riso", "classroom"}
 LAYOUT_REFS = ("below", "above", "left_of", "right_of", "within", "over")
 DEMO_WORDS = ("演示", "不是证明", "不算证明", "并非证明", "demonstration", "not a proof")  # 后两个给英文版（localize 成 en）
 CAMERA_ARGS = {"zoom", "fit", "margin", "reset"}
@@ -34,6 +34,7 @@ REQUIRED_PEDAGOGY = {
     "insight": ("insight", "misconception", "non_example", "status", "landing"),
     "worked": ("insight", "status"),
     "contest": ("status",),
+    "lecture": (),  # 大学课程讲座（docs/cs-lecture.md）：一讲很长、讲很多点，不要求教学字段
 }
 
 _COLOR = re.compile(r"^(#[0-9a-fA-F]{3}|#[0-9a-fA-F]{6}|#[0-9a-fA-F]{8}|(rgb|rgba|hsl|hsla)\(.*\))$")

@@ -166,11 +166,12 @@
           "minLength": 1
         },
         "line": {
-          "description": "产品线：insight 洞察短视频 | worked 例题讲解 | contest 竞赛拔高",
+          "description": "产品线：insight 洞察短视频 | worked 例题讲解 | contest 竞赛拔高 | lecture 大学课程讲座",
           "enum": [
             "insight",
             "worked",
-            "contest"
+            "contest",
+            "lecture"
           ]
         },
         "units": {
@@ -316,6 +317,17 @@
             "soft",
             "none"
           ]
+        },
+        "layout": {
+          "description": "分区模板：default（默认，题卡在上）| lecture（讲座：顶上一条窄带放页眉，side 是右半边），见 docs/cs-lecture.md",
+          "enum": ["default", "lecture"]
+        },
+        "fonts": {
+          "description": "西文正文和代码的字体（字体族名）；系统里没有时 kit 退回默认字体",
+          "type": "object",
+          "additionalProperties": false,
+          "minProperties": 1,
+          "properties": {"text": {"type": "string", "minLength": 1}, "code": {"type": "string", "minLength": 1}}
         },
         "min_font": {
           "type": "integer",

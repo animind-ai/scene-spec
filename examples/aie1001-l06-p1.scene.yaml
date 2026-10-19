@@ -1,0 +1,526 @@
+# AIE1001 第 6 讲（递归）第 1 部分：函数怎么调用自己。编程课用 scene-spec 写的第一支（docs/cs-lecture.md）。
+# 照着课程仓库里手写的 Manim 版（aie1001/videos/L06/p1/scenes.py）一个 beat 一个 beat 改写；旁白和那一版逐字相同，
+# 所以可以直接用那一版已经合成好的音频（每个 beat 的句数一样）。句子 id 是 s0、s1……，对应 Manim 版 cue.at() 的下标。
+# 墨线的对象跨 beat 常驻：每个 beat 开头先收掉上一个 beat 的对象；页眉 head 只有一个，每个 beat 用 retitle 换标题。
+spec: "0.1"
+
+meta:
+  id: aie1001-l06-p1
+  title: "Recursion, part 1: how a function calls itself"
+  line: lecture
+  author: Boxi Yu
+  license: CC-BY-4.0
+  sources:
+    - {kind: text, cite: "AIE1001 Introduction to AI Programming (CUHK-Shenzhen), week 6 slides 2–13", note: "outline only; narration and visuals are original"}
+
+pedagogy:
+  insight: "Every call gets its own frame; the frames of unfinished calls form the call stack, last in, first out"
+  misconception: "A recursive call jumps back to the top of the function like a loop, with n changed"
+
+style:
+  theme: classroom
+  layout: lecture
+  lang: en
+  fonts: {text: Inter, code: Source Code Pro}
+  subtitles: soft
+
+objects:
+  # ---------- Hook ----------
+  shirt: {type: text, text: "First 100 people: free T-shirt", in: top}
+  rule1: {type: text, text: "At the front?  You're number 1.", in: stage}
+  rule2: {type: text, text: "Otherwise: ask the person in front, then add 1.", below: rule1, gap: sm, align: {x: rule1}}
+  line: {widget: queue, people: 6, you: 5, label: STAGE, below: rule2, gap: lg}
+  cant: {type: text, text: "can't see the front", role: DIM, level: caption, above: line, align: {x: "line.person[2]"}}
+  q: {type: text, text: "[?]{.HL .bold}", level: display, above: line, align: {x: line.you}}
+  rule_title: {type: text, text: "[Everyone follows the same rule]{.A .bold}", in: top}
+
+  # ---------- Title ----------
+  name: {type: text, text: "[Recursion]{.A .bold}", level: display, in: stage}
+  sub: {type: text, text: "Lecture 6 · Part 1 of 3: How a function calls itself", below: name, gap: md}
+  course: {type: text, text: "AIE1001 Introduction to AI Programming", role: DIM, level: caption, below: sub, gap: sm}
+  plan:
+    widget: bullets
+    items: ["What a recursive function is", "What Python does: frames and the call stack", "Three bugs that catch almost everyone"]
+    below: course
+    gap: xl
+
+  # ---------- 页眉（Structure 起每页都有） ----------
+  head: {widget: heading, text: "What recursion is", kicker: "AIE1001 · Lecture 6 · Recursion (1/3)", in: top}
+
+  # ---------- Structure ----------
+  definition: {type: text, text: "A recursive function calls itself while it runs.", in: stage}
+  parts:
+    widget: cards
+    cols: 26
+    rows: 2
+    below: definition
+    gap: lg
+    items:
+      - {title: "1  Base case", body: "the smallest problem,\nanswered directly", role: A, note: "At the front? You're number 1."}
+      - {title: "2  Smaller problem", body: "same kind of problem,\nsolved by a recursive call", role: B, note: "Ask the person in front of you."}
+      - {title: "3  Combine", body: "turn the smaller answer\ninto the whole answer", role: C, note: "Add 1."}
+
+  # ---------- Factorial ----------
+  five: {type: text, text: '$5!=5\cdot$ [$4\cdot 3\cdot 2\cdot 1$]{#rest} $=120$', level: title, in: stage}
+  zero: {type: math, tex: "0! = 1", role: DIM, below: five, gap: md}
+  four: {type: math, tex: "4!", role: C, below: five, gap: md, align: {x: "five#rest"}}
+  compact: {type: text, text: '$5!=5\cdot$ [$4!$]{#f .C}', level: title, in: stage}
+  general: {type: math, tex: 'n! = \begin{cases} 1 & n = 0 \\ n \cdot (n-1)! & n \ge 1 \end{cases}', below: compact, gap: lg}
+  code:
+    widget: code
+    in: side
+    src: |
+      def fact(n):
+          if n == 0:
+              return 1
+          else:
+              return n * fact(n - 1)
+    spans: {call: {line: 4, text: "fact(n - 1)"}, times: {line: 4, text: "n *"}}
+  pb: {widget: pill, text: "base case", role: A, below: code, gap: md}
+  ps: {widget: pill, text: "smaller problem", role: B, below: pb, gap: sm}
+  pc: {widget: pill, text: "combine: n * …", role: C, below: ps, gap: sm}
+
+  # ---------- Predict ----------
+  pcode:
+    widget: code
+    in: stage
+    src: |
+      def fact(n):
+          if n == 0:
+              return 1
+          else:
+              return n * fact(n - 1)
+  q1: {type: text, text: "[fact(3)]{.code} returns ?", level: title, in: side}
+  six: {type: text, text: "[6]{.HL .bold}", level: title, below: q1, gap: sm, align: {x: q1}}
+  q2: {type: text, text: "How many calls in total?", level: title, below: six, gap: lg}
+  four2: {type: text, text: "[4]{.HL .bold}", level: title, below: q2, gap: sm}
+  calls: {type: text, text: "[fact(3) fact(2) fact(1) fact(0)]{.code .A}", level: caption, below: four2, gap: sm}
+
+  # ---------- CallStack ----------
+  ccode:
+    widget: code
+    in: stage
+    src: |
+      def fact(n):
+          if n == 0:
+              return 1
+          else:
+              return n * fact(n - 1)
+  stack: {widget: call_stack, depth: 4, label: call stack, in: side}
+  newcard: {widget: card, title: "New call → new frame", body: "holds the call's parameters\nand local variables", within: stack}
+  lifo:
+    widget: card
+    title: "Last in, first out"
+    body: ["[call]{.A .bold}  push a frame on top", "[return]{.C .bold}  pop the top frame off"]
+    within: stack
+
+  # ---------- NotALoop ----------
+  ncode:
+    widget: code
+    in: stage
+    src: |
+      def fact(n):
+          if n == 0:
+              return 1
+          else:
+              return n * fact(n - 1)
+  w2: {type: text, text: "with n changed?", role: "NO", above: ncode, gap: sm}
+  w1: {type: text, text: "jump back to the top", role: "NO", above: w2, gap: xs}
+  nstack: {widget: call_stack, depth: 2, note_cols: 24, in: side}
+  resume: {type: text, text: "then carries on from [n * fact(n - 1)]{.code .A .bold}", below: nstack, gap: md}
+
+  # ---------- Trace ----------
+  tcode:
+    widget: code
+    in: stage
+    src: |
+      def fact_traced(n, depth=0):
+          indent = "    " * depth
+          print(indent + "fact(" + str(n) + ")")
+          if n == 0:
+              result = 1
+          else:
+              result = n * fact_traced(n - 1, depth + 1)
+          print(indent + "returns " + str(result))
+          return result
+  term:
+    widget: terminal
+    below: tcall
+    gap: sm
+    cols: 22
+    lines:
+      - "fact(3)"
+      - "    fact(2)"
+      - "        fact(1)"
+      - "            fact(0)"
+      - {text: "            returns 1", role: HL}
+      - {text: "        returns 1", role: HL}
+      - {text: "    returns 2", role: HL}
+      - {text: "returns 6", role: HL}
+  tcall: {type: text, text: "[>>> fact_traced(3)]{.code .A}", in: side}
+  tnote: {type: text, text: "last call made, first to return", role: HL, level: caption, below: term, gap: sm}
+  tutor: {widget: pill, text: pythontutor.com, role: A, below: tnote, gap: sm}
+
+  # ---------- Leap ----------
+  modes: {type: text, text: '[check]{.A .bold}\quad trace it\qquad\qquad [design]{.C .bold}\quad trust the smaller call', in: stage}
+  lline: {type: text, text: "[return n * ]{.code} [fact(n - 1)]{#call .code}", level: title, below: modes, gap: xl}
+  trust: {type: math, tex: "(n-1)!", role: A, below: lline, gap: sm, align: {x: "lline#call"}}
+  label: {type: text, text: "assume it already works", role: A, level: caption, below: trust, gap: xs}
+  lq: {type: math, tex: 'n \cdot (n-1)! \overset{?}{=} n!', below: label, gap: lg}
+  yes: {type: math, tex: 'n \cdot (n-1)! = n! \;\checkmark', role: B, below: label, gap: lg}
+  checks:
+    type: text
+    text: '$\checkmark$ base case right\qquad $\checkmark$ every call moves closer to it\qquad $\checkmark$ combine step right'
+    role: B
+    in: footer
+
+  # ---------- Bugs ----------
+  names: {widget: bullets, items: ["No base case", "No progress", "Forgot return"], role: "NO", in: stage}
+  bstack: {widget: call_stack, depth: 4, in: side}
+  away: {type: text, text: "moving away from [n == 0]{.code}", role: "NO", level: caption, below: bstack, gap: sm}
+  err:
+    widget: terminal
+    in: side
+    cols: 34
+    lines: [">>> fact(-1)", "Traceback (most recent call last):", "  ...",
+            {text: "RecursionError: maximum recursion", role: "NO"}, {text: "depth exceeded", role: "NO"}]
+  limit: {type: text, text: "limit: about 1000 frames", role: DIM, level: caption, below: err, gap: sm}
+  bad: {widget: code, in: side, src: "return n * fact(n)"}
+  good: {widget: code, src: "return n * fact(n - 1)", below: bad, gap: lg}
+  broken:
+    widget: code
+    in: side
+    src: |
+      def fact_broken(n):
+          if n == 0:
+              return 1
+          else:
+              n * fact_broken(n - 1)
+  none: {type: text, text: "[→ returns None]{.NO .bold .code}", below: broken, gap: sm}
+  err2:
+    widget: terminal
+    cols: 34
+    below: none
+    gap: sm
+    lines: [">>> fact_broken(2)", {text: "TypeError: unsupported operand type(s)", role: "NO"},
+            {text: "for *: 'int' and 'NoneType'", role: "NO"}]
+
+  # ---------- Close ----------
+  points:
+    widget: bullets
+    in: stage
+    items: ["Base case, smaller problem, combine step",
+            "Every call gets its own frame; unfinished calls form the call stack",
+            "Design with the leap of faith. Check by tracing."]
+  ccards:
+    widget: cards
+    below: points
+    gap: xl
+    items:
+      - {title: "Try it", body: "sum_digits(472)  →  13\nWhat is your base case?", role: C, mono: true}
+      - {title: "Next: Part 2", body: "Recursion on lists\nBinary search", role: A}
+
+beats:
+  - id: Hook
+    say:
+      - {id: s0, pace: normal, text: "Imagine you're waiting in a long line for a concert. The first one hundred people get a free T-shirt, so you want to know your position."}
+      - {id: s1, pace: normal, text: "But you can't see the front of the line. And if you step out to count, you lose your place."}
+      - {id: s2, pace: ask, text: "So what can you do?"}
+      - {id: s3, pace: normal, text: "Here's one way. Everyone in the line follows the same simple rule."}
+      - {id: s4, pace: slow, text: "If you're at the front, you know your position: you're number one. {@b}Otherwise, ask the person in front of you for their number, and add one to it."}
+      - {id: s5, pace: normal, text: "The question travels forward, person by person, until it reaches the front. {@n}Then the answers travel back. One, two, three, four, five, six. You're number six."}
+    do:
+      - {at: s0, act: show, target: line, dur: 1.4}
+      - {after: prev, act: show, target: shirt}
+      - {at: s1, act: set, target: "line.person[0:5]", args: {opacity: 0.2}, dur: 0.8}
+      - {with: prev, act: show, target: cant}
+      - {at: s2, act: show, target: q}
+      - {at: s3, act: set, target: "line.person[0:5]", args: {opacity: 1}}
+      - {with: prev, act: hide, target: cant}
+      - {with: prev, act: hide, target: q}
+      - {with: prev, act: hide, target: shirt}
+      - {after: prev, act: show, target: rule_title}
+      - {at: s4, act: show, target: rule1}
+      - {at: s4@b, act: show, target: rule2}
+      - {at: s5, act: ask, target: line, dur: 2.4}
+      - {at: s5@n, act: number, target: line, dur: 2.9}
+
+  - id: Title
+    say:
+      - {id: s0, pace: normal, text: "This idea is called recursion. Welcome to Lecture Six of Introduction to AI Programming."}
+      - {id: s1, pace: normal, text: "In this first part, we'll see {@a}what a recursive function is, {@b}what Python really does when a function calls itself, and {@c}the three bugs that catch almost everyone."}
+    do:
+      - {at: s0, act: hide, target: line}
+      - {with: prev, act: hide, target: rule_title}
+      - {with: prev, act: hide, target: rule1}
+      - {with: prev, act: hide, target: rule2}
+      - {after: prev, act: show, target: name, style: write}
+      - {after: prev, act: show, target: sub}
+      - {with: prev, act: show, target: course}
+      - {at: s1@a, act: show, target: "plan[0]"}
+      - {at: s1@b, act: show, target: "plan[1]"}
+      - {at: s1@c, act: show, target: "plan[2]"}
+
+  - id: Structure
+    say:
+      - {id: s0, pace: normal, text: "Recursion is when a function calls itself while it's running."}
+      - {id: s1, pace: normal, text: "Look again at the rule from the concert line. It has three parts, and every recursive function has the same three."}
+      - {id: s2, pace: slow, text: "First, a base case: the smallest problem, which you can answer directly. {@q}If you're at the front, you're number one."}
+      - {id: s3, pace: slow, text: "Second, a smaller problem of the same kind, solved by a recursive call. {@q}Ask the person in front of you."}
+      - {id: s4, pace: slow, text: "Third, a combine step, which turns the smaller answer into the answer for the whole problem. {@q}Add one."}
+      - {id: s5, pace: normal, text: "Keep these three parts in mind. We'll look for them in every example."}
+    do:
+      - {at: s0, act: hide, target: name}
+      - {with: prev, act: hide, target: sub}
+      - {with: prev, act: hide, target: course}
+      - {with: prev, act: hide, target: plan}
+      - {after: prev, act: show, target: head}
+      - {after: prev, act: show, target: definition}
+      - {at: s2, act: show, target: "parts[0]"}
+      - {at: s2@q, act: show, target: "parts.note[0]"}
+      - {at: s3, act: show, target: "parts[1]"}
+      - {at: s3@q, act: show, target: "parts.note[1]"}
+      - {at: s4, act: show, target: "parts[2]"}
+      - {at: s4@q, act: show, target: "parts.note[2]"}
+
+  - id: Factorial
+    say:
+      - {id: s0, pace: normal, text: "Our first example is the factorial. Five factorial is five times four times three times two times one, which is one hundred and twenty. And zero factorial is defined to be one."}
+      - {id: s1, pace: ask, text: "Now look closely. What is four times three times two times one?"}
+      - {id: s2, pace: normal, text: "It's four factorial. {@c}So five factorial is five times four factorial. The factorial of five contains the factorial of four."}
+      - {id: s3, pace: normal, text: "In general, n factorial is n times the factorial of n minus one, and zero factorial is one. That's a recursive definition."}
+      - {id: s4, pace: normal, text: "And it turns into Python almost word for word."}
+      - {id: s5, pace: slow, text: "If n is zero, return one. That's the base case. {@s}Otherwise, return n times fact of n minus one. Calling fact on n minus one is the smaller problem, {@m}and multiplying by n is the combine step."}
+    do:
+      - {at: s0, act: hide, target: definition}
+      - {with: prev, act: hide, target: parts}
+      - {with: prev, act: retitle, target: head, args: {text: "Example: factorial"}}
+      - {after: prev, act: show, target: five, style: write}
+      - {after: prev, act: show, target: zero}
+      - {at: s1, act: underline, target: "five#rest"}
+      - {with: prev, act: set, target: "five#rest", args: {role: C}}
+      - {with: prev, act: hide, target: zero}
+      - {at: s2, act: show, target: four}
+      - {at: s2@c, act: clear, target: five}
+      - {with: prev, act: hide, target: four}
+      - {after: prev, act: transform, from: five, to: compact, match: tex}
+      - {with: prev, act: hide, target: five}
+      - {at: s3, act: show, target: general, style: write}
+      - {at: s4, act: show, target: code}
+      - {at: s5, act: highlight, target: code, args: {lines: [1, 2]}}
+      - {with: prev, act: show, target: pb}
+      - {at: s5@s, act: unhighlight, target: code}
+      - {with: prev, act: highlight, target: code, args: {lines: [4]}}
+      - {with: prev, act: circle, target: "code#call"}
+      - {with: prev, act: show, target: ps}
+      - {at: s5@m, act: underline, target: "code#times"}
+      - {with: prev, act: show, target: pc}
+
+  - id: Predict
+    pause: {type: predict, prompt: "What does fact(3) return, and how many calls are made?", hold: 0}
+    say:
+      - {id: s0, pace: ask, text: "Before we go on, pause the video and predict. What does fact of three return? And how many times is fact called in total?"}
+      - {id: s1, pace: normal, text: "Fact of three returns six. {@f}And fact is called four times: with three, two, one, and zero."}
+    do:
+      - {at: s0, act: hide, target: compact}
+      - {with: prev, act: hide, target: general}
+      - {with: prev, act: hide, target: code}
+      - {with: prev, act: hide, target: pb}
+      - {with: prev, act: hide, target: ps}
+      - {with: prev, act: hide, target: pc}
+      - {with: prev, act: retitle, target: head, args: {text: "Pause and predict", role: C}}
+      - {after: prev, act: show, target: pcode}
+      - {after: prev, act: show, target: q1}
+      - {with: prev, act: show, target: q2}
+      - {at: s1, act: show, target: six}
+      - {at: s1@f, act: show, target: four2}
+      - {with: prev, act: show, target: calls}
+
+  - id: CallStack
+    say:
+      - {id: s0, pace: normal, text: "So what does Python actually do when fact calls fact? This is the picture you need to understand recursion."}
+      - {id: s1, pace: normal, text: "Every time a function is called, Python creates a new frame. A frame holds that call's parameters and local variables."}
+      - {id: s2, pace: normal, text: "We call fact of three. Python makes a frame where n is three. {@w}Since n isn't zero, this call needs fact of two. So it stops, and waits."}
+      - {id: s3, pace: normal, text: "Fact of two gets its own frame, with its own n, equal to two. It waits for {@b}fact of one. And fact of one waits for {@c}fact of zero."}
+      - {id: s4, pace: slow, text: "Look at the stack now: four frames, four different values of n, all alive at the same time. {@r}Only the top one is running."}
+      - {id: s5, pace: normal, text: "Fact of zero hits the base case and returns one. {@p}Its frame is removed."}
+      - {id: s6, pace: normal, text: "Now fact of one can finish: one times one is one. {@b}Then fact of two: two times one is two. {@c}Then fact of three: three times two is six."}
+      - {id: s7, pace: slow, text: "The frames of unfinished calls form the call stack. A new call pushes a frame on top. A return pops it off. Last in, first out."}
+    do:
+      - {at: s0, act: hide, target: pcode}
+      - {with: prev, act: hide, target: q1}
+      - {with: prev, act: hide, target: six}
+      - {with: prev, act: hide, target: q2}
+      - {with: prev, act: hide, target: four2}
+      - {with: prev, act: hide, target: calls}
+      - {with: prev, act: retitle, target: head, args: {text: "What Python does: the call stack", role: A}}
+      - {after: prev, act: show, target: ccode}
+      - {with: prev, act: show, target: stack}
+      - {at: s1, act: show, target: newcard}
+      - {at: s2, act: hide, target: newcard}
+      - {after: prev, act: push, target: stack, args: {name: fact, vars: {n: 3}}}
+      - {after: prev, act: highlight, target: ccode, args: {lines: [4]}}
+      - {at: s2@w, act: note, target: stack, args: {text: waiting}}
+      - {at: s3, act: push, target: stack, args: {name: fact, vars: {n: 2}}}
+      - {after: prev, act: note, target: stack, args: {text: waiting}}
+      - {at: s3@b, act: push, target: stack, args: {name: fact, vars: {n: 1}}}
+      - {after: prev, act: note, target: stack, args: {text: waiting}}
+      - {at: s3@c, act: push, target: stack, args: {name: fact, vars: {n: 0}}}
+      - {at: s4, act: focus, target: "stack.value[0:4]", dur: 1.0}
+      - {at: s4@r, act: note, target: stack, args: {text: running, role: A}}
+      - {at: s5, act: unfocus, target: stack}
+      - {with: prev, act: unhighlight, target: ccode}
+      - {with: prev, act: highlight, target: ccode, args: {lines: [2]}}
+      - {with: prev, act: note, target: stack, args: {text: returns 1, role: HL, mono: true}}
+      - {at: s5@p, act: pop, target: stack}
+      - {at: s6, act: unhighlight, target: ccode}
+      - {with: prev, act: highlight, target: ccode, args: {lines: [4]}}
+      - {with: prev, act: note, target: stack, args: {text: "1 * 1 = 1", role: HL, mono: true}}
+      - {after: prev, act: hold, dur: 0.9}
+      - {after: prev, act: pop, target: stack}
+      - {at: s6@b, act: note, target: stack, args: {text: "2 * 1 = 2", role: HL, mono: true}}
+      - {after: prev, act: hold, dur: 0.9}
+      - {after: prev, act: pop, target: stack}
+      - {at: s6@c, act: note, target: stack, args: {text: "3 * 2 = 6", role: HL, mono: true}}
+      - {after: prev, act: hold, dur: 0.9}
+      - {after: prev, act: pop, target: stack}
+      - {after: prev, act: note, target: stack, args: {frame: base, text: "fact(3) → 6", role: A, mono: true}}
+      - {with: prev, act: unhighlight, target: ccode}
+      - {at: s7, act: show, target: lifo}
+
+  - id: NotALoop
+    shows: misconception
+    say:
+      - {id: s0, pace: normal, text: "Here's the most common misunderstanding about recursion."}
+      - {id: s1, pace: normal, text: "Many students picture a recursive call as jumping back to the top of the function, like a loop, with n changed to the new value."}
+      - {id: s2, pace: slow, text: "That's not what happens. {@f}A recursive call creates a fresh frame, with fresh variables. {@k}The caller's variable n doesn't change. {@r}When the call returns, the caller carries on from the middle of its own line, where n is still three."}
+    do:
+      - {at: s0, act: hide, target: ccode}
+      - {with: prev, act: hide, target: stack}
+      - {with: prev, act: hide, target: lifo}
+      - {with: prev, act: retitle, target: head, args: {text: "A recursive call is not a loop"}}
+      - {at: s1, act: show, target: ncode}
+      - {after: prev, act: jump, target: ncode, args: {from: 4, to: 0}, dur: 1.0}
+      - {with: prev, act: show, target: w2}
+      - {with: prev, act: show, target: w1}
+      - {at: s2, act: cross, target: ncode}
+      - {with: prev, act: show, target: nstack}
+      - {after: prev, act: push, target: nstack, args: {name: fact, vars: {n: 3}}}
+      - {at: s2@f, act: push, target: nstack, args: {name: fact, vars: {n: 2}, role: C}}
+      - {after: prev, act: note, target: nstack, args: {text: "new frame, fresh n", role: C}}
+      - {at: s2@k, act: note, target: nstack, args: {frame: 0, text: "caller's n is untouched", role: A}}
+      - {at: s2@r, act: pop, target: nstack}
+      - {with: prev, act: show, target: resume}
+
+  - id: Trace
+    say:
+      - {id: s0, pace: normal, text: "You can watch the stack yourself. This version prints a line when each call starts and when it returns, indented by how deep the call is."}
+      - {id: s1, pace: normal, text: "First the calls go down: three, then two, then one, then zero."}
+      - {id: s2, pace: normal, text: "Then the returns come back up, in the opposite order. The first call to return is the last one that was made."}
+      - {id: s3, pace: normal, text: "You can also step through it in Python Tutor, and watch the frames appear and disappear."}
+    do:
+      - {at: s0, act: hide, target: ncode}
+      - {with: prev, act: hide, target: w1}
+      - {with: prev, act: hide, target: w2}
+      - {with: prev, act: hide, target: nstack}
+      - {with: prev, act: hide, target: resume}
+      - {with: prev, act: retitle, target: head, args: {text: "Watching the frames"}}
+      - {after: prev, act: show, target: tcode}
+      - {after: prev, act: show, target: tcall}
+      - {at: s1, act: show, target: "term[0]", dur: 0.45}
+      - {after: prev, act: show, target: "term[1]", dur: 0.45}
+      - {after: prev, act: show, target: "term[2]", dur: 0.45}
+      - {after: prev, act: show, target: "term[3]", dur: 0.45}
+      - {at: s2, act: show, target: "term[4]", dur: 0.45}
+      - {after: prev, act: show, target: "term[5]", dur: 0.45}
+      - {after: prev, act: show, target: "term[6]", dur: 0.45}
+      - {after: prev, act: show, target: "term[7]", dur: 0.45}
+      - {after: prev, act: circle, target: "term[3:5]"}
+      - {with: prev, act: show, target: tnote}
+      - {at: s3, act: show, target: tutor}
+
+  - id: Leap
+    say:
+      - {id: s0, pace: normal, text: "Tracing is the right way to check a recursive function. But it's a poor way to write one."}
+      - {id: s1, pace: slow, text: "When you write the recursive line, don't follow the call all the way down. {@t}Instead, trust it. Assume fact of n minus one already returns the right answer."}
+      - {id: s2, pace: ask, text: "Then ask just one question. If it does, is n times that the right answer for n?"}
+      - {id: s3, pace: normal, text: "It is. {@c}So as long as the base case is right, and every call moves closer to it, the function is correct. This is called the recursive leap of faith."}
+    do:
+      - {at: s0, act: hide, target: tcode}
+      - {with: prev, act: hide, target: tcall}
+      - {with: prev, act: hide, target: term}
+      - {with: prev, act: hide, target: tnote}
+      - {with: prev, act: hide, target: tutor}
+      - {with: prev, act: retitle, target: head, args: {text: "The recursive leap of faith"}}
+      - {after: prev, act: show, target: modes}
+      - {at: s1, act: show, target: lline}
+      - {at: s1@t, act: mark, target: "lline#call"}
+      - {with: prev, act: show, target: trust}
+      - {with: prev, act: show, target: label}
+      - {at: s2, act: show, target: lq, style: write}
+      - {at: s3, act: transform, from: lq, to: yes, match: tex, dur: 0.6}
+      - {with: prev, act: hide, target: lq}
+      - {at: s3@c, act: show, target: checks, dur: 1.2}
+
+  - id: Bugs
+    say:
+      - {id: s0, pace: normal, text: "Finally, the three bugs that catch almost everyone."}
+      - {id: s1, pace: normal, text: "The first bug: no base case, or a base case that some inputs never reach. {@c}Call fact of minus one. It calls fact of minus two, then minus three. {@a}The numbers move away from zero, forever."}
+      - {id: s2, pace: normal, text: "Python limits the stack to about a thousand frames. Go past that, and you get a recursion error."}
+      - {id: s3, pace: normal, text: "The second bug: no progress. If the recursive call isn't on a smaller problem, say fact of n instead of fact of n minus one, the same thing happens."}
+      - {id: s4, pace: normal, text: "The third bug: forgetting to return. This line computes n times fact of n minus one, and then throws the result away. {@n}So the function returns None."}
+      - {id: s5, pace: normal, text: "And the error shows up one level up, because Python can't multiply a number by None."}
+    do:
+      - {at: s0, act: hide, target: modes}
+      - {with: prev, act: hide, target: lline}
+      - {with: prev, act: hide, target: trust}
+      - {with: prev, act: hide, target: label}
+      - {with: prev, act: hide, target: yes}
+      - {with: prev, act: hide, target: checks}
+      - {with: prev, act: retitle, target: head, args: {text: "Three common bugs", role: "NO"}}
+      - {after: prev, act: show, target: names}
+      - {after: prev, act: set, target: "names[0:3]", args: {opacity: 0.3}}
+      - {at: s1, act: set, target: "names[0]", args: {opacity: 1}}
+      - {at: s1@c, act: show, target: bstack}
+      - {with: prev, act: push, target: bstack, args: {name: fact, vars: {n: -1}, role: "NO"}}
+      - {after: prev, act: push, target: bstack, args: {name: fact, vars: {n: -2}, role: "NO"}}
+      - {after: prev, act: push, target: bstack, args: {name: fact, vars: {n: -3}, role: "NO"}}
+      - {after: prev, act: push, target: bstack, args: {name: fact, vars: {n: -4}, role: "NO"}}
+      - {at: s1@a, act: show, target: away}
+      - {at: s2, act: hide, target: bstack}
+      - {with: prev, act: hide, target: away}
+      - {after: prev, act: show, target: err}
+      - {after: prev, act: show, target: limit}
+      - {at: s3, act: set, target: "names[1]", args: {opacity: 1}}
+      - {with: prev, act: hide, target: err}
+      - {with: prev, act: hide, target: limit}
+      - {after: prev, act: show, target: bad}
+      - {after: prev, act: cross, target: bad}
+      - {with: prev, act: show, target: good}
+      - {at: s4, act: set, target: "names[2]", args: {opacity: 1}}
+      - {with: prev, act: hide, target: bad}
+      - {with: prev, act: hide, target: good}
+      - {after: prev, act: show, target: broken}
+      - {after: prev, act: highlight, target: broken, args: {lines: [4], role: "NO"}}
+      - {at: s4@n, act: show, target: none}
+      - {at: s5, act: show, target: err2}
+
+  - id: Close
+    say:
+      - {id: s0, pace: normal, text: "Let's sum up."}
+      - {id: s1, pace: normal, text: "A recursive function has a base case, a smaller problem, and a combine step."}
+      - {id: s2, pace: normal, text: "Every call gets its own frame, and the frames of unfinished calls form the call stack."}
+      - {id: s3, pace: normal, text: "Design with the leap of faith. Check by tracing."}
+      - {id: s4, pace: ask, text: "Here's one to try. Write a function that returns the sum of the digits of a number, so that sum digits of four seven two is thirteen. What's your base case?"}
+      - {id: s5, pace: normal, text: "In part two, we'll use recursion on lists, and meet one of the most useful algorithms in computing: binary search."}
+    do:
+      - {at: s0, act: hide, target: names}
+      - {with: prev, act: hide, target: broken}
+      - {with: prev, act: hide, target: none}
+      - {with: prev, act: hide, target: err2}
+      - {with: prev, act: retitle, target: head, args: {text: "Summary", role: A}}
+      - {at: s1, act: show, target: "points[0]"}
+      - {at: s2, act: show, target: "points[1]"}
+      - {at: s3, act: show, target: "points[2]"}
+      - {at: s4, act: show, target: "ccards[0]"}
+      - {at: s5, act: show, target: "ccards[1]"}
