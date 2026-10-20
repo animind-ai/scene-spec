@@ -627,7 +627,8 @@ beats:
 - **`tween` 动作**：在动作时长内把 `args` 里的参数补间到目标值（必须是数，在声明的 `[min, max]` 里）；不写 `target`，画面上依赖这些参数的对象自己跟着变。`ease` 可选 `linear`、`smooth`（默认）、`in`、`out`、`in_out`；`dur` 默认 1.5 秒，可以写 `fit`。
 - **表达式**：只能写在组件声明为"可用参数"的属性里，以及 `readout` 的 `value`。语法沿用 `graph` 的白名单（四则、乘方、括号、`sin cos tan exp ln log sqrt abs`、`pi e`），多了声明过的参数名；参数名紧挨着写算乘法（`kx` = k·x，`2kx` = 2·k·x）。从不 `eval`。只有曲线的 `f` 能用 `x`。
 - **读数 `readout`**：`label` 是值前面的文字（可混排公式），`value` 是表达式；`digits` 定小数位，`format: fraction` 时能写成分母不超过 12 的分数就写成分数（例如 1/2），否则按 2 位小数。值变宽时左端不动、往右长。
-- **graph 里能用参数的属性**：`plots[].f`、`points[].x`、`lines[].x / slope / through`、`triangles[].run`。割线、切线跟着它们的点走。
+- **graph 里能用参数的属性**：`plots[].f`、`points[].x`、`lines[].x / slope / through`、`triangles[].run`、数据曲线的 `plots[].progress`。割线、切线跟着它们的点走。
+- **plane 里能用参数的属性**：`curves[].progress`、参数曲线的 `curves[].x / y`（变量是 `t`）、`points[].at`。见 §7.5.1。
 
 时间语义：参数在 beat 内时刻 t 的值只由 t 决定（同一参数的后一个补间从前一个补间当时的值接管），逐帧渲染、跳着预览、往回拖都得到同一画面。
 
@@ -649,6 +650,59 @@ beats:
 | SS411 | 参数取到某个关键值时表达式没有定义，或点、三角形出了坐标范围 |
 
 SS411 按文件顺序推演参数：初值、每个 `tween` 的中点和终点逐个代入，只看对象**在画面上**的那些时刻（例如 k 补间到 0 时截距读数 −b/k 没有定义，但那时读数还没出现，就不报）。渲染时 kit 的版式检查也在每个补间的起点、中点、终点采样包围盒，不只看 beat 结束那一帧。
+
+### 7.5.1 预计算的轨迹：数据曲线和参数曲线
+
+微分方程的相轨线、行星轨道、模拟数据这类曲线写不成 `f(x)`：用脚本算好点列放进 `data`，在 `graph` 或 `plane` 里按参数画出来。
+
+```yaml
+params:
+  p: {value: 0, min: 0, max: 1}
+
+data:
+  damped: {src: assets/damped-phase.json}   # 外部 JSON：[[x0, y0], [x1, y1], …]；也可以直接内联写点列
+
+objects:
+  phase:
+    widget: plane
+    x: [-3, 4]
+    y: [-3, 3]
+    curves:
+      - {data: damped, progress: p, along: param, role: A}           # 数据曲线
+      - {x: "2cos(t)", y: "sin(t)", domain: [0, 6.2832], role: B}    # 参数曲线，变量是 t
+    points:
+      - {curve: 0, at: p, label: P, role: HL}                        # 沿第 0 条曲线走的点
+beats:
+  - id: Spiral
+    do:
+      - {at: s1, act: tween, args: {p: 1}, dur: 6, ease: linear}
+```
+
+- **外部数据**：`data` 的一项写 `{src: 路径}` 时从 JSON 文件读（只认 `.json`；路径相对场景文件，不能是绝对路径、不能含 `..`，符号链接也不能指到场景目录外面；文件不超过 4 MB）。读出来的内容和内联写的一样用，差分表的数列也可以放在文件里。kit 渲染时用 scene-spec 的同一个读取函数（`scene_spec.curves.load_data`），beat 缓存的键里有文件内容的哈希，改了 JSON 就重渲。`check(doc)` 不带场景目录时不读文件，用到它的曲线跳过检查（和 clip 的 `src` 一样）；`scene-spec check 文件` 和 kit 都带。
+- **点列**：`[[x, y], …]`，2 到 4096 个点，坐标是有限数，按顺序连成折线（不做样条：数据该采得够密）。
+- **`graph.plots[]`**：除了 `{f}`，可以写 `{data: 键, progress?, along?, role?, label?}`。数据曲线不写 `domain`，不裁剪（整条都要在坐标范围里）；名字放在最后一个点旁边。`graph` 的点、割线、切线、三角形只能放在函数曲线上——沿数据走的点用 `plane`。
+- **`plane.curves[]`**：`{data: 键}` 或参数曲线 `{x: "x(t)", y: "y(t)", domain: [t0, t1]}`（白名单表达式，变量 `t`，可以再引用场景参数；在 domain 上等分取 512 段）。可加 `progress`、`along`、`role`（默认 A）。曲线垫在坐标轴下面，从刻度的底色下面过。
+- **`plane.points[]`**：`{curve: i, at, label?, role?, dir?}`。名字压到刻度时自动换个方向（先试离 `dir` 近的方向，再试远一档）。
+- **`progress` 和 `at`**：数或参数表达式，取值在 0 到 1。`progress` 只画曲线的前一部分（0 不画，1 画完），补间它就是一条平滑长出来的轨迹；`at` 是点在曲线上的位置。两者用同一把尺子，写同一个参数时点正好在轨迹的头上。尺子由 `along` 定：`length`（默认）按弧长，点匀速走；`param` 按参数——数据曲线是点的序号，参数曲线是 `t`。按等时间间隔采样的模拟数据用 `param`，点的快慢就是真实的快慢。都是分段线性插值。
+- 曲线和沿曲线走的点不跟着平面整体 `rotate / scale / warp / reset` 变换：有 `curves` 的平面不能整体变换（写 `name` 只动某几个东西可以）。
+- 补间 `progress` / `at` 引用的参数时，kit 的中途采样（α = 0.25 / 0.5 / 0.75）检查的就是那一刻的轨迹和点。
+
+检查（错误码 SS490–SS499）：
+
+| 代码 | 内容 |
+|---|---|
+| SS490 | `{src}` 写法不对：不是字符串、绝对路径、含 `..`、跑出场景目录、不是 `.json`、多了别的字段 |
+| SS491 | 数据文件找不到、读不了，或大于 4 MB |
+| SS492 | 数据文件不是合法的 JSON |
+| SS493 | 当曲线用的数据不是 `[[x, y], …]`：不是列表、点不是两个数、少于两个点 |
+| SS494 | 坐标不是有限数（JSON 里的 `NaN`、`Infinity`、`1e999`） |
+| SS495 | 点数超过 4096 |
+| SS496 | 曲线写法不对：引用的 data 不存在；`f` 和 `data` 都写或都没写；数据曲线写了 `domain`；参数曲线缺 `x` / `y` / `domain`；`t` 和场景参数重名；`along` 不对；点的 `curve` 不存在或缺 `at`；graph 的点放在数据曲线上；有 `curves` 的平面整体变换 |
+| SS497 | 曲线出了坐标范围 `x` / `y`：数据曲线逐点查（报第一个越界的点），参数曲线按取样的点、在参数的每组关键取值下查 |
+| SS498 | 参数曲线在某个取样的 `t` 处没有定义 |
+| SS499 | `progress` / `at` 在参数的某组关键取值下不在 [0, 1] 里 |
+
+参数曲线的表达式错报 SS401 / SS402（和别处的表达式一样）。
 
 ### 7.6 分段播放、残影和常驻公式
 

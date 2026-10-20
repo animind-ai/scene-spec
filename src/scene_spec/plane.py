@@ -3,13 +3,17 @@
 按动作顺序推演平面上有哪些东西（名字 → 数学坐标）和到目前为止的整体变换，检查：
 - 参数和动作参数的类型；名字不重复、引用的名字存在；
 - 每个东西在每个动作之后都还在坐标范围 x、y 里（伸出去会盖住刻度、出了组件排版时预留的框），SS262；
-- warp 的矩阵不能是奇异的（整个平面压成一条线，网格画不出来），SS281。
+- warp 的矩阵不能是奇异的（整个平面压成一条线，网格画不出来），SS281；
+- curves（数据曲线、参数曲线）和沿曲线走的 points：引用的 data 存在、点列合规、整条曲线在坐标范围里，
+  progress / at 在 [0, 1] 里（SS490–SS499，见 curves.py）；有 curves 的平面不能整体 rotate / scale / warp / reset
+  （曲线不跟着变换），SS496。
 """
 
 from __future__ import annotations
 
 import math
 
+from . import curves as C
 from .report import Report
 from .textmarks import ROLES
 
@@ -36,6 +40,25 @@ def _bool(value: object) -> str | None:
 
 def _role(value: object) -> str | None:
     return None if value in ROLES else f"应为 {'/'.join(sorted(ROLES))} 之一"
+
+
+def _entries(fields: tuple[str, ...], what: str):
+    def check(value: object) -> str | None:
+        if not isinstance(value, list) or not value:
+            return f"应为非空列表，每项是{what}"
+        for n, entry in enumerate(value):
+            if not isinstance(entry, dict):
+                return f"第 {n} 项应为映射：{what}"
+            extra = set(entry) - set(fields)
+            if extra:
+                return f"第 {n} 项有不认识的字段 {sorted(extra)}（可用：{', '.join(fields)}）"
+        return None
+
+    return check
+
+
+_curves = _entries(C.CURVE_FIELDS, "{data: 键} 或 {x: \"x(t)\", y: \"y(t)\", domain: [t0, t1]}，可加 progress、along、role")
+_points = _entries(C.POINT_FIELDS, "沿曲线走的点 {curve: i, at: 0 到 1, label?, role?, dir?}")
 
 
 def _labels(value: object) -> str | None:
@@ -92,7 +115,9 @@ def rotation_angle(m: Mat) -> float | None:
 
 def register(registry: dict, Widget, Exposed, unknown_args) -> None:  # noqa: N803
     def expose(definition: dict, data: dict) -> Exposed:
-        return Exposed(parts={"axes": 1, "grid": 1, "mesh": 1, "items": 1}, state={"items": {}, "M": EYE, "fixed": set()})
+        n = {k: len(v) if isinstance(v := definition.get(k), list) else 0 for k in ("curves", "points")}
+        return Exposed(parts={"axes": 1, "grid": 1, "mesh": 1, "items": 1, "curve": n["curves"], "point": n["points"]},
+                       state={"items": {}, "M": EYE, "fixed": set()})
 
     def box(ctx):
         x, y = ctx.definition.get("x"), ctx.definition.get("y")
@@ -228,6 +253,10 @@ def register(registry: dict, Widget, Exposed, unknown_args) -> None:  # noqa: N8
     def apply(ctx, report: Report, path: str, names: list[str], m: Mat, whole: bool) -> None:
         """names 按 m 变换（和 kit 一样：纯旋转走圆弧，其他矩阵走 (1−t)I + tM），途中按 16 步取样检查范围。"""
         state = ctx.exposed.state
+        if whole and ctx.definition.get("curves"):
+            report.error("SS496", path, "这个平面有 curves：曲线和沿曲线走的点不跟着整体变换，"
+                         "不能整体 rotate / scale / warp / reset（写 name 只转、只缩放某几个东西）")
+            return
         angle = rotation_angle(m)
         for n in names:
             p0 = state["items"][n]
@@ -295,12 +324,43 @@ def register(registry: dict, Widget, Exposed, unknown_args) -> None:  # noqa: N8
         labels = d.get("axis_labels")
         if labels is not None and _labels(labels):
             report.error("SS202", f"{path}.axis_labels", _labels(labels))
+        b = box(ctx)
+        cs = d.get("curves") if _curves(d.get("curves")) is None else []
+        for n, entry in enumerate(cs):
+            cpath = f"{path}.curves[{n}]"
+            if "data" in entry:
+                stray = [k for k in ("x", "y", "domain") if k in entry]
+                if stray:
+                    report.error("SS496", cpath, f"数据曲线不写 {'、'.join(stray)}（参数曲线才写 x、y、domain）")
+                C.check_data(entry, cpath, ctx.data, b, report)
+            else:
+                C.check_parametric(entry, cpath, ctx.ex, ctx.obj_id, b, report)
+            C.check_common(entry, cpath, ctx.ex, ctx.obj_id, report)
+            if "role" in entry and _role(entry["role"]):
+                report.error("SS202", f"{cpath}.role", _role(entry["role"]))
+        ps = d.get("points") if _points(d.get("points")) is None else []
+        for n, entry in enumerate(ps):
+            ppath = f"{path}.points[{n}]"
+            k = entry.get("curve")
+            if not (isinstance(k, int) and not isinstance(k, bool) and 0 <= k < len(cs)):
+                report.error("SS496", f"{ppath}.curve", f"curve 应为 0 到 {len(cs) - 1} 的整数（第几条曲线，从 0 数）"
+                             if cs else "这个平面没有 curves，点没有曲线可走")
+            if "at" not in entry:
+                report.error("SS496", ppath, "沿曲线走的点需要 at：在曲线上的位置，0 起点 … 1 终点（数或参数表达式）")
+            else:
+                C.check_fraction(entry["at"], f"{ppath}.at", ctx.ex, ctx.obj_id, report, "at")
+            if "dir" in entry and entry["dir"] not in POINT_DIRS:
+                report.error("SS202", f"{ppath}.dir", f"dir 应为 {' / '.join(POINT_DIRS)} 之一")
+            if "role" in entry and _role(entry["role"]):
+                report.error("SS202", f"{ppath}.role", _role(entry["role"]))
+            if "label" in entry and not isinstance(entry["label"], str):
+                report.error("SS202", f"{ppath}.label", "label 应为字符串（公式，不加 $）")
 
     registry["plane"] = Widget(
         "plane",
         params={"x": (True, _range), "y": (True, _range), "grid": (False, _bool), "numbers": (False, _bool),
                 "complex": (False, _bool), "mesh": (False, _bool), "mesh_role": (False, _role),
-                "axis_labels": (False, _labels)},
+                "axis_labels": (False, _labels), "curves": (False, _curves), "points": (False, _points)},
         expose=expose,
         actions={"vector": vector, "slide": slide, "point": point, "shape": shape, "rotate": rotate, "scale": scale,
                  "warp": warp, "reset": reset, "relabel": relabel, "remove": remove},
