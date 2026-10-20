@@ -410,11 +410,12 @@ objects:
 
 | 码 | 内容 |
 |---|---|
-| SS470 | `kind: frames` 没写 `fps`，或 fps 不是正数 |
+| SS470 | `kind: frames` 没写 `fps`，或 fps 不是大于 0 的有限数（NaN / Infinity 也算） |
 | SS471 | `content_kind` 是 text / formula / caption 这类（字必须是矢量），或不是 plate / simulation / broll |
 | SS472 | 给了素材根，但 src 不存在，或文件类型和 kind 不符 |
-| SS473 | `trim.out` 不大于 `trim.in`，或探得到时长时落在时长外面 |
+| SS473 | `trim.in` / `trim.out` 不是有限数，`trim.out` 不大于 `trim.in`，或探得到时长时落在时长外面 |
 | SS474 | 讲解 beat 里 clip 占住了主讲区，又没有 `explain: allow` / `plate: allow` |
+| SS100 | `rate`、`start`、`opacity`、`z`、`size.max_width`、`size.max_height` 是 NaN 或 Infinity。结构层的上下界比不出 NaN，没有上界的字段也接不住 Infinity |
 
 ---
 

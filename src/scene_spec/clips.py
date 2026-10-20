@@ -4,15 +4,17 @@
 讲解 beat 里，clip 不能占住主讲区，除非这一条 clip 写了 explain: allow，或这个 beat 写了 plate: allow。
 
 错误码：
-- SS470  frames 没写 fps
+- SS470  frames 没写 fps，或 fps 不是大于 0 的有限数
 - SS471  content_kind 是文字/公式，或不是 plate / simulation / broll
 - SS472  src 不存在，或文件类型和 kind 不符（只有给出素材根目录时才查是否存在）
-- SS473  trim 的入点不小于出点，或探得到时长时落在时长外面
+- SS473  trim 不是有限数、入点不小于出点，或探得到时长时落在时长外面
 - SS474  讲解 beat 里 clip 占住了主讲区
+- SS100   rate / start / opacity / z / size 是 NaN 或 Infinity（结构层的上下界比不出 NaN）
 """
 
 from __future__ import annotations
 
+import math
 import re
 import subprocess
 from pathlib import Path
@@ -46,10 +48,11 @@ def _check_one(oid: str, definition: dict, report: Report, root: Path | None) ->
     _check_content_kind(definition.get("content_kind"), f"{path}.content_kind", report)
     if kind == "frames" and "fps" not in definition:
         report.error("SS470", f"{path}.fps", "kind: frames 需要 fps：这串帧每秒几张")
-    if kind == "frames" and "fps" in definition:
+    elif "fps" in definition:
         fps = definition["fps"]
-        if isinstance(fps, bool) or not isinstance(fps, (int, float)) or fps <= 0:
-            report.error("SS470", f"{path}.fps", f"fps 应为大于 0 的数，收到 {fps!r}")
+        if not _number(fps) or fps <= 0:
+            report.error("SS470", f"{path}.fps", f"fps 应为大于 0 的有限数，收到 {fps!r}")
+    _check_finite(definition, path, report)
     _check_trim(definition, path, report, root)
     _check_src(definition, path, report, root)
 
@@ -104,10 +107,10 @@ def _check_trim(definition: dict, path: str, report: Report, root: Path | None) 
     end = trim.get("out")
     tpath = f"{path}.trim"
     if not _number(start) or start < 0:
-        report.error("SS473", f"{tpath}.in", f"trim.in 应为不小于 0 的秒数，收到 {start!r}")
+        report.error("SS473", f"{tpath}.in", f"trim.in 应为不小于 0 的有限秒数，收到 {start!r}")
         return
     if end is not None and (not _number(end) or end <= start):
-        report.error("SS473", f"{tpath}.out", f"trim.out 应大于 trim.in（{start:g}），收到 {end!r}")
+        report.error("SS473", f"{tpath}.out", f"trim.out 应大于 trim.in（{start:g}）的有限秒数，收到 {end!r}")
         return
     duration = _duration(definition, root)
     if duration is None:
@@ -355,5 +358,22 @@ def _obj(text: object) -> str | None:
     return None if sel is None else sel.obj
 
 
+def _check_finite(definition: dict, path: str, report: Report) -> None:
+    """rate / start / opacity / z / size 的上下界比不出 NaN，Infinity 在没有上界时也能过结构层。"""
+    for name in ("rate", "start", "opacity", "z"):
+        if name in definition and _nonfinite(definition[name]):
+            report.error("SS100", f"{path}.{name}", f"{name} 应为有限数，收到 {definition[name]!r}")
+    size = definition.get("size")
+    if not isinstance(size, dict):
+        return
+    for name in ("max_width", "max_height"):
+        if name in size and _nonfinite(size[name]):
+            report.error("SS100", f"{path}.size.{name}", f"size.{name} 应为有限数，收到 {size[name]!r}")
+
+
+def _nonfinite(value: object) -> bool:
+    return isinstance(value, (int, float)) and not isinstance(value, bool) and not math.isfinite(value)
+
+
 def _number(value: object) -> bool:
-    return isinstance(value, (int, float)) and not isinstance(value, bool)
+    return isinstance(value, (int, float)) and not isinstance(value, bool) and math.isfinite(value)

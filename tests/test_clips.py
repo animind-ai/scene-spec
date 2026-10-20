@@ -148,6 +148,46 @@ def test_trim_order_and_duration(insight, tmp_path, monkeypatch):
     assert codes(insight, root=tmp_path) == []
 
 
+def test_clip_numbers_must_be_finite(insight):
+    nan, inf, ninf = float("nan"), float("inf"), float("-inf")
+    with_plate(insight, kind="frames", src="frames", fps=nan)
+    assert codes(insight) == ["SS470"]
+    insight["objects"]["plate"]["fps"] = inf
+    assert codes(insight) == ["SS100"]  # 结构层的 maximum 接住 +Infinity
+    insight["objects"]["plate"]["fps"] = 12
+
+    for trim, path in (
+        ({"in": nan}, "trim.in"),
+        ({"in": inf}, "trim.in"),
+        ({"in": 0, "out": nan}, "trim.out"),
+        ({"in": 0, "out": inf}, "trim.out"),
+    ):
+        insight["objects"]["plate"]["trim"] = trim
+        found = [i for i in check(insight).issues if i.code == "SS473"]
+        assert len(found) == 1 and found[0].path.endswith(path), trim
+    del insight["objects"]["plate"]["trim"]
+
+    for field, value in (
+        ("rate", nan), ("start", nan), ("start", inf),
+        ("opacity", nan), ("z", nan), ("z", inf), ("z", ninf),
+    ):
+        insight["objects"]["plate"][field] = value
+        found = [i for i in check(insight).issues if i.code == "SS100"]
+        assert len(found) == 1 and found[0].path.endswith(field), (field, value)
+        del insight["objects"]["plate"][field]
+
+    insight["objects"]["plate"]["size"] = {"max_width": nan, "max_height": 0.4}
+    found = [i for i in check(insight).issues if i.code == "SS100"]
+    assert [i.path for i in found] == ["objects.plate.size.max_width"]
+    insight["objects"]["plate"]["size"] = {"max_width": 0.4, "max_height": nan}
+    found = [i for i in check(insight).issues if i.code == "SS100"]
+    assert [i.path for i in found] == ["objects.plate.size.max_height"]
+
+    insight["objects"]["plate"]["size"] = {"max_width": 0.4, "max_height": 0.4}
+    insight["objects"]["plate"].update(rate=1, start=0, opacity=1, z=-2)
+    assert codes(insight) == []
+
+
 def test_clip_schema_edges(insight):
     with_plate(insight, fit="zoom")
     assert codes(insight) == ["SS100"]
