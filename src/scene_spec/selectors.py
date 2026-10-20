@@ -59,18 +59,12 @@ def parse_slice(value: object) -> tuple[int, int] | None:
     return None
 
 
-MATCH_REPLACES = ("tex", "auto")  # 按片段配对的 transform 默认替换源对象
-
-
 def transform_replaces(action: dict) -> bool:
-    """transform 结束后源（from）是否被替换掉（淡出、不再可见）。
+    """transform 结束后源（from）是否被替换掉（淡出、不再可见）：只有显式写了 replace: true 才是。
 
-    replace 显式写了就按它；没写时 match: tex / auto 默认替换（配上的片段从源里"走"到目标里，源不该原样留着），
-    其余（不写 match、match: shape）默认不替换：源保持不动，和以前一样。
+    match（tex / auto / shape）只管片段怎么配对，不隐含替换：不写 replace 时源保持不动，和以前一样。
     """
-    if "replace" in action:
-        return action["replace"] is True
-    return action.get("match") in MATCH_REPLACES
+    return action.get("replace") is True
 
 
 def transform_replaced(action: dict) -> str | None:

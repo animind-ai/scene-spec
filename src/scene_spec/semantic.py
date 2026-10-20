@@ -114,7 +114,10 @@ class _Checker:
         for obj_id, definition in self.objects.items():
             if definition.get("type") != "group" or "widget" in definition:
                 continue
-            for child in definition.get("children") or []:
+            children = definition.get("children") or []
+            for child in sorted({c for c in children if children.count(c) > 1}):
+                self.r.error("SS344", f"objects.{obj_id}.children", f"{child} 在 {obj_id} 的成员里重复出现；一个对象在画面上只有一份，只能写一次")
+            for child in dict.fromkeys(children):
                 if child in owner and child != obj_id:
                     self.r.error("SS344", f"objects.{obj_id}.children", f"{child} 已经是 {owner[child]} 的成员，不能再放进 {obj_id}")
                 owner.setdefault(child, obj_id)

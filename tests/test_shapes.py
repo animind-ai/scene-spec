@@ -1,5 +1,7 @@
 """基础图形 type: shape、组合 type: group，以及 transform 的 replace。"""
 
+import copy
+
 import pytest
 
 from scene_spec import check, selectors
@@ -61,6 +63,7 @@ def test_schema_rejects_unknown_shape_and_bad_radius(example):
 
 
 def test_group_cycles_and_shared_children(example):
+    fresh = copy.deepcopy(example)
     objs = {"u": {"type": "shape", "shape": "dot"},
             "g1": {"type": "group", "children": ["u", "g2"]}, "g2": {"type": "group", "children": ["g1"]}}
     doc = with_shapes(example, objs, [{"after": "prev", "act": "show", "target": "g1"}])
@@ -70,6 +73,10 @@ def test_group_cycles_and_shared_children(example):
     doc = with_shapes(example, objs, [{"after": "prev", "act": "show", "target": "g1"},
                                       {"after": "prev", "act": "show", "target": "g2"}])
     assert "SS344" in codes(doc)
+    # 同一个 group 里写了两次：kit 构建时会第二次碰到它，必须在 check 这一关拦下
+    objs = {"u": {"type": "shape", "shape": "dot"}, "g1": {"type": "group", "children": ["u", "u"]}}
+    doc = with_shapes(copy.deepcopy(fresh), objs, [{"after": "prev", "act": "show", "target": "g1"}])
+    assert codes(doc).count("SS344") == 1
 
 
 def test_group_index_out_of_range(example):
@@ -98,8 +105,9 @@ def test_replace_is_accepted_on_transform_only(example):
     ({"act": "transform", "from": "e1", "to": "e2"}, None),  # 默认不替换：源保持不动
     ({"act": "transform", "from": "e1", "to": "e2", "match": "shape"}, None),
     ({"act": "transform", "from": "e1", "to": "e2", "replace": True}, "e1"),
-    ({"act": "transform", "from": "e1", "to": "e2", "match": "tex"}, "e1"),  # match: tex / auto 默认替换
-    ({"act": "transform", "from": "e1", "to": "e2", "match": "auto"}, "e1"),
+    ({"act": "transform", "from": "e1", "to": "e2", "match": "tex"}, None),  # match 只管配对，不隐含替换
+    ({"act": "transform", "from": "e1", "to": "e2", "match": "auto"}, None),
+    ({"act": "transform", "from": "e1", "to": "e2", "match": "tex", "replace": True}, "e1"),
     ({"act": "transform", "from": "e1", "to": "e2", "match": "tex", "replace": False}, None),
     ({"act": "transform", "from": "e1#a", "to": "e2", "replace": True}, None),  # 片段：对象本身还在
     ({"act": "transform", "from": "e1", "to": "e1", "replace": True}, None),
@@ -117,3 +125,18 @@ def test_replaced_source_is_no_longer_visible_to_segment_checks(example):
     assert "SS442" in found
     doc["beats"][-1]["do"][1].pop("replace")
     assert "SS442" not in [i.code for i in check(doc).issues]
+
+
+@pytest.mark.parametrize("extra, replaced", [
+    ({"match": "tex"}, False),  # 有同名片段、没写 replace：源保持可见
+    ({"match": "auto"}, False),
+    ({"match": "tex", "replace": True}, True),
+])
+@pytest.mark.parametrize("to_text", [EQ["e2"]["text"], "[$y$]{#p} $=1$"])  # 第二个：没有同名片段，退回整体变形
+def test_match_alone_keeps_the_source_visible_to_segment_checks(example, extra, replaced, to_text):
+    doc = with_shapes(example, {**EQ, "e2": {"type": "text", "text": to_text}},
+                      [{"after": "prev", "act": "show", "target": "e1"},
+                       {"after": "prev", "act": "transform", "from": "e1", "to": "e2", **extra},
+                       {"after": "prev", "act": "ghost", "target": "e1"}])
+    found = check(doc).issues
+    assert ("SS442" in [i.code for i in found]) == replaced, [str(i) for i in found]

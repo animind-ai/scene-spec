@@ -246,7 +246,7 @@ objects:
   fig: {type: group, children: [o, v], in: stage}
 ```
 
-`group` 把几个对象当成一个对象：`children` 按顺序递归建好，在组内排开——成员写了 `below` / `above` / `left_of` / `right_of` 且指向组内已经排好的成员时按它摆（`gap` 照常），否则接在上一个成员右边（间距 md）。整组再按 group 自己的布局字段放进区域。`fig[i]` 是第 i 个成员（`show fig[1]` 只亮出它）；直接 `show` / `hide` 成员的 id 等于 `fig[i]`。一个对象只能属于一个 group，嵌套不能成环（SS344）。几何参数写错报 SS205。
+`group` 把几个对象当成一个对象：`children` 按顺序递归建好，在组内排开——成员写了 `below` / `above` / `left_of` / `right_of` 且指向组内已经排好的成员时按它摆（`gap` 照常），否则接在上一个成员右边（间距 md）。整组再按 group 自己的布局字段放进区域。`fig[i]` 是第 i 个成员（`show fig[1]` 只亮出它）；直接 `show` / `hide` 成员的 id 等于 `fig[i]`。一个对象只能属于一个 group、在同一个 group 里也只能写一次，嵌套不能成环（SS344）。几何参数写错报 SS205。
 
 ### 6.5 引用语法
 
@@ -518,9 +518,9 @@ objects:
 **变形 `transform`**：`from` 变成 `to`。
 
 - 不写 `match`（或 `match: shape`）：整体变形，目标的每个字形从源里对应的字形长出来；**源保持不动**（和以前一样）。
-- `match: tex`：`from` 和 `to` 都是整个 `text` 对象时，按同名片段 `#id` 一一配对：配上的片段从源里的位置、大小平滑地平移 + 缩放到目标里的位置（两边内容不同时一边走一边交叉淡入淡出），目标里新出现的部分淡入，源里没配上的部分淡出。两边没有同名片段、或者指向的是片段 / 子元素时，退回整体变形。`math` 对象没有片段，只能整体变形。
+- `match: tex`：`from` 和 `to` 都是整个 `text` 对象时，按同名片段 `#id` 一一配对：配上的片段从源里的位置、大小平滑地平移 + 缩放到目标里的位置（两边内容不同时一边走一边交叉淡入淡出），目标里新出现的部分淡入；源保持不动（写了 `replace: true` 时源随之淡出，配上的片段像是从源里走过去的）。两边没有同名片段、或者指向的是片段 / 子元素时，退回整体变形。`math` 对象没有片段，只能整体变形。
 - `match: auto`：两边有同名片段时同 `tex`，否则整体变形。
-- `replace: true`：源在变形期间淡出，结束后不再可见（等于同时 `hide` 了源：它的强调框、标记、残影一起收掉，之后的版式检查也不再看它）。`from` 是片段或子元素时只让这几项淡出。`match: tex` / `auto` 默认 `replace: true`（配上的片段是从源里"走"过去的，源不该原样留着）；要留着源写 `replace: false`，配上的片段像复制一样飞过去。不写 `match` 时默认 `false`。
+- `replace: true`：源在变形期间淡出，结束后不再可见（等于同时 `hide` 了源：它的强调框、标记、残影一起收掉，之后的版式检查也不再看它）。`from` 是片段或子元素时只让这几项淡出。默认 `false`，不管 `match` 写的是什么：`match` 只决定片段怎么配对，不隐含替换。不写 `replace` 时源保持不动，配上的片段像复制一样飞过去；两边没配上（退回整体变形）时也一样。要"源里的片段走到目标里、最后只剩目标"，显式写 `replace: true`。
 
 ```yaml
 objects:
@@ -530,7 +530,7 @@ beats:
   - id: Complete
     do:
       - {at: 0, act: show, target: e1}
-      - {after: prev, act: transform, from: e1, to: e2, match: tex}   # #a #b 移过去，#c #d 淡入，e1 消失
+      - {after: prev, act: transform, from: e1, to: e2, match: tex, replace: true}   # #a #b 移过去，#c #d 淡入，e1 淡出（不写 replace 则 e1 留着）
 ```
 
 **镜头 `camera`**：整幅画面一起放大、平移，对象本身不动（布局、引用的坐标都不变）。

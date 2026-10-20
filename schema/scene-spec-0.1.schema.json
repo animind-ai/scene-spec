@@ -934,7 +934,7 @@
           "$ref": "#/$defs/selector"
         },
         "match": {
-          "description": "transform：tex 按同名片段 #id 配对（配上的平移缩放过去，新片段淡入，消失的淡出）；auto 两边有同名片段时同 tex，否则整体变形；shape 整体变形",
+          "description": "transform：tex 按同名片段 #id 配对（配上的平移缩放过去，新片段淡入，消失的淡出）；auto 两边有同名片段时同 tex，否则整体变形；shape 整体变形。只管配对，不替换源：要源淡出请写 replace: true",
           "enum": [
             "tex",
             "shape",
@@ -942,7 +942,7 @@
           ]
         },
         "replace": {
-          "description": "transform：true 时源（from）在变形期间淡出，结束后不再可见（等于同时 hide）；默认 false，match: tex / auto 时默认 true",
+          "description": "transform：true 时源（from）在变形期间淡出，结束后不再可见（等于同时 hide）；默认 false（源保持不动），不管 match 写的是什么",
           "type": "boolean"
         },
         "style": {
