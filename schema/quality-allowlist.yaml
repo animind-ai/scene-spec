@@ -1,0 +1,12 @@
+# 硬门槛的豁免名单。匹配到的集不报列出的错误码。
+# 匹配（满足一条即可）：
+#   - meta.id 等于 ids 里的一项
+#   - meta.series 等于 series
+# 发布内容默认没有豁免。往 ids 里加 id，或让那一集写 meta.series。
+entries:
+  - name: week-1 competition 20 problems
+    series: week-1-competition
+    ids: []
+    codes:
+      - SS482
+    note: 这一系列允许用别的 Gemini 声音或语速。其余门槛（画面晚于书签、句间静音、clip）仍然生效。
