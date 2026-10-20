@@ -60,6 +60,12 @@ def check(doc: dict, report: Report, stats: dict | None = None) -> None:
                 to = selectors.parse(action["to"])
                 if to is not None:
                     visible.add(to.obj)
+                gone = selectors.transform_replaced(action)
+                if gone is not None and gone in pinned:
+                    report.error("SS448", f"{path}.from", f"{gone} 已经常驻（{pinned[gone]}），transform 不能替换掉它")
+                elif gone is not None and gone in objects:
+                    visible.discard(gone)
+                    ghosts.pop(gone, None)  # 和 hide 一样：原对象被替换掉，残影跟着收掉
             elif act == "set" and obj and _positive(action.get("args", {}).get("opacity")):
                 visible.add(obj)
             elif act in ("hide", "move") and obj:

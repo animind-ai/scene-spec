@@ -224,6 +224,30 @@ allow:
 - `line: insight`（洞察短视频）：**禁止**，检查器报错。确实需要的画面走 `custom`（§9）。
 - `line: worked` / `contest`：允许，但给出警告，并统计每集的绝对坐标数量，用来跟踪 §6.7 迁移进度。
 
+### 6.4.1 基础图形 shape 和组合 group
+
+不想为一个圆、一条箭头专门写组件时，用基础图形。坐标、长度都是画面单位（画面高 8），只表示形状；位置和整体大小照常由布局决定（放进区域时整体缩放）。
+
+| `shape` | 参数（都可选，除了 polygon 的 points） |
+|---|---|
+| `circle` | `radius`（默认 1） |
+| `dot` | `radius`（默认 0.08），实心 |
+| `square` | `side` 边长（默认 2） |
+| `rectangle` | `side: [宽, 高]`（默认 [3, 2]） |
+| `polygon` | `points`：至少三个顶点 `[x, y]` |
+| `line` / `arrow` | `points`：起点和终点；或 `side` 长度（水平，默认 2）；两者只写一个 |
+
+都可以写 `role`（颜色；闭合图形描边加淡色填充）和 `label`（标注，可混排 `$...$`：圆、方、多边形写在中间，线、箭头写在中点上方，点写在右上）。
+
+```yaml
+objects:
+  o:   {type: shape, shape: circle, radius: 1, label: '$O$'}
+  v:   {type: shape, shape: arrow, points: [[0, 0], [2, 1]], role: A, label: '$\vec v$'}
+  fig: {type: group, children: [o, v], in: stage}
+```
+
+`group` 把几个对象当成一个对象：`children` 按顺序递归建好，在组内排开——成员写了 `below` / `above` / `left_of` / `right_of` 且指向组内已经排好的成员时按它摆（`gap` 照常），否则接在上一个成员右边（间距 md）。整组再按 group 自己的布局字段放进区域。`fig[i]` 是第 i 个成员（`show fig[1]` 只亮出它）；直接 `show` / `hide` 成员的 id 等于 `fig[i]`。一个对象只能属于一个 group，嵌套不能成环（SS344）。几何参数写错报 SS205。
+
 ### 6.5 引用语法
 
 动作里用选择器指向对象或对象的一部分：
@@ -478,7 +502,7 @@ objects:
 | 动作 | 作用 |
 |---|---|
 | `show` / `hide` | 出现、消失；`style:` 淡入、书写、从边缘长出等，由后端映射 |
-| `transform` | 一个对象变成另一个；`match: tex` 按公式片段对应（TransformMatchingTex），`match: shape` 按形状 |
+| `transform` | 一个对象变成另一个；`match: tex` 按同名片段对应，`match: shape` 按形状；`replace: true` 同时替换掉源，见下 |
 | `move` | 移到新的布局约束（不写坐标，写新的 `in` / `below` 等） |
 | `focus` / `unfocus` | 强调状态：加粗描边，其余调暗 |
 | `mark` / `unmark` | 底下垫淡色 |
@@ -490,6 +514,24 @@ objects:
 | `step` / `ghost` / `unghost` / `pin` | 子步定格、残影、常驻公式，见 §7.6 |
 | `tween` | 把场景参数在动作时长内补间到目标值，依赖参数的图形和读数跟着连续变化（§7.5） |
 | 原语动作 | 由 `primitives` 提供，例如 `derive`、`extend`（差分表）、`cut`、`slide`（面积模型）、`flip`（数轴） |
+
+**变形 `transform`**：`from` 变成 `to`。
+
+- 不写 `match`（或 `match: shape`）：整体变形，目标的每个字形从源里对应的字形长出来；**源保持不动**（和以前一样）。
+- `match: tex`：`from` 和 `to` 都是整个 `text` 对象时，按同名片段 `#id` 一一配对：配上的片段从源里的位置、大小平滑地平移 + 缩放到目标里的位置（两边内容不同时一边走一边交叉淡入淡出），目标里新出现的部分淡入，源里没配上的部分淡出。两边没有同名片段、或者指向的是片段 / 子元素时，退回整体变形。`math` 对象没有片段，只能整体变形。
+- `match: auto`：两边有同名片段时同 `tex`，否则整体变形。
+- `replace: true`：源在变形期间淡出，结束后不再可见（等于同时 `hide` 了源：它的强调框、标记、残影一起收掉，之后的版式检查也不再看它）。`from` 是片段或子元素时只让这几项淡出。`match: tex` / `auto` 默认 `replace: true`（配上的片段是从源里"走"过去的，源不该原样留着）；要留着源写 `replace: false`，配上的片段像复制一样飞过去。不写 `match` 时默认 `false`。
+
+```yaml
+objects:
+  e1: {type: text, text: '[$x^2$]{#a} $+$ [$2x$]{#b} $=0$'}
+  e2: {type: text, text: '[$x^2$]{#a} $+$ [$2x$]{#b} $+$ [$1$]{#c} $=$ [$1$]{#d}', below: e1}
+beats:
+  - id: Complete
+    do:
+      - {at: 0, act: show, target: e1}
+      - {after: prev, act: transform, from: e1, to: e2, match: tex}   # #a #b 移过去，#c #d 淡入，e1 消失
+```
 
 **镜头 `camera`**：整幅画面一起放大、平移，对象本身不动（布局、引用的坐标都不变）。
 

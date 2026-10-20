@@ -326,6 +326,9 @@ def _apply(visible: set[str], action: dict, objects: dict) -> None:
         _reveal(visible, _obj(action["target"]), objects)
     elif act == "transform" and "to" in action:
         _reveal(visible, _obj(action["to"]), objects)
+        gone = selectors.transform_replaced(action)
+        if gone is not None:
+            _conceal(visible, gone, objects)
     elif act == "hide" and "target" in action:
         sel = selectors.parse(action["target"]) if isinstance(action["target"], str) else None
         if sel is not None and sel.span is None and sel.part is None and sel.index is None:

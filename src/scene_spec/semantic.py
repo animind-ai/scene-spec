@@ -24,6 +24,22 @@ BUILTIN_ACTS = {
 } | segments.ACTS
 NEEDS_TARGET = BUILTIN_ACTS - {"transform", "camera", "hold", "tween"} - segments.NO_TARGET
 READOUT_KEYS = ("value", "label", "digits", "format")
+SHAPE_KEYS = ("side", "radius", "points")
+SHAPE_PARAMS = {  # 每种图形可用的几何参数（label、role 每种都能用）
+    "circle": ("radius",), "dot": ("radius",), "square": ("side",), "rectangle": ("side",),
+    "polygon": ("points",), "line": ("side", "points"), "arrow": ("side", "points"),
+}
+
+
+def shape_length(value: object) -> float | None:
+    """side 的长度：正数或写成数字的字符串；不是就 None。"""
+    if isinstance(value, bool):
+        return None
+    try:
+        x = float(value)  # type: ignore[arg-type]
+    except (TypeError, ValueError):
+        return None
+    return x if x > 0 and x == x and x != float("inf") else None
 KNOWN_THEMES = {"paper", "chalk", "jade", "xuan", "blueprint", "riso"}
 LAYOUT_REFS = ("below", "above", "left_of", "right_of", "within", "over")
 DEMO_WORDS = ("演示", "不是证明", "不算证明", "并非证明", "demonstration", "not a proof")  # 后两个给英文版（localize 成 en）
@@ -90,13 +106,33 @@ class _Checker:
                 self.check_basic(obj_id, definition, path)
         for obj_id, definition in self.objects.items():
             self.check_layout(obj_id, definition, f"objects.{obj_id}")
+        self.check_groups()
+
+    def check_groups(self) -> None:
+        """group 嵌套不能成环；一个对象只能是一个 group 的成员（它在画面上只有一份）。"""
+        owner: dict[str, str] = {}
+        for obj_id, definition in self.objects.items():
+            if definition.get("type") != "group" or "widget" in definition:
+                continue
+            for child in definition.get("children") or []:
+                if child in owner and child != obj_id:
+                    self.r.error("SS344", f"objects.{obj_id}.children", f"{child} 已经是 {owner[child]} 的成员，不能再放进 {obj_id}")
+                owner.setdefault(child, obj_id)
+        for start in owner:
+            seen, node = {start}, owner[start]
+            while node in owner:
+                if node in seen:
+                    self.r.error("SS344", f"objects.{node}.children", f"group 嵌套成环（{node} 间接包含了自己）")
+                    break
+                seen.add(node)
+                node = owner[node]
 
     def check_basic(self, obj_id: str, definition: dict, path: str) -> None:
         exposed = widgets.Exposed()
         kind = definition["type"]
         if kind != "readout":
             for key in READOUT_KEYS:
-                if key in definition:
+                if key in definition and not (kind == "shape" and key == "label"):
                     self.r.error("SS410", f"{path}.{key}", f"{key} 只用于 type: readout")
         if kind == "readout":
             P.check_readout(obj_id, definition, path, self.ex, self.r)
@@ -113,8 +149,11 @@ class _Checker:
                 exposed.spans = set(ids)
         elif kind == "math" and "tex" not in definition:
             self.r.error("SS204", path, "math 对象需要 tex")
-        elif kind == "shape" and "shape" not in definition:
-            self.r.error("SS204", path, "shape 对象需要 shape")
+        elif kind == "shape":
+            if "shape" not in definition:
+                self.r.error("SS204", path, "shape 对象需要 shape")
+            else:
+                self.check_shape(definition, path)
         elif kind == "group":
             children = definition.get("children")
             if not children:
@@ -127,7 +166,43 @@ class _Checker:
                         self.r.error("SS341", f"{path}.children", "group 不能包含自己")
                     self.referenced.add(child)
                 exposed.items = len(children)
+        if kind != "shape":
+            for key in SHAPE_KEYS:
+                if key in definition:
+                    self.r.error("SS205", f"{path}.{key}", f"{key} 只用于 type: shape")
         self.exposed[obj_id] = exposed
+
+    def check_shape(self, definition: dict, path: str) -> None:
+        """type: shape 的几何参数：每种图形只认自己的那几个，数值要能用。"""
+        shape = definition["shape"]
+        allowed = SHAPE_PARAMS.get(shape, ())
+        for key in SHAPE_KEYS:
+            if key in definition and key not in allowed:
+                self.r.error("SS205", f"{path}.{key}", f"shape: {shape} 不用 {key}（可用：{'、'.join(allowed) or '无'}）")
+        side = definition.get("side")
+        if "side" in allowed and side is not None:
+            if shape == "rectangle":
+                if not (isinstance(side, list) and len(side) == 2):
+                    self.r.error("SS205", f"{path}.side", "rectangle 的 side 写 [宽, 高]")
+            elif shape_length(side) is None:
+                self.r.error("SS205", f"{path}.side", f"side 要是正数，收到 {side!r}")
+        points = definition.get("points")
+        if "points" in allowed and points is not None:
+            need = 3 if shape == "polygon" else 2
+            if shape == "polygon" and len(points) < 3:
+                self.r.error("SS205", f"{path}.points", "polygon 至少要三个顶点")
+            elif shape != "polygon" and len(points) != 2:
+                self.r.error("SS205", f"{path}.points", f"{shape} 的 points 是起点和终点两个点")
+            elif len({tuple(p) for p in points}) < need:
+                self.r.error("SS205", f"{path}.points", "points 里有重合的点")
+            if "side" in definition and shape != "polygon":
+                self.r.error("SS205", f"{path}.side", "points 和 side 只写一个")
+        if shape == "polygon" and points is None:
+            self.r.error("SS204", path, "polygon 需要 points")
+        if "label" in definition:
+            parsed = parse_object_text(definition["label"])
+            for problem in parsed.problems:
+                self.r.error("SS210", f"{path}.label", problem)
 
     def check_widget(self, obj_id: str, definition: dict, path: str) -> None:
         widget = widgets.lookup(definition["widget"])
@@ -299,6 +374,8 @@ class _Checker:
                     self.r.error("SS331", f"{path}.target", "hold 不需要 target")
             if "match" in action and act != "transform":
                 self.r.error("SS331", f"{path}.match", "只有 transform 用 match")
+            if "replace" in action and act != "transform":
+                self.r.error("SS331", f"{path}.replace", "只有 transform 用 replace")
             if act == "camera":
                 self.check_camera(action, target, path)
             return
