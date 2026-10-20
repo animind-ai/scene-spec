@@ -9,6 +9,7 @@ voice 应调用 `silence_after(text, hold)` 决定拼进 `<beat>.wav` 的句间�
 
 from __future__ import annotations
 
+import math
 import re
 
 _BOOKMARK = re.compile(r"\{@[A-Za-z_][A-Za-z0-9_]*\}")
@@ -52,11 +53,16 @@ def classify(text: str) -> str:
 def silence_after(text: str, hold: float | None = None) -> float:
     """这一句之后应插入的静音秒数。最后一句 voice 不插入；调用方自己判断。
 
-    hold 给了就用 hold（调用方应先用 `hold_in_range` 确认它落在区间里）。
+    hold 给了、而且是有限数，就用 hold（调用方应先用 `hold_in_range` 确认它落在区间里）。
+    NaN / Infinity 不当成期望值，退回标点默认，避免把句间比较比没。
     """
-    if hold is not None:
+    if _finite(hold):
         return float(hold)
     return PUNCT[classify(text)]["default"]
+
+
+def _finite(value: object) -> bool:
+    return isinstance(value, (int, float)) and not isinstance(value, bool) and math.isfinite(value)
 
 
 def hold_in_range(text: str, hold: float) -> bool:

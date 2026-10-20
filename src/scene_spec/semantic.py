@@ -423,6 +423,7 @@ class _Checker:
         clips.check(self.doc, self.r, self.root)
         quality.check_voice(self.doc, self.r, self.allowlist)
         quality.check_pauses(self.doc, self.r)
+        quality.check_tolerances(self.doc, self.r)
         if self.timing is not None:
             quality.check_timing(self.doc, self.timing, self.r, self.allowlist)
         self.r.stats.update(self.stats)

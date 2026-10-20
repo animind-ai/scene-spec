@@ -309,7 +309,7 @@
               "pattern": "^[A-Za-z][A-Za-z0-9_-]*$"
             },
             "speed": {
-              "description": "语速。发布内容必须是 1.0；不写时按 1.0。",
+              "description": "语速，有限数。发布内容必须是 1.0；不写时按 1.0。NaN 报 SS482，不在豁免名单里。",
               "type": "number",
               "minimum": 0.5,
               "maximum": 2
@@ -322,11 +322,13 @@
           "additionalProperties": false,
           "properties": {
             "cue_late": {
+              "description": "有限秒数。NaN 报 SS100，检查器改用默认 0.4。",
               "type": "number",
               "minimum": 0,
               "maximum": 5
             },
             "cue_late_skip_before": {
+              "description": "有限秒数。NaN 报 SS100，检查器改用默认 0.5。",
               "type": "number",
               "minimum": 0,
               "maximum": 5
@@ -828,7 +830,7 @@
           "minLength": 1
         },
         "hold": {
-          "description": "这句说完之后的句间静音（秒），覆盖标点默认值。必须落在该标点的允许区间里，见设计稿 §7.8。",
+          "description": "这句说完之后的句间静音（秒），有限数，覆盖标点默认值。必须落在该标点的允许区间里，见设计稿 §7.8。NaN 报 SS485。",
           "type": "number",
           "minimum": 0,
           "maximum": 2
@@ -965,6 +967,7 @@
           "minLength": 1
         },
         "hold": {
+          "description": "有限秒数。NaN 和没有上界的 Infinity 报 SS486。",
           "type": "number",
           "minimum": 0
         },

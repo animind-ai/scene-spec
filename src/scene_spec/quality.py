@@ -71,15 +71,31 @@ def check_voice(doc: dict, report: Report, entries=None) -> None:
     model = voice.get("model", REQUIRED_MODEL)
     name = voice.get("voice", REQUIRED_VOICE)
     speed = voice.get("speed", REQUIRED_SPEED)
+    # NaN 过得了结构层，豁免名单只放行另一种有限语速，不放行 NaN / Infinity。
+    if _nonfinite(speed):
+        report.error(
+            "SS482", "style.voice",
+            f"speed 应为有限的 {REQUIRED_SPEED:g}，收到 {speed!r}。例外名单不覆盖 NaN / Infinity",
+        )
     problems = []
     if model != REQUIRED_MODEL:
         problems.append(f"model 应为 {REQUIRED_MODEL}，收到 {model!r}")
     if name != REQUIRED_VOICE:
         problems.append(f"voice 应为 {REQUIRED_VOICE}，收到 {name!r}")
-    if not _speed_ok(speed):
+    if not _nonfinite(speed) and not _speed_ok(speed):
         problems.append(f"speed 应为 {REQUIRED_SPEED:g}，收到 {speed!r}")
     if problems and not waived(doc, "SS482", entries):
         report.error("SS482", "style.voice", "；".join(problems) + "。例外只写在 schema/quality-allowlist.yaml")
+
+
+def check_tolerances(doc: dict, report: Report) -> None:
+    """cue_late / cue_late_skip_before 的上下界比不出 NaN。坏值按默认容差继续查，不能把比较比没。"""
+    quality = (doc.get("style") or {}).get("quality") or {}
+    if not isinstance(quality, dict):
+        return
+    for name in ("cue_late", "cue_late_skip_before"):
+        if name in quality and _nonfinite(quality[name]):
+            report.error("SS100", f"style.quality.{name}", f"{name} 应为有限秒数，收到 {quality[name]!r}")
 
 
 def check_pauses(doc: dict, report: Report) -> None:
@@ -88,28 +104,32 @@ def check_pauses(doc: dict, report: Report) -> None:
             if "hold" not in sentence:
                 continue
             hold = sentence["hold"]
-            if not _number(hold):
+            if not _real(hold):
                 continue
-            if not pauses.hold_in_range(sentence["text"], hold):
+            if not math.isfinite(hold) or not pauses.hold_in_range(sentence["text"], hold):
                 default, lo, hi = pauses.range_for(sentence["text"])
                 kind = pauses.classify(sentence["text"])
-                report.error(
-                    "SS485", f"beats[{n}].say[{i}].hold",
-                    f"句末是{ _kind_zh(kind) }，hold 应在 {lo:g}–{hi:g} 秒（默认 {default:g}），收到 {hold:g}",
-                )
+                if not math.isfinite(hold):
+                    detail = f"hold 应为有限秒数，并落在 {lo:g}–{hi:g}（默认 {default:g}），收到 {hold!r}"
+                else:
+                    detail = f"句末是{_kind_zh(kind)}，hold 应在 {lo:g}–{hi:g} 秒（默认 {default:g}），收到 {hold:g}"
+                report.error("SS485", f"beats[{n}].say[{i}].hold", detail)
         pause = beat.get("pause")
         if not pause or "hold" not in pause:
             continue
         hold = pause["hold"]
+        if not _real(hold):
+            continue
         bounds = pauses.PAUSE_HOLD.get(pause.get("type"))
-        if bounds is None or not _number(hold):
+        if bounds is None:
             continue
         lo, hi = bounds
-        if not lo - 1e-9 <= float(hold) <= hi + 1e-9:
-            report.error(
-                "SS486", f"beats[{n}].pause.hold",
-                f"pause.type {pause.get('type')!r} 的 hold 应在 {lo:g}–{hi:g} 秒，收到 {hold:g}",
-            )
+        if not math.isfinite(hold) or not lo - 1e-9 <= float(hold) <= hi + 1e-9:
+            if not math.isfinite(hold):
+                detail = f"pause.hold 应为有限秒数（{lo:g}–{hi:g}），收到 {hold!r}"
+            else:
+                detail = f"pause.type {pause.get('type')!r} 的 hold 应在 {lo:g}–{hi:g} 秒，收到 {hold:g}"
+            report.error("SS486", f"beats[{n}].pause.hold", detail)
 
 
 def check_timing(doc: dict, timing: object, report: Report, entries=None) -> None:
@@ -224,8 +244,17 @@ def _time_ref(value: object) -> bool:
     return False
 
 
+def _real(value: object) -> bool:
+    """整数或浮点，含 NaN / Infinity。布尔不算。"""
+    return isinstance(value, (int, float)) and not isinstance(value, bool)
+
+
+def _nonfinite(value: object) -> bool:
+    return _real(value) and not math.isfinite(value)
+
+
 def _number(value: object) -> bool:
-    return isinstance(value, (int, float)) and not isinstance(value, bool) and math.isfinite(value)
+    return _real(value) and math.isfinite(value)
 
 
 def _kind_zh(kind: str) -> str:

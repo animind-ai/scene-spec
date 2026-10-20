@@ -692,7 +692,7 @@ i18n:
 | `voice` | `Kore` |
 | `speed` | `1.0` |
 
-`persona` 仍是人设文案（teacher-hs / peer-ms / friend-ps），不在这三条里。写了别的模型、声音或语速就报 SS482。`week-1 competition 20 problems` 这一系列例外：场景写 `meta.series: week-1-competition`（或把 `meta.id` 加进名单的 `ids`），可以换声音和语速。名单里目前只豁免 SS482。
+`persona` 仍是人设文案（teacher-hs / peer-ms / friend-ps），不在这三条里。写了别的模型、声音或语速就报 SS482。`week-1 competition 20 problems` 这一系列例外：场景写 `meta.series: week-1-competition`（或把 `meta.id` 加进名单的 `ids`），可以换声音和语速。名单里目前只豁免 SS482。NaN / Infinity 不是另一种语速：Infinity 由结构层的上下界报 SS100，NaN 报 SS482，豁免名单也不吞。
 
 #### 句间静音（SS485、SS486、SS487）
 
@@ -708,7 +708,7 @@ i18n:
 | 省略号 | `…` 或 `...` | 同左 | 0.75 | 0.40–1.40 |
 | 其他 | | | 0.35 | 0.15–0.70 |
 
-书签和收尾引号不算句末。句子写了 `hold` 就用它代替默认值，但必须落在区间里，否则 SS485。`pause.hold` 超出上面 §7.3 的区间报 SS486。
+书签和收尾引号不算句末。句子写了 `hold` 就用它代替默认值，但必须是有限数并落在区间里，否则 SS485。`pause.hold` 不是有限数，或超出上面 §7.3 的区间，报 SS486。结构层的上下界比不出 NaN，`pause.hold` 又没有上界，所以 NaN 和 `+Infinity` 的停顿由这两条码接住。这样的 hold 不拿去当 SS487 的期望值，句间仍按标点默认值比较。
 
 #### 画面晚于书签（SS480）
 
@@ -721,7 +721,7 @@ style:
     cue_late_skip_before: 0.5   # 书签时刻 ≤ 这个值不报，默认 0.5
 ```
 
-单条动作可以写 `allow_late: true` 放行。整集放行就把 `SS480` 写进豁免名单。
+单条动作可以写 `allow_late: true` 放行。整集放行就把 `SS480` 写进豁免名单。`cue_late` 和 `cue_late_skip_before` 必须是有限数；NaN 报 SS100，并按上面的默认值继续查时间报告，不能把 `<=` 比没。
 
 时间报告（一个文件可以只含其中一块；缺的那块不查）：
 
@@ -751,8 +751,8 @@ style:
 | SS480 | 画面比旁白书签晚，超过容差 |
 | SS481 | 时间报告格式不对 |
 | SS482 | 旁白不是规定的模型、声音或语速，且不在豁免名单 |
-| SS485 | 句子的 `hold` 超出句末标点的区间 |
-| SS486 | `pause.hold` 超出该 pause 类型的区间 |
+| SS485 | 句子的 `hold` 不是有限数，或超出句末标点的区间 |
+| SS486 | `pause.hold` 不是有限数，或超出该 pause 类型的区间 |
 | SS487 | 时间报告里的句间静音和标点规则不一致 |
 
 钩子检查不动：迷思要被某个 beat 标 `shows: misconception`（SS362），insight 线要有 `pause: {type: predict}`（SS365）。外部流水线如果另有 `HOOK_MYTH_BY_S` 这类代码，不由本仓库产生，豁免名单也不吞它们。
