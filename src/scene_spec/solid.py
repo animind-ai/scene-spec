@@ -14,7 +14,8 @@
       plane: {bodies: [P, K], z: 0.5, compare: right, labels: ['$S_1$', '$S_2$']}
       view: {azimuth: 30, elevation: 20}
 
-动作：split / apart / join / unsplit（按 splits 的名字），sweep {z}（截平面移到高度 z），compare（截面平铺到旁边比大小）。
+动作：split / apart / join / unsplit（按 splits 的名字），sweep {z}（截平面移到高度 z），compare（截面平铺到旁边比大小），
+orbit {azimuth?, elevation?, d_azimuth?, d_elevation?}（相机连续转到新的视角：绝对角度或相对增量，转完之后的仰角在 ±85° 内）。
 错误码 SS460–SS469。
 """
 
@@ -33,10 +34,12 @@ COMPARE = ("right", "below")
 NAME = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
 ACTION_ARGS = {
     "split": {"split"}, "apart": {"split"}, "join": {"split"}, "unsplit": {"split"},
-    "sweep": {"z"}, "compare": set(),
+    "sweep": {"z"}, "compare": set(), "orbit": {"azimuth", "elevation", "d_azimuth", "d_elevation"},
 }
 AZIMUTH = (10.0, 80.0)  # 方位角的绝对值：太小侧面看成一条线，太大正面看成一条线
 ELEVATION = (10.0, 50.0)
+VIEW = (30.0, 20.0)  # 不写 view 时的方位角、仰角
+ORBIT_ELEVATION = 85.0  # orbit 转完之后仰角的绝对值上限：再大就几乎正对着顶面或底面，侧面挤成一条线
 
 
 def _num(v: object) -> bool:
@@ -165,7 +168,7 @@ def problems(definition: dict, roles: set[str]) -> list[tuple[str, str, str]]:
         if not isinstance(view, dict) or set(view) - VIEW_KEYS:
             out.append(("SS464", "view", "view 应为 {azimuth?, elevation?}（度）"))
         else:
-            az, el = view.get("azimuth", 30), view.get("elevation", 20)
+            az, el = view.get("azimuth", VIEW[0]), view.get("elevation", VIEW[1])
             if not _num(az) or not AZIMUTH[0] <= abs(az) <= AZIMUTH[1]:
                 out.append(("SS464", "view.azimuth", f"azimuth 的绝对值应在 {AZIMUTH[0]:g}°–{AZIMUTH[1]:g}°"
                             "（太小或太大时有的面看成一条线，棱会叠在一起）"))
@@ -228,7 +231,37 @@ def _plane_problems(plane: object, bodies: dict) -> list[tuple[str, str, str]]:
 
 def start_state(definition: dict) -> dict:
     splits = definition.get("splits") if isinstance(definition.get("splits"), dict) else {}
-    return {"split": {name: "whole" for name in splits}, "plane": False, "compared": False}
+    view = definition.get("view") if isinstance(definition.get("view"), dict) else {}
+    az, el = view.get("azimuth", VIEW[0]), view.get("elevation", VIEW[1])
+    angles = [float(az) if _num(az) else VIEW[0], float(el) if _num(el) else VIEW[1]]
+    return {"split": {name: "whole" for name in splits}, "plane": False, "compared": False, "view": angles}
+
+
+def _orbit(args: dict, state: dict, report: Report, path: str) -> None:
+    """orbit：每个角度写绝对值（azimuth / elevation）或相对增量（d_azimuth / d_elevation），不能两个都写；
+    至少写一个。按顺序推演出转完之后的视角，仰角要在 ±85° 内。方位角不限（相对增量可以转一整圈）。"""
+    view = state["view"]
+    if not set(args) & ACTION_ARGS["orbit"]:
+        report.error("SS469", f"{path}.args", "orbit 要写 azimuth / elevation（转到的角度）或 d_azimuth / d_elevation（转多少），单位是度")
+        return
+    for i, (absolute, relative) in enumerate((("azimuth", "d_azimuth"), ("elevation", "d_elevation"))):
+        if absolute in args and relative in args:
+            report.error("SS469", f"{path}.args.{relative}", f"{absolute} 和 {relative} 只能写一个（转到的角度，或转多少）")
+            continue
+        key = absolute if absolute in args else relative if relative in args else None
+        if key is None:
+            continue
+        v = args[key]
+        if not _num(v):
+            report.error("SS469", f"{path}.args.{key}", f"{key} 应为数（度）")
+            continue
+        new = float(v) if key == absolute else view[i] + float(v)
+        if i == 1 and abs(new) > ORBIT_ELEVATION:
+            now = f"（现在是 {view[1]:g}°，转 {float(v):g}° 之后是 {new:g}°）" if key == relative else ""
+            report.error("SS469", f"{path}.args.{key}",
+                         f"转完之后的仰角应在 -{ORBIT_ELEVATION:g}°–{ORBIT_ELEVATION:g}°{now}：再大就几乎正对着顶面或底面")
+            continue
+        view[i] = new
 
 
 def check_action(act: str, args: dict, definition: dict, state: dict, report: Report, path: str) -> None:
@@ -251,6 +284,9 @@ def check_action(act: str, args: dict, definition: dict, state: dict, report: Re
             report.error("SS466", path, f"{act} {name}：{hint[now]}")
             return
         state["split"][name] = {"split": "joined", "apart": "apart", "join": "joined", "unsplit": "whole"}[act]
+        return
+    if act == "orbit":
+        _orbit(args, state, report, path)
         return
     if not isinstance(definition.get("plane"), dict):
         report.error("SS467", path, f"{act} 要先在对象上写 plane: {{bodies: [...]}}")

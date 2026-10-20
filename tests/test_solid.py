@@ -107,3 +107,52 @@ def test_sweep_needs_a_plane(example):
 def test_compare_needs_room(example):
     obj = with_(plane={"bodies": ["P", "K"]})
     assert "SS468" in add(example, obj, ("sweep", {"z": 1}), ("compare", None))
+
+
+@pytest.mark.parametrize("actions", [
+    [("orbit", {"azimuth": 65, "elevation": 28})],
+    [("orbit", {"d_azimuth": 360})],  # 相对增量可以转一整圈
+    [("orbit", {"azimuth": -120, "elevation": -40}), ("split", {"split": "s"}), ("sweep", {"z": 1}), ("compare", None)],
+    [("orbit", {"d_elevation": 60}), ("orbit", {"d_elevation": -140})],  # 20 → 80 → -60
+])
+def test_orbit_passes(example, actions):
+    assert add(example, SOLID, *actions) == []
+
+
+@pytest.mark.parametrize("actions,code", [
+    ([("orbit", {"azimuth": 65, "elevation": 95})], "SS469"),
+    ([("orbit", {"elevation": -86})], "SS469"),
+    ([("orbit", {"d_elevation": 70})], "SS469"),  # 默认仰角 20°，转完 90°
+    ([("orbit", {"d_elevation": 60}), ("orbit", {"d_elevation": 10})], "SS469"),  # 按顺序推演：80 → 90
+    ([("orbit", {"azimuth": 60, "d_azimuth": 10})], "SS469"),  # 绝对和相对只能写一个
+    ([("orbit", {"elevation": "high"})], "SS469"),
+    ([("orbit", {})], "SS469"),
+    ([("orbit", None)], "SS469"),
+    ([("orbit", {"azimuth": 60, "roll": 10})], "SS281"),
+])
+def test_bad_orbits(example, actions, code):
+    assert code in add(example, SOLID, *actions)
+
+
+def test_orbit_starts_from_the_declared_view(example):
+    obj = with_(view={"azimuth": 30, "elevation": 50})
+    assert "SS469" in add(copy.deepcopy(example), obj, ("orbit", {"d_elevation": 40}))
+    assert add(example, obj, ("orbit", {"d_elevation": -130})) == []
+
+
+def test_scene_spec_check_cli_on_orbit(tmp_path, example):
+    import yaml
+
+    from scene_spec.cli import main
+
+    doc = copy.deepcopy(example)
+    doc["objects"]["w"] = {**copy.deepcopy(SOLID), "in": "stage"}
+    do = next(b for b in doc["beats"] if b["id"] == "Down")["do"]
+    do.append({"after": "prev", "act": "orbit", "target": "w", "args": {"azimuth": 65, "elevation": 28}})
+    good = tmp_path / "good.scene.yaml"
+    good.write_text(yaml.safe_dump(doc, allow_unicode=True), encoding="utf-8")
+    assert main(["check", str(good)]) == 0
+    do[-1]["args"] = {"elevation": 95}
+    bad = tmp_path / "bad.scene.yaml"
+    bad.write_text(yaml.safe_dump(doc, allow_unicode=True), encoding="utf-8")
+    assert main(["check", str(bad)]) != 0
