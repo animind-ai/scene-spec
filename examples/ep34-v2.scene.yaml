@@ -24,6 +24,7 @@ pedagogy:
   landing: Landing
 
 style:
+  side: column  # v2 改版：侧栏内容放回主讲区右边一栏，顶栏只留一行问题句
   layout: v2  # 培玉视觉规范 v2（style-v2 批量重渲，2026-10-20）
   theme: paper
   canvas: "16:9"
@@ -39,13 +40,13 @@ objects:
     text: '四个数 $\begin{pmatrix}a&b\\c&d\end{pmatrix}$ 在做什么？'
     level: title
     in: top
+  # v2 改版：误区一句放底栏（这一集底栏空着），右栏只留 m1–m5 两叠矩阵
   myth:
+    in: footer
     type: text
     text: '[只是一张数表？]{#m}'
     role: "NO"
     level: title
-    right_of: q
-    gap: lg
   plane:
     widget: plane
     x: [-2, 4]

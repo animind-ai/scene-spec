@@ -24,6 +24,7 @@ pedagogy:
   landing: Landing
 
 style:
+  side: column  # v2 改版：侧栏内容放回主讲区右边一栏，顶栏只留一行问题句
   layout: v2  # 培玉视觉规范 v2（style-v2 批量重渲，2026-10-20）
   theme: paper
   canvas: "16:9"
@@ -40,19 +41,17 @@ objects:
     level: title
     in: top
   myth:
+    in: side
     type: text
     text: '[等于一？]{#m}'
     role: "NO"
     level: title
-    right_of: q
-    gap: lg
   temp:
+    in: side
     # 开场情境：和 myth 同一个位置，Myth 里换成 myth
     type: text
     text: '[升了 $5$ 度]{#g}'
     level: title
-    right_of: q
-    gap: lg
   line:
     widget: number_line
     range: [-3, 6]

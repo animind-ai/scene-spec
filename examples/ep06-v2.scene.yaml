@@ -27,6 +27,7 @@ pedagogy:
   landing: Equation
 
 style:
+  side: column  # v2 改版：侧栏内容放回主讲区右边一栏，顶栏只留一行问题句
   layout: v2  # 培玉视觉规范 v2（style-v2 批量重渲，2026-10-20）
   theme: paper
   canvas: "16:9"
@@ -53,11 +54,11 @@ objects:
     role: A
     in: stage
   eq:
+    in: side
     type: text
     text: '[$\dfrac{1}{2}$]{#a} [$=\dfrac{2}{4}$]{#b} [$=\dfrac{3}{6}$]{#c}'
     role: HL
     level: title
-    in: top
   plusone:
     type: text
     text: '上下都加一：[$\dfrac{1+1}{2+1}=\dfrac{2}{3}$]{#f}'
