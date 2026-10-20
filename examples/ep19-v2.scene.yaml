@@ -1,0 +1,198 @@
+# v2 版式副本：与 ep19.scene.yaml 相同，只加 style.layout: v2（无右侧栏、顶栏 1.0、满宽 stage；字幕仍是双语两行烧录带）。
+# 洞察系列 #19 解方程就是天平（七年级）。单集，种子 S-2（等号是天平）。
+# 按脚本 insight/ep19-equation-balance/script.yaml（第 1 轮）写。组件 balance（天平）。
+# 钩子问 3 + 4 = □ + 5 填几、停三秒、说出"填 7"；左盘三块再放四块，右盘盒子加五块，天平平；
+# 先按错误想法：盒子是 7 的天平歪向右边；预测暂停后两边各拿走五块，还平，盒子是 2；
+# 非例：只从左边拿两块，天平歪；放回去又平；落到 x + 5 = 7，x = 7 − 5 = 2。
+spec: "0.1"
+
+meta:
+  id: ep19
+  title: 解方程就是天平
+  line: insight
+  units: [J3]
+  episode: 19
+  grade: 七年级
+  author: Boxi Yu
+  license: CC-BY-4.0
+
+pedagogy:
+  insight: 等号说的是两边一样重，像一架平着的天平；两边同时拿走一样多，天平还是平的，所以两边可以同时减去同一个数，一直减到盒子单独留在一边
+  misconception: 等号后面是写答案的地方，所以三加四等于空格加五，空格里填七
+  non_example: 只从一边拿走砝码，天平马上歪向另一边，两边不一样重，等式就不成立了
+  status: proof
+  landing: Landing
+
+style:
+  layout: v2  # 培玉视觉规范 v2（style-v2 批量重渲，2026-10-20）
+  theme: paper
+  canvas: "16:9"
+  voice:
+    persona: teacher-hs
+    speed: 1.0
+  segmented: true
+  step_hold: 1.0
+
+objects:
+  q:
+    type: text
+    text: '[$3+4=$]{#l} [$\square$]{#b} [$+5$]{#r}'
+    level: title
+    in: top
+  q2:
+    type: text
+    text: '[$3+4=$]{#l} [$2$]{#b .HL} [$+5$]{#r}'
+    level: title
+    in: top
+  myth:
+    type: text
+    text: '[填 $7$？]{#m}'
+    role: "NO"
+    level: title
+    right_of: q
+    gap: lg
+  hw:
+    # 开场情境：和 myth 同一个位置，Myth 里换成 myth
+    type: text
+    text: '[表弟的作业]{#g}'
+    level: title
+    right_of: q
+    gap: lg
+  scale:
+    widget: balance
+    role: A
+    in: stage
+    left: [1, 1, 1]
+    right: [box, 1, 1, 1, 1, 1]
+    box: 2
+    box_label: '?'
+    room: 7
+  wrongscale:
+    widget: balance
+    role: A
+    in: stage
+    left: [1, 1, 1, 1, 1, 1, 1]
+    right: [box, 1, 1, 1, 1, 1]
+    box: 7
+    box_label: '7'
+    room: 7
+  w:
+    type: text
+    text: '[$7+5=12$]{#all .NO}'
+    level: title
+    in: footer
+  mid:
+    type: text
+    text: '[$3+4-5$]{#l} [$=$]{#e} [$\square+5-5$]{#r}'
+    level: title
+    in: footer
+  law:
+    type: text
+    text: '[$x+5=7$]{#a}，[$x=7-5$]{#m} [$=2$]{#r .HL}'
+    level: title
+    in: footer
+
+i18n:
+  en:
+    meta: {title: "Solving an Equation Is Balancing a Scale"}
+    objects:
+      myth: {text: '[Write $7$?]{#m}'}
+      hw: {text: "[Cousin's homework]{#g}"}
+      law: {text: '[$x+5=7$]{#a}, [$x=7-5$]{#m} [$=2$]{#r .HL}'}
+    beats:
+      Hook: {pause: {prompt: "3 + 4 = □ + 5: what goes in the blank?"}}
+      Predict: {pause: {prompt: "Take five blocks off both sides at once: will the balance stay level?"}}
+
+beats:
+  - id: Hook
+    pause: {type: predict, prompt: 3 + 4 = □ + 5，空格里填几？, hold: 3, app_item: ep19-before-1}
+    say:
+      - {id: s1, pace: normal, text: "帮表弟检查作业，碰到这一题：{@q}三加四等于空格加五。", en: "Checking your little cousin's homework, you hit this one: {@q}three plus four equals blank plus five."}
+      - {id: s2, pace: normal, text: "空格里该填几？你先在心里填一个。", en: "What goes in the blank? Fill one in in your head first."}
+    do:
+      - {at: s1@q, act: show, target: q}
+      - {with: prev, act: show, target: hw}
+
+  - id: Myth
+    shows: misconception
+    say:
+      - {id: s1, pace: normal, text: "表弟填的是七，{@m}他觉得等号后面就是写答案的地方。", en: "Your cousin wrote seven. {@m}He thinks the equals sign is where the answer goes."}
+    do:
+      - {at: s1@m, act: hide, target: hw}
+      - {with: prev, act: show, target: myth}
+
+  - id: Setup
+    say:
+      - {id: s1, pace: normal, text: "{@b}把等号想成一架天平，两边必须一样重。", en: "{@b}Think of the equals sign as a balance: both sides must weigh the same."}
+      - {id: s2, pace: normal, text: "左盘放三块{@f}再放四块，一共七块；右盘放一个盒子和五块。", en: "On the left pan, three blocks and {@f}then four, seven in all. On the right, a box and five blocks."}
+      - {id: s3, pace: normal, text: "等式成立，就是说七块和盒子加五块一样重，{@l}天平是平的。", en: "The equation being true means seven blocks weigh the same as the box plus five: {@l}the balance is level."}
+    do:
+      - {at: s1@b, act: show, target: scale}
+      - {at: s2@f, act: add, target: scale, args: {side: left, count: 4}, dur: fit}
+      - {at: s3@l, act: focus, target: "scale.beam"}
+      - {after: prev, act: unfocus, target: scale}
+
+  - id: Wrong
+    shows: misconception
+    say:
+      - {id: s1, pace: normal, text: "{@w}要是盒子里是七，右盘就是七加五，{@t}十二块那么重。", en: "{@w}If the box were seven, the right pan would be seven plus five: {@t}twelve blocks' worth."}
+      - {id: s2, pace: normal, text: "十二比七重多了，{@x}天平一下子就歪了，所以七不对。", en: "Twelve is much heavier than seven. {@x}The balance tips at once, so seven is wrong."}
+    do:
+      - {at: s1@w, act: hide, target: scale}
+      - {after: prev, act: show, target: wrongscale}
+      - {at: s1@t, act: show, target: w}
+      - {at: s2@x, act: focus, target: "wrongscale.right"}
+      - {after: prev, act: unfocus, target: wrongscale}
+
+  - id: Predict
+    pause: {type: predict, prompt: 两边同时拿走五块，天平还会平吗？, hold: 3, app_item: ep19-why-1}
+    say:
+      - {id: s1, pace: ask, text: "{@q}两边同时拿走五块，天平还会是平的吗？", en: "{@q}If we take five blocks off both sides at the same time, will it still be level?"}
+    do:
+      - {at: s1, act: hide, target: wrongscale}
+      - {with: prev, act: hide, target: w}
+      - {after: prev, act: show, target: scale}
+
+  - id: Solve
+    say:
+      - {id: s1, pace: normal, text: "{@go}两边各拿走五块，一次拿一块，左边右边一起拿。", en: "{@go}Take five off each side, one at a time, left and right together."}
+      - {id: s2, pace: slow, text: "天平还是平的，左边剩下两块，右边只剩下盒子。", en: "The balance is still level. Two blocks are left on the left; only the box on the right."}
+      - {id: s3, pace: normal, text: "{@m}左边是三加四减五，右边是空格加五减五，两边还是相等。", en: "{@m}The left is three plus four minus five, the right is blank plus five minus five, and they're still equal."}
+      - {id: s4, pace: normal, text: "盒子和两块一样重，{@b}所以空格里是二。", en: "The box weighs the same as two blocks, {@b}so the blank is two."}
+    do:
+      - {at: s1@go, act: remove, target: scale, args: {side: both, count: 5}, dur: fit}
+      - {at: s3, act: step}
+      - {at: s3@m, act: show, target: mid}
+      - {at: s4@b, act: label, target: scale, args: {text: '2'}}
+      - {with: prev, act: transform, from: q, to: q2}
+      - {with: prev, act: hide, target: q}
+
+  - id: NonExample
+    shows: non_example
+    say:
+      - {id: s1, pace: normal, text: "要是只从一边拿呢？{@l}我们只从左边拿走两块。", en: "What if we take from one side only? {@l}Let's take two blocks off the left."}
+      - {id: s2, pace: normal, text: "{@t}天平马上歪向右边，两边不一样重，等式就不成立了。", en: "{@t}The balance tips to the right straight away: the sides aren't equal, so the equation no longer holds."}
+      - {id: s3, pace: normal, text: "{@p}把两块放回去，天平又平了。", en: "{@p}Put the two blocks back, and it's level again."}
+    do:
+      - {at: s1@l, act: remove, target: scale, args: {side: left, count: 2}, dur: fit}
+      - {at: s2@t, act: focus, target: "scale.right"}
+      - {after: prev, act: unfocus, target: scale}
+      - {at: s3@p, act: add, target: scale, args: {side: left, count: 2, role: C}, dur: fit}
+
+  - id: Landing
+    shows: landing
+    say:
+      - {id: s1, pace: slow, text: "{@law}所以等号说的是两边一样重，两边同时减去一样多，它还成立。", en: "{@law}So the equals sign says both sides weigh the same; subtract the same from both, and it still holds."}
+      - {id: s2, pace: normal, text: "换成字母也一样，{@x}x 加五等于七，两边都减五，{@r}x 就等于二。", en: "Same with a letter: {@x}x plus five equals seven; subtract five from both sides, and {@r}x is two."}
+    do:
+      - {at: s1@law, act: hide, target: mid}
+      - {after: prev, act: show, target: law}
+      - {at: s2@x, act: label, target: scale, args: {text: 'x'}}
+      - {at: s2@r, act: label, target: scale, args: {text: '2'}}
+
+  - id: Close
+    say:
+      - {id: s1, pace: normal, text: "等号的意思不是写答案，{@x}而是两边一样重。", en: "The equals sign isn't where the answer goes. {@x}It says: both sides weigh the same."}
+      - {id: s2, pace: normal, text: "{@q}下一集看看，a 加 b 的平方为什么会多出两块 a 乘 b 的面积。", en: "{@q}Next time: why a plus b, squared, picks up two extra a-times-b pieces of area."}
+    do:
+      - {at: s1@x, act: cross, target: "myth#m"}

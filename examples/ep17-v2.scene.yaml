@@ -1,0 +1,304 @@
+# v2 版式副本：与 ep17.scene.yaml 相同，只加 style.layout: v2（无右侧栏、顶栏 1.0、满宽 stage；字幕仍是双语两行烧录带）。
+# 洞察系列 #17 完全平方公式：多出来的 2ab（七至八年级）。squares 系列第一集，接 #18、#23。
+# 按脚本 insight/ep17-square-of-sum/script.yaml（第 1 轮）写。
+# 开场（2026-10-18 改情境式）：表弟家的正方形菜园每边加 b 米，面积多少，停三秒，表弟说出 a² + b²；边长 a + b 的大正方形里先只放 a² 和 b²，另外两个角空着（非例画在屏幕上），
+# 代数 3、2：25 对 13；预测暂停后空白换成两条 ab；a = b 时四块一样大，照样是两个 ab；落到 (a+b)² = a² + 2ab + b²，
+# 回访 #4（横竖各切一刀）、#5（12 × 12 = 100 + 2 × 20 + 4）。结尾留一个挖掉一角的正方形（#18 的开头画面）。
+spec: "0.1"
+
+meta:
+  id: ep17
+  title: 完全平方公式：多出来的 2ab
+  line: insight
+  units: [J2]
+  episode: 17
+  grade: 七至八年级
+  author: Boxi Yu
+  license: CC-BY-4.0
+
+pedagogy:
+  insight: 边长 a+b 的正方形横竖各切一刀，切成 a²、b² 和两条 ab 的长条，所以 (a+b)²=a²+2ab+b²
+  misconception: 平方就是各自平方，(a+b)² 就是 a²+b²
+  non_example: 大正方形里只放 a² 和 b²，另外两个角上空着两条长条，填不满；a=b 时也一样，四块里有两块是 ab
+  status: proof
+  landing: Landing
+
+style:
+  layout: v2  # 培玉视觉规范 v2（style-v2 批量重渲，2026-10-20）
+  theme: paper
+  canvas: "16:9"
+  voice:
+    persona: teacher-hs
+    speed: 1.0
+  segmented: true
+  step_hold: 1.0
+
+objects:
+  q:
+    type: math
+    tex: '(a+b)^2=\ ?'
+    level: display
+    in: stage
+  sq:
+    widget: dissect
+    role: A
+    in: stage
+    shapes:
+      S: {rect: [5, 5], role: DIM}
+      A2: {rect: [3, 3], at: [0, 2], role: B, label: '$a^2$', hidden: true}
+      B2: {rect: [2, 2], at: [3, 0], role: C, label: '$b^2$', hidden: true}
+      G1: {rect: [3, 2], at: [0, 0], role: NO, hidden: true}
+      G2: {rect: [2, 3], at: [3, 2], role: NO, hidden: true}
+      AB1:
+        rect: [3, 2]
+        at: [0, 0]
+        role: HL
+        label: '$ab$'
+        hidden: true
+        edges: [{at: [[0, 0], [3, 0]], text: '$a$'}]
+      AB2: {rect: [2, 3], at: [3, 2], role: HL, label: '$ab$', hidden: true}
+    guides:
+      ta: {from: [0, 5], to: [3, 5], label: '$a$', role: A, side: above, solid: true}
+      tb: {from: [3, 5], to: [5, 5], label: '$b$', role: A, side: above, solid: true}
+      la: {from: [0, 5], to: [0, 2], label: '$a$', role: A, side: left, solid: true}
+      lb: {from: [0, 2], to: [0, 0], label: '$b$', role: A, side: left, solid: true}
+      cx: {from: [3, 0], to: [3, 5], role: FG}
+      cy: {from: [0, 2], to: [5, 2], role: FG}
+  same:
+    widget: dissect
+    role: A
+    in: stage
+    shapes:
+      S: {rect: [4, 4], role: DIM}
+      Q1: {rect: [2, 2], at: [0, 2], role: B, label: '$a^2$', hidden: true}
+      Q2: {rect: [2, 2], at: [2, 0], role: C, label: '$b^2$', hidden: true}
+      Q3: {rect: [2, 2], at: [0, 0], role: HL, label: '$ab$', hidden: true}
+      Q4: {rect: [2, 2], at: [2, 2], role: HL, label: '$ab$', hidden: true}
+    guides:
+      ta: {from: [0, 4], to: [2, 4], label: '$a$', role: A, side: above, solid: true}
+      tb: {from: [2, 4], to: [4, 4], label: '$b=a$', role: A, side: above, solid: true}
+      cx: {from: [2, 0], to: [2, 4], role: FG}
+      cy: {from: [0, 2], to: [4, 2], role: FG}
+  wrong:
+    type: text
+    text: '[$(a+b)^2=a^2+b^2$ ？]{#w}'
+    role: "NO"
+    level: display
+    in: side
+  num1:
+    type: math
+    tex: '5\times 5=25'
+    level: title
+    below: wrong
+    gap: lg
+  num2:
+    type: math
+    tex: '3\times 3+2\times 2=13'
+    level: title
+    below: num1
+    gap: md
+  num3:
+    type: math
+    tex: '25-13=2\times 3\times 2'
+    role: HL
+    level: title
+    below: num2
+    gap: md
+  law:
+    type: text
+    text: '[$(a+b)^2$]{#l} [$=$]{#e} [$a^2$]{#a2 .B} [$+$]{#p1} [$2ab$]{#ab .HL} [$+$]{#p2} [$b^2$]{#b2 .C}'
+    level: display
+    in: side
+  num4:
+    type: math
+    tex: '12\times 12=100+2\times 20+4=144'
+    level: title
+    below: sq
+    gap: lg
+  # 结尾：#18 的开头（同样的定义写在 ep18-difference-of-squares 里）
+  dsq:
+    widget: dissect
+    role: A
+    in: stage
+    view: [[-0.6, -0.9], [7.6, 5.6]]
+    shapes:
+      S: {rect: [5, 5]}
+      W: {rect: [3, 3], role: NO, label: '$(a-b)^2$', hidden: true, edges: [{at: [[0, 0], [0, 3]], text: '$a-b$'}]}
+      U1: {rect: [3, 2], at: [0, 3], role: HL, hidden: true}
+      U2: {rect: [2, 3], at: [3, 0], role: HL, hidden: true}
+    cuts:
+      hole: {piece: S, path: [[5, 3], [3, 3], [3, 5]], into: [L, B2]}
+      c2: {piece: L, line: [[0, 3], [3, 3]], into: [Top, Bottom]}
+    pieces:
+      B2: {role: NO, label: '$b^2$'}
+      L: {label: '$a^2-b^2$'}
+      Top: {role: B}
+    guides:
+      ba: {from: [0, 0], to: [5, 0], label: '$a$', role: A, side: below, solid: true}
+      hb: {from: [3, 5], to: [5, 5], label: '$b$', role: NO, side: above}
+      long: {from: [0, 0], to: [7, 0], label: '$a+b$', role: HL, side: below, solid: true}
+      short: {from: [7, 0], to: [7, 3], label: '$a-b$', role: HL, side: right, solid: true}
+    merges:
+      R: {pieces: [Bottom, Top], label: '$(a+b)(a-b)$', role: HL}
+
+i18n:
+  en:
+    meta: {title: "(a+b)²: Where the Extra 2ab Comes From"}
+    objects:
+      wrong: {text: '[$(a+b)^2=a^2+b^2$ ?]{#w}'}
+    beats:
+      Hook: {pause: {prompt: "A square of side a grows by b on each side. What is the area (a+b)²?"}}
+      Predict: {pause: {prompt: "What shape is each of the two empty pieces, and how big?"}}
+
+beats:
+  - id: Hook
+    pause: {type: predict, prompt: 边长 a 的正方形每边加 b，面积 (a+b)² 是多少？, hold: 3, app_item: ep17-before-1}
+    say:
+      - {id: s1, pace: ask, text: "表弟家的菜园是边长 a 米的正方形，每边再加 b 米，{@q}面积是多少？", en: "Your cousin's vegetable patch is a square, a metres on a side. Each side grows by b metres. {@q}What's the new area?"}
+      - {id: s2, pace: normal, text: "先自己定个答案，再往下看。", en: "Settle on an answer before you read on."}
+    do:
+      - {at: s1@q, act: show, target: q}
+
+  - id: Myth
+    shows: misconception
+    say:
+      - {id: s1, pace: normal, text: "表弟张口就答：{@w}平方就各自平方，a 方加 b 方。", en: "Your cousin answers straight away: {@w}squaring squares each part, a squared plus b squared."}
+    do:
+      - {at: s1@w, act: show, target: wrong}
+
+  - id: Setup
+    say:
+      - {id: s1, pace: normal, text: "我们一起看。平方就是正方形，{@s}这个正方形的边长是 a 加 b。", en: "Let's look together. A square number is a square, and {@s}this square has side a plus b."}
+      - {id: s2, pace: normal, text: "{@t}上边、{@l}左边都分成 a、b 两段，{@f}它的面积就是 a 加 b 的平方。", en: "{@t}The top and {@l}left sides each split into a and b, and {@f}its area is a plus b, squared."}
+    do:
+      - {at: s1@s, act: hide, target: q}
+      - {after: prev, act: show, target: "sq#S"}
+      - {at: s2@t, act: show, target: "sq#ta"}
+      - {with: prev, act: show, target: "sq#tb"}
+      - {at: s2@l, act: show, target: "sq#la"}
+      - {with: prev, act: show, target: "sq#lb"}
+      - {at: s2@f, act: mark, target: "sq#S"}
+
+  - id: Wrong
+    shows: non_example
+    say:
+      - {id: s1, pace: normal, text: "要是它等于 a 方加 b 方，{@a}正方形里就只有{@b}这两块。", en: "If it equalled a squared plus b squared, the square would hold just {@a}this piece and {@b}this one."}
+      - {id: s2, pace: normal, text: "可是另外两个角上{@g}还空着两块，正方形根本没填满。", en: "But two pieces in the other corners {@g}are still empty. The square isn't filled."}
+      - {id: s3, pace: normal, text: "代个数试试，a 是三，b 是二，{@n}五的平方是二十五。", en: "Try numbers: a is three and b is two, so {@n}five squared is twenty-five."}
+      - {id: s4, pace: normal, text: "{@n}三的平方加二的平方只有十三，{@x}差了整整十二。", en: "{@n}Three squared plus two squared is only thirteen, {@x}a whole twelve short."}
+    do:
+      - {at: s1, act: unmark, target: "sq#S"}
+      - {at: s1@a, act: show, target: "sq#A2"}
+      - {at: s1@b, act: show, target: "sq#B2"}
+      - {at: s2@g, act: show, target: "sq#G1"}
+      - {with: prev, act: show, target: "sq#G2"}
+      - {at: s3@n, act: show, target: num1}
+      - {at: s4@n, act: show, target: num2}
+      - {at: s4@x, act: cross, target: "wrong#w"}
+
+  - id: Predict
+    pause: {type: predict, prompt: 空着的这两块，各是什么形状、有多大？, hold: 3}
+    say:
+      - {id: s1, pace: ask, text: "{@g}空着的这两块，各是什么形状、有多大？", en: "{@g}What shape is each of those empty pieces, and how big?"}
+    do:
+      - {at: s1@g, act: mark, target: "sq#G1"}
+      - {with: prev, act: mark, target: "sq#G2"}
+
+  - id: Fill
+    say:
+      - {id: s1, pace: normal, text: "{@p}左下这块，长是 a，{@w}宽是 b，它的面积是 a 乘 b。", en: "{@p}The bottom-left piece is a long and {@w}b wide, so its area is a times b."}
+      - {id: s2, pace: normal, text: "{@p}右上这块也是 a 乘 b，两块一模一样。", en: "{@p}The top-right piece is a times b too. The two are exactly the same."}
+      - {id: s3, pace: slow, text: "所以多出来的是{@two}两个 a b，也就是二 a b。", en: "So the extra part is {@two}two a b's: two a b."}
+      - {id: s4, pace: normal, text: "{@n}差的这十二正好是两个三乘二，就是这两条长条。", en: "{@n}The missing twelve is exactly two lots of three times two: these two strips."}
+    do:
+      - {at: s1@p, act: unmark, target: "sq#G1"}
+      - {with: prev, act: unmark, target: "sq#G2"}
+      - {with: prev, act: hide, target: "sq#G1"}
+      - {with: prev, act: show, target: "sq#AB1"}
+      - {at: s1@w, act: mark, target: "sq#lb"}
+      - {at: s2@p, act: unmark, target: "sq#lb"}
+      - {with: prev, act: hide, target: "sq#la"}
+      - {with: prev, act: hide, target: "sq#lb"}
+      - {with: prev, act: hide, target: "sq#G2"}
+      - {with: prev, act: show, target: "sq#AB2"}
+      - {at: s3@two, act: mark, target: "sq#AB1"}
+      - {with: prev, act: mark, target: "sq#AB2"}
+      - {at: s4@n, act: show, target: num3}
+
+  - id: NonExample
+    shows: non_example
+    say:
+      - {id: s1, pace: ask, text: "要是 a 和 b 一样长，{@s}四块都成了一样的正方形，总该对了吧？", en: "What if a and b are the same length, so {@s}all four pieces are equal squares? Surely it works then?"}
+      - {id: s2, pace: normal, text: "{@a}a 方加 b 方只数了其中两个，{@ab}另外两个还是那两条 a b。", en: "{@a}a squared plus b squared only counts two of them. {@ab}The other two are still the a b strips."}
+    do:
+      - {at: s1, act: unmark, target: "sq#AB1"}
+      - {with: prev, act: unmark, target: "sq#AB2"}
+      - {at: s1@s, act: hide, target: sq}
+      - {after: prev, act: show, target: "same#S"}
+      - {with: prev, act: show, target: "same#ta"}
+      - {with: prev, act: show, target: "same#tb"}
+      - {after: prev, act: show, target: "same#cx"}
+      - {with: prev, act: show, target: "same#cy"}
+      - {at: s2@a, act: show, target: "same#Q1"}
+      - {with: prev, act: show, target: "same#Q2"}
+      - {at: s2@ab, act: show, target: "same#Q3"}
+      - {with: prev, act: show, target: "same#Q4"}
+      - {after: prev, act: mark, target: "same#Q3"}
+      - {with: prev, act: mark, target: "same#Q4"}
+
+  - id: Landing
+    shows: landing
+    say:
+      - {id: s1, pace: slow, text: "{@l}所以 a 加 b 的平方，等于 a 方加二 a b 加 b 方。", en: "{@l}So a plus b squared equals a squared plus two a b plus b squared."}
+      - {id: s2, pace: normal, text: "{@a}这块是 a 方，{@ab}这两条是二 a b，{@b}那块是 b 方。", en: "{@a}This piece is a squared, {@ab}these two strips are two a b, and {@b}that piece is b squared."}
+      - {id: s3, pace: normal, text: "还记得切一刀吗？{@c}这回是横竖各切一刀，切出四块。", en: "Remember cutting a rectangle once? {@c}This time we cut once across and once down, into four pieces."}
+      - {id: s4, pace: normal, text: "{@m}竖式算十二乘十二，也是一百、两个二十，再加四。", en: "{@m}Twelve times twelve in long multiplication is the same: a hundred, two twenties, and four."}
+    do:
+      - {at: s1, act: hide, target: same}
+      - {with: prev, act: hide, target: num1}
+      - {with: prev, act: hide, target: num2}
+      - {with: prev, act: hide, target: num3}
+      - {after: prev, act: show, target: "sq#S"}
+      - {with: prev, act: show, target: "sq#A2"}
+      - {with: prev, act: show, target: "sq#B2"}
+      - {with: prev, act: show, target: "sq#AB1"}
+      - {with: prev, act: show, target: "sq#AB2"}
+      - {with: prev, act: show, target: "sq#ta"}
+      - {with: prev, act: show, target: "sq#tb"}
+      - {at: s1@l, act: show, target: law}
+      - {at: s2@a, act: mark, target: "sq#A2"}
+      - {with: prev, act: mark, target: "law#a2"}
+      - {at: s2@ab, act: unmark, target: "sq#A2"}
+      - {with: prev, act: unmark, target: "law#a2"}
+      - {with: prev, act: mark, target: "sq#AB1"}
+      - {with: prev, act: mark, target: "sq#AB2"}
+      - {with: prev, act: mark, target: "law#ab"}
+      - {at: s2@b, act: unmark, target: "sq#AB1"}
+      - {with: prev, act: unmark, target: "sq#AB2"}
+      - {with: prev, act: unmark, target: "law#ab"}
+      - {with: prev, act: mark, target: "sq#B2"}
+      - {with: prev, act: mark, target: "law#b2"}
+      - {at: s3, act: unmark, target: "sq#B2"}
+      - {with: prev, act: unmark, target: "law#b2"}
+      - {at: s3@c, act: show, target: "sq#cx"}
+      - {after: prev, act: show, target: "sq#cy"}
+      - {at: s4@m, act: show, target: num4}
+
+  - id: Close
+    say:
+      - {id: s1, pace: normal, text: "{@x}平方不是各自平方，中间那两条长条，一条也不能丢。", en: "{@x}Squaring isn't squaring each part. Neither of those two strips can be left out."}
+      - {id: s2, pace: ask, text: "{@n}要是反过来，从正方形里{@h}挖掉一个小正方形呢？", en: "{@n}What if we go the other way and {@h}cut a small square out of a big one?"}
+    do:
+      - {at: s1@x, act: mark, target: "wrong#w"}
+      - {with: prev, act: mark, target: "sq#AB1"}
+      - {with: prev, act: mark, target: "sq#AB2"}
+      # 收成 #18 的开头画面：挖掉一角的正方形，右侧只留公式
+      - {at: s2@n, act: hide, target: sq}
+      - {with: prev, act: hide, target: wrong}
+      - {with: prev, act: hide, target: num4}
+      - {after: prev, act: show, target: "dsq#S"}
+      - {with: prev, act: show, target: "dsq#ba"}
+      - {at: s2@h, act: cut, target: dsq, args: {cut: hole}, dur: 1.0}
+      - {after: prev, act: hide, target: "dsq#B2"}
+      - {with: prev, act: labels, target: dsq, args: {piece: L, show: false}}
+      - {with: prev, act: show, target: "dsq#hb"}

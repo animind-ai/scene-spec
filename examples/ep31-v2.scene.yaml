@@ -1,0 +1,355 @@
+# v2 版式副本：与 ep31.scene.yaml 相同，只加 style.layout: v2（无右侧栏、顶栏 1.0、满宽 stage；字幕仍是双语两行烧录带）。
+# 洞察系列 #31 为什么 (x²)′ = 2x（高二）。sums 系列第三集，接 #30、#39。第 2 版：两把滚筒刷（2026-10-18 用户定）。
+# 按脚本 insight/ep31-derivative-x-squared/script.yaml（第 2 版）写。
+# 开场就是 #30 的片尾画面（抛物线、P 点、切线，右侧一句「换一个点呢？」，底部导数的定义）；钩子问 (x²)′ 为什么是 2x、停三秒、
+# 说出"角块是硬丢掉的"；x² 是边长 x 的正方形草坪，边每秒长 1；右边、上边各一把长 x 的滚筒刷往外推，刷过的就是新面积；
+# 读数：边长 3 每秒刷 6，边长 5 每秒刷 10 → 每秒刷 2x；角上补的小方块放大看，推 dx 时是 dx²，越短小得越快；
+# 非例 dx = x 时角块和长条一样大；落到 (x²)′ = 2x。片尾画面（dx = 0.1 的正方形、底部公式、右侧下一集的问题）和第 1 版一样，#39 接它。
+spec: "0.1"
+
+meta:
+  id: ep31
+  title: 为什么 (x²)′ = 2x
+  line: insight
+  units: [S7]
+  episode: 31
+  grade: 高二
+  author: Boxi Yu
+  license: CC-BY-4.0
+
+pedagogy:
+  insight: 边长 x 的正方形草坪往外长，就像右边、上边各有一把长 x 的滚筒刷往外推；刷过的就是新长的面积，所以面积每秒长 2x；两把刷子在角上补出的小方块，推得越短小得越快
+  misconception: 角上那一小块是硬丢掉的，所以 2x 只是个近似
+  non_example: 推得不短的时候角块丢不得：推出 x 那么远，角块和一条一样大
+  status: proof
+  landing: Landing
+
+style:
+  layout: v2  # 培玉视觉规范 v2（style-v2 批量重渲，2026-10-20）
+  theme: paper
+  canvas: "16:9"
+  voice:
+    persona: teacher-hs
+    speed: 1.0
+  segmented: true
+  step_hold: 1.0
+
+objects:
+  # 开场：#30 的片尾（同样的定义）
+  g:
+    widget: graph
+    x: [-2.0, 5.0]
+    y: [-0.7, 4.8]
+    readout_at: [3.05, 2.2]
+    plots:
+      - {f: "x^2", label: "y=x^2"}
+    points:
+      - {x: 1, label: P}
+    secants:
+      - {point: 0, h: 1, label: Q, readout: true, readout_text: 右侧割线斜率}
+      - {point: 0, h: -1, label: "Q'", role: C, label_dir: ul, readout: true, readout_text: 左侧割线斜率}
+    tangents:
+      - {point: 0, role: HL}
+    lines:
+      - {x: 1}
+    in: stage
+  nq30:
+    type: text
+    text: '换一个点呢？'
+    role: HL
+    level: title
+    in: side
+  deriv:
+    type: math
+    tex: "f'(x_0)=\\lim_{h\\to 0}\\frac{f(x_0+h)-f(x_0)}{h}"
+    role: HL
+    in: footer
+
+  # 本集
+  qx:
+    type: text
+    text: "[$(x^2)'=2x$]{#l} [$?$]{#q .NO}"
+    level: title
+    in: side
+  myth:
+    type: text
+    text: '[角块是硬丢掉的？]{#m}'
+    role: "NO"
+    below: qx
+    gap: sm
+  grow:
+    type: text
+    text: '$(x+dx)^2-x^2$'
+    below: rd2x
+    gap: lg
+  grow2:
+    type: text
+    text: '[$=$]{#e} [$2x\,dx$]{#s .B} [$+\,dx^2$]{#c .C}'
+    below: grow
+    gap: sm
+  nq:
+    type: text
+    text: '边长只能取整数呢？'
+    role: HL
+    level: title
+    in: side
+  law:
+    type: text
+    text: "[$(x^2)'=2x$]{#l}"
+    role: HL
+    level: display
+    in: footer
+  chk:
+    type: text
+    text: '$x=1\ \to\ 2$'
+    right_of: law
+    gap: lg
+  sq01:
+    widget: dissect
+    role: A
+    in: stage
+    view: [[-1.2, -1.2], [6.8, 5.6]]
+    shapes:
+      S: {rect: [4, 4], label: '$x^2$'}
+      R: {rect: [0.1, 4], at: [4, 0], role: B}
+      T: {rect: [4, 0.1], at: [0, 4], role: B}
+      C: {rect: [0.1, 0.1], at: [4, 4], role: C}
+    guides:
+      d: {from: [4, -0.5], to: [4.1, -0.5], label: '$dx=0.1$', role: HL, side: below, solid: true}
+  sq4:
+    widget: dissect
+    role: A
+    in: stage
+    view: [[-1.0, -1.0], [9.0, 9.0]]
+    shapes:
+      S: {rect: [4, 4], label: '$x^2$'}
+      R: {rect: [4, 4], at: [4, 0], role: B, label: '$x\,dx$'}
+      T: {rect: [4, 4], at: [0, 4], role: B, label: '$x\,dx$'}
+      C: {rect: [4, 4], at: [4, 4], role: "NO", label: '$dx^2$'}
+    guides:
+      d: {from: [4, -0.5], to: [8, -0.5], label: '$dx=x$', role: "NO", side: below, solid: true}
+
+  # 本集
+  sq3:
+    widget: dissect
+    role: A
+    in: stage
+    view: [[-1.2, -1.2], [7.6, 7.4]]
+    shapes:
+      S: {rect: [3, 3], label: '$x^2$', edges: [{at: [[0, 0], [3, 0]], text: '$x=3$'}]}
+      R: {rect: [1, 3], at: [3, 0], hidden: true, role: B}
+      T: {rect: [3, 1], at: [0, 3], hidden: true, role: B}
+      C: {rect: [1, 1], at: [3, 3], hidden: true, role: C}
+      RR: {rect: [0.25, 3], at: [3, 0], hidden: true, role: HL}
+      RT: {rect: [3, 0.25], at: [0, 3], hidden: true, role: HL}
+    guides:
+      lr: {from: [3.6, 0], to: [3.6, 3], label: '刷子长 $x$', role: HL, side: right}
+      lt: {from: [0, 3.6], to: [3, 3.6], label: '刷子长 $x$', role: HL, side: above}
+  sq5:
+    widget: dissect
+    role: A
+    in: stage
+    view: [[-1.2, -1.2], [7.6, 7.4]]
+    shapes:
+      S: {rect: [5, 5], label: '$x^2$', edges: [{at: [[0, 0], [5, 0]], text: '$x=5$'}]}
+      R: {rect: [1, 5], at: [5, 0], hidden: true, role: B}
+      T: {rect: [5, 1], at: [0, 5], hidden: true, role: B}
+      C: {rect: [1, 1], at: [5, 5], hidden: true, role: C}
+      RR: {rect: [0.25, 5], at: [5, 0], hidden: true, role: HL}
+      RT: {rect: [5, 0.25], at: [0, 5], hidden: true, role: HL}
+    guides:
+      lr: {from: [5.6, 0], to: [5.6, 5], label: '刷子长 $x$', role: HL, side: right}
+      lt: {from: [0, 5.6], to: [5, 5.6], label: '刷子长 $x$', role: HL, side: above}
+  zc:
+    widget: dissect
+    role: A
+    in: stage
+    view: [[-1.9, -1.9], [1.9, 1.9]]
+    shapes:
+      S: {rect: [1.5, 1.5], at: [-1.5, -1.5]}
+      R: {rect: [1, 1.5], at: [0, -1.5], role: B}
+      T: {rect: [1.5, 1], at: [-1.5, 0], role: B}
+      C: {rect: [1, 1], at: [0, 0], role: C, label: '$dx^2$'}
+    guides:
+      dxr: {from: [0, -1.7], to: [1, -1.7], label: '$dx$', role: HL, side: below, solid: true}
+      dxt: {from: [1.2, 0], to: [1.2, 1], label: '$dx$', role: HL, side: right, solid: true}
+      mag: {from: [-1.5, 1.4], to: [0.6, 1.4], label: '角上放大', role: HL, side: above}
+  rd3:
+    type: text
+    text: '[每秒刷]{#l} [$2\times 3=6$]{#r .HL}'
+    below: myth
+    gap: lg
+  rd5:
+    type: text
+    text: '[每秒刷]{#l} [$2\times 5=10$]{#r .HL}'
+    below: myth
+    gap: lg
+  rd2x:
+    type: text
+    text: '[每秒刷]{#l} [$2x$]{#r .HL}'
+    level: title
+    below: rd5
+    gap: sm
+
+i18n:
+  en:
+    meta: {title: "Why the Derivative of x² Is 2x"}
+    objects:
+      g:
+        secants:
+          - {point: 0, h: 1, label: Q, readout: true, readout_text: "Right secant slope"}
+          - {point: 0, h: -1, label: "Q'", role: C, label_dir: ul, readout: true, readout_text: "Left secant slope"}
+      nq30: {text: "Another point?"}
+      myth: {text: '[Corner thrown away?]{#m}'}
+      nq: {text: "Whole-number sides?"}
+      sq3:
+        guides:
+          lr: {label: 'Roller $x$'}
+          lt: {label: 'Roller $x$'}
+      sq5:
+        guides:
+          lr: {label: 'Roller $x$'}
+          lt: {label: 'Roller $x$'}
+      zc:
+        guides:
+          mag: {label: 'Zoom in on corner'}
+      rd3: {text: '[Per second]{#l} [$2\times 3=6$]{#r .HL}'}
+      rd5: {text: '[Per second]{#l} [$2\times 5=10$]{#r .HL}'}
+      rd2x: {text: '[Per second]{#l} [$2x$]{#r .HL}'}
+    beats:
+      Hook: {pause: {prompt: "A little corner piece is thrown away. Does this step earn the mark?"}}
+      Predict: {pause: {prompt: "Picture two rollers pushing the edges out. How much do they cover each second?"}}
+
+beats:
+  - id: Hook
+    pause: {type: predict, prompt: 扔掉角上一小块，这一步给不给分？, hold: 3, app_item: ep31-before-1}
+    say:
+      - {id: s1, pace: normal, text: "推导 x 平方的导数，{@q}最后一步，角上一小块被直接扔掉了。", en: "When you work out the derivative of x squared, {@q}the last step simply throws away a little corner piece."}
+      - {id: s2, pace: ask, text: "要是你来批改，这一步给不给分？", en: "If you were marking it, would that step get the mark?"}
+    do:
+      # 开场：一下子摆出 #30 的片尾画面
+      - {at: s1, act: show, target: g.axes, dur: 0.01}
+      - {with: prev, act: draw, target: g, args: {plot: 0}, dur: 0.01}
+      - {with: prev, act: show, target: g.plot_label, dur: 0.01}
+      - {with: prev, act: show, target: "g.point[0]", dur: 0.01}
+      - {with: prev, act: show, target: "g.tangent[0]", dur: 0.01}
+      - {with: prev, act: show, target: nq30, dur: 0.01}
+      - {with: prev, act: show, target: deriv, dur: 0.01}
+      - {at: s1@q, act: hide, target: nq30}
+      - {with: prev, act: hide, target: deriv}
+      - {after: prev, act: show, target: qx}
+
+  - id: Myth
+    shows: misconception
+    say:
+      - {id: s1, pace: normal, text: "后排同学不服：{@m}扔掉一块还说相等，二 x 只能算近似值。", en: "A classmate at the back objects: {@m}you threw a piece away and still call it equal, so two x is only an approximation."}
+    do:
+      - {at: s1@m, act: show, target: myth}
+
+  - id: Setup
+    say:
+      - {id: s1, pace: normal, text: "上一集我们在一这个点算出斜率是二，{@v}这次换个看法。", en: "Last time we found the slope at one is two. {@v}This time, a different view."}
+      - {id: s2, pace: normal, text: "{@sq}x 的平方，就是一块边长为 x 的正方形草坪的面积。", en: "{@sq}x squared is the area of a square lawn with side x."}
+      - {id: s3, pace: normal, text: "草坪的边每秒往外长一，面积每秒多出多少？", en: "The lawn's edges move out by one every second. How much area does it gain per second?"}
+    do:
+      - {at: s1@v, act: hide, target: g}
+      - {at: s2@sq, act: show, target: sq3}
+
+  - id: Predict
+    pause: {type: predict, prompt: 想象两把滚筒刷推着边往外走，每秒能刷多少？, hold: 3, app_item: ep31-why-1}
+    say:
+      - {id: s1, pace: ask, text: "想象{@r}两把滚筒刷推着边往外走，每秒能刷多少？", en: "Picture {@r}two paint rollers pushing the edges outward. How much do they cover each second?"}
+    do:
+      - {at: s1@r, act: show, target: "sq3#RR"}
+      - {with: prev, act: show, target: "sq3#RT"}
+
+  - id: Brush
+    say:
+      - {id: s1, pace: normal, text: "{@a}右边一把，{@b}上边一把，每把刷子都和边一样长，是 x。", en: "{@a}One roller on the right, {@b}one on top, each exactly as long as the side: x."}
+      - {id: s2, pace: normal, text: "{@p}刷子往外推，刷过的地方，就是新长出来的草坪。", en: "{@p}Push the rollers out, and whatever they sweep is the new lawn."}
+      - {id: s3, pace: normal, text: "边长三的时候，两把各刷三，{@r}每秒刷六。", en: "When the side is three, each roller sweeps three: {@r}six per second."}
+      - {id: s4, pace: normal, text: "{@five}边长五的时候，每把刷子长五，{@r}每秒刷十。", en: "{@five}When the side is five, each sweeps five: {@r}ten per second."}
+      - {id: s5, pace: slow, text: "两把刷子，每把长 x，{@x}所以每秒刷二 x。", en: "Two rollers, each x long, so {@x}they cover two x per second."}
+    do:
+      - {at: s1@a, act: show, target: "sq3#lr"}
+      - {at: s1@b, act: show, target: "sq3#lt"}
+      - {at: s2@p, act: hide, target: "sq3#lr"}
+      - {with: prev, act: hide, target: "sq3#lt"}
+      - {after: prev, act: shift, target: sq3, args: {piece: RR, by: [1, 0]}, dur: 1.2}
+      - {with: prev, act: show, target: "sq3#R", dur: 1.2}
+      - {with: prev, act: shift, target: sq3, args: {piece: RT, by: [0, 1]}, dur: 1.2}
+      - {with: prev, act: show, target: "sq3#T", dur: 1.2}
+      - {at: s3@r, act: show, target: rd3}
+      - {at: s4@five, act: hide, target: sq3}
+      - {with: prev, act: show, target: sq5}
+      - {with: prev, act: show, target: "sq5#RR"}
+      - {with: prev, act: show, target: "sq5#RT"}
+      - {after: prev, act: shift, target: sq5, args: {piece: RR, by: [1, 0]}, dur: 1.0}
+      - {with: prev, act: show, target: "sq5#R", dur: 1.0}
+      - {with: prev, act: shift, target: sq5, args: {piece: RT, by: [0, 1]}, dur: 1.0}
+      - {with: prev, act: show, target: "sq5#T", dur: 1.0}
+      - {at: s4@r, act: hide, target: rd3}
+      - {with: prev, act: show, target: rd5}
+      - {at: s5@x, act: show, target: rd2x}
+      - {after: prev, act: mark, target: "rd2x#r"}
+
+  - id: Corner
+    say:
+      - {id: s1, pace: normal, text: "那角上呢？{@c}两把刷子都没刷到，补出一个小方块。", en: "And the corner? {@c}Neither roller sweeps it, so a little square fills the gap."}
+      - {id: s2, pace: normal, text: "{@s}只推一小段 d x，它就是 d x 乘 d x，推得越短，小得越快。", en: "{@s}Push only a little dx and it's dx by dx: the shorter the push, the faster it shrinks."}
+      - {id: s3, pace: normal, text: "{@g}两条长条是 x 乘 d x，{@c}角块和它们一比，几乎没有。", en: "{@g}The strips are x times dx; {@c}next to them the corner is almost nothing."}
+    do:
+      - {at: s1, act: unmark, target: "rd2x#r"}
+      - {at: s1@c, act: show, target: "sq5#C"}
+      - {after: prev, act: hide, target: sq5}
+      - {with: prev, act: show, target: zc}
+      - {with: prev, act: show, target: "zc#dxr"}
+      - {with: prev, act: show, target: "zc#dxt"}
+      - {with: prev, act: show, target: "zc#mag"}
+      - {at: s2@s, act: hide, target: zc}
+      - {with: prev, act: show, target: sq01}
+      - {with: prev, act: show, target: "sq01#d"}
+      - {at: s3@g, act: show, target: grow}
+      - {with: prev, act: show, target: grow2}
+      - {at: s3@c, act: mark, target: "grow2#c"}
+
+  - id: NonExample
+    shows: non_example
+    say:
+      - {id: s1, pace: normal, text: "可要是{@big}一下推出 x 那么远，{@c}角块就和一条一样大，丢不得。", en: "But {@big}push all the way out by x in one go and {@c}the corner is as big as a strip. You can't drop it."}
+    do:
+      - {at: s1@big, act: hide, target: sq01}
+      - {with: prev, act: show, target: sq4}
+      - {with: prev, act: show, target: "sq4#d"}
+
+  - id: Landing
+    shows: landing
+    say:
+      - {id: s1, pace: slow, text: "{@back}所以面积长得有多快，{@a}就看两把刷子有多长，二 x。", en: "{@back}So how fast the area grows is just {@a}how long the two rollers are: two x."}
+      - {id: s2, pace: slow, text: "{@law}所以 x 平方的导数是二 x。", en: "{@law}So the derivative of x squared is two x."}
+      - {id: s3, pace: normal, text: "{@k}代 x 等于一，正好就是上一集算出的斜率二。", en: "{@k}Put x equal to one and you get two, the slope we found last time."}
+      - {id: s4, pace: normal, text: "角块不是硬丢的，{@x}而是它比长条小得越来越快。", en: "The corner isn't thrown away: {@x}it just gets small much faster than the strips."}
+    do:
+      - {at: s1@back, act: unmark, target: "grow2#c"}
+      - {with: prev, act: hide, target: sq4}
+      - {after: prev, act: show, target: sq01}
+      - {with: prev, act: show, target: "sq01#d"}
+      - {at: s1@a, act: mark, target: "rd2x#r"}
+      - {at: s2@law, act: show, target: law}
+      - {at: s3@k, act: show, target: chk}
+      - {at: s4@x, act: cross, target: "myth#m"}
+
+  - id: Close
+    say:
+      - {id: s1, pace: normal, text: "台阶一级一级地加，正方形一圈一圈地长，看的都是多出来的那块。", en: "Staircases add step by step, squares grow ring by ring: either way, we look at the piece that's added."}
+      - {id: s2, pace: ask, text: "{@q}如果边长只能取整数，d x 最小是一，角块还能丢吗？", en: "{@q}Next: if the side can only be a whole number, so dx is at least one, can we still drop the corner?"}
+    do:
+      # 片尾画面：dx = 0.1 的正方形、底部 (x²)′ = 2x 和右侧一句下一集的问题，不留叠加层，#39 开场好还原
+      - {at: s1, act: unmark, target: "rd2x#r"}
+      - {with: prev, act: hide, target: qx}
+      - {with: prev, act: hide, target: myth}
+      - {with: prev, act: hide, target: rd5}
+      - {with: prev, act: hide, target: rd2x}
+      - {with: prev, act: hide, target: grow}
+      - {with: prev, act: hide, target: grow2}
+      - {at: s2@q, act: show, target: nq}

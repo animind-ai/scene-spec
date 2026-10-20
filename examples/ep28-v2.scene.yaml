@@ -1,0 +1,235 @@
+# v2 版式副本：与 ep28.scene.yaml 相同，只加 style.layout: v2（无右侧栏、顶栏 1.0、满宽 stage；字幕仍是双语两行烧录带）。
+# 洞察系列 #28 单位圆上的 sin 和 cos（高一）。按脚本 insight/ep28-unit-circle/script.yaml（第 1 轮）写。
+# 开场接 #27 片尾（绕圆转圈的高度）；钩子问正弦图像为什么是波浪、停三秒、说出"弧度只是度数换个写法"；
+# 单位圆上走过的弧长 = 弧度；把走过的路摊在横轴上，P 的高度描出 y = sin x；预测暂停后 t 从 0 走到 2π；
+# 非例：横轴用度数，sin(x°) 几乎贴着横轴；落到 P = (cos t, sin t)，余弦波提前四分之一圈（回访 #26）。
+#
+# 画面只用一个 graph + 场景参数 t（走过的弧长）：
+# - 单位圆 = 上下两个半圆 ±√(1 − x²)，圆心就在坐标原点；
+# - 正弦波的起点放在横轴 x = 1.6 处（避开圆），曲线是 sin(x − 1.6)，横轴上的 0、π、2π 用点的名字标；
+# - P 是挂在不画出来的常数曲线 y = sin t 上、x = cos t 的点；
+# - "描到哪儿画到哪儿"：在 sin(x − 1.6) 后面加上 √(t + 1.6001 − x) − √(t + 1.6001 − x)（值为 0），
+#   x 超过 t + 1.6 时根号没有定义，曲线就只画到当前位置；前面的 √(x − 1.5999) 同理截掉 x < 1.6 的部分。
+spec: "0.1"
+
+meta:
+  id: ep28
+  title: 单位圆上的 sin 和 cos
+  line: insight
+  units: [S5]
+  episode: 28
+  grade: 高一
+  author: Boxi Yu
+  license: CC-BY-4.0
+
+pedagogy:
+  insight: 单位圆上走过的弧长就是转过的弧度；点匀速绕圆走，高度是正弦，把走过的路摊平在横轴上，高度描出曲线；圆一圈圈地转，高度一遍遍重复，所以是波浪
+  misconception: 弧度只是度数的另一种写法，和弧长没有关系
+  non_example: 横轴改用度数，同样长的路要记到 360，sin(x°) 被拉得几乎是平的，高度和走过的路不再一比一
+  status: proof
+  landing: Landing
+
+style:
+  layout: v2  # 培玉视觉规范 v2（style-v2 批量重渲，2026-10-20）
+  theme: paper
+  canvas: "16:9"
+  voice:
+    persona: teacher-hs
+    speed: 1.0
+  segmented: true
+  step_hold: 1.0
+
+params:
+  t: {value: 0, min: 0, max: 6.2832}   # 单位圆上走过的弧长（= 弧度）
+
+objects:
+  g:
+    widget: graph
+    x: [-1.4, 8.2]
+    y: [-1.5, 1.5]
+    ticks: false
+    tick_labels: false
+    plots:
+      - {f: "sqrt(1-x^2)"}
+      - {f: "-sqrt(1-x^2)"}
+      - {f: "sin(x-1.6)+sqrt(x-1.5999)-sqrt(x-1.5999)+sqrt(t+1.6001-x)-sqrt(t+1.6001-x)", role: B}
+      - {f: "sin(t)", role: HL}
+      - {f: "0", role: DIM}
+      - {f: "sin((x-1.6)*pi/180)", role: "NO", domain: [1.6, 8.2]}
+      - {f: "cos(x-1.6)", role: C, domain: [1.6, 7.8832]}
+    points:
+      - {x: "cos(t)", plot: 3, role: HL, label: P, label_dir: ur}
+      - {x: "t+1.6", plot: 2, role: HL}
+      - {x: 1.6, plot: 4, role: DIM, label: "0", label_dir: dl}
+      - {x: 4.7416, plot: 4, role: DIM, label: "\\pi", label_dir: d}
+      - {x: 7.8832, plot: 4, role: DIM, label: "2\\pi", label_dir: d}
+    lines:
+      - {through: [0, "sin(t)"], slope: 0, role: DIM}
+    in: stage
+  wrong:
+    type: text
+    text: '[弧度 = 度数换个写法？]{#m}'
+    role: "NO"
+    in: side
+  pxy:
+    type: math
+    tex: 'P=(\cos t,\ \sin t)'
+    role: HL
+    level: title
+    in: side
+  arc:
+    type: readout
+    label: "走过的弧长 $t$ ="
+    value: t
+    digits: 2
+    role: B
+    below: pxy
+    gap: lg
+  hgt:
+    type: readout
+    label: "高度 $\\sin t$ ="
+    value: "sin(t)"
+    digits: 2
+    role: HL
+    below: arc
+    gap: md
+  ask:
+    type: text
+    text: 高度会画出什么？
+    role: HL
+    below: hgt
+    gap: lg
+  degq:
+    type: text
+    text: 横轴用度数？
+    role: "NO"
+    below: hgt
+    gap: lg
+  wrong2:
+    type: text
+    text: '[弧度 = 度数换个写法？]{#m}'
+    role: "NO"
+    below: degq
+    gap: md
+  law:
+    type: text
+    text: '$P=(\cos t,\ \sin t)$，$t$ = 单位圆上走过的弧长'
+    role: HL
+    in: footer
+  nq:
+    type: text
+    text: 半径是 2 会怎样？
+    role: HL
+    level: title
+    in: side
+
+i18n:
+  en:
+    meta: {title: "Sine and Cosine on the Unit Circle"}
+    objects:
+      wrong: {text: '[Radians = degrees?]{#m}'}
+      wrong2: {text: '[Radians = degrees?]{#m}'}
+      arc: {label: 'Arc walked $t$ ='}
+      hgt: {label: 'Height $\sin t$ ='}
+      ask: {text: "What will the height draw?"}
+      degq: {text: "Degrees on x?"}
+      law: {text: '$P=(\cos t,\ \sin t)$, $t$ = arc walked on the unit circle'}
+      nq: {text: "What if the radius is 2?"}
+    beats:
+      Hook: {pause: {prompt: "Sine comes from a circle. Why is its graph a wave?"}}
+      Predict: {pause: {prompt: "The point walks one lap at a steady pace. What does its height trace along the x-axis?"}}
+
+beats:
+  - id: Hook
+    pause: {type: predict, prompt: 正弦来自圆，它的图像凭什么是波浪？, hold: 3, app_item: ep28-before-1}
+    say:
+      - {id: s1, pace: normal, text: "海浪一起一伏，画成图就是一条波浪线。", en: "Sea waves rise and fall, and drawn as a graph they make a wavy line."}
+      - {id: s2, pace: ask, text: "{@w}正弦来自圆，它的图像凭什么也是波浪？", en: "{@w}Sine comes from a circle, so why is its graph a wave too?"}
+      - {id: s3, pace: normal, text: "停一停，先想个理由。", en: "Pause, and think of a reason first."}
+    do:
+      - {at: s1, act: show, target: g.axes}
+      - {at: s2@w, act: draw, target: g, args: {plot: 0}}
+      - {with: prev, act: draw, target: g, args: {plot: 1}}
+
+  - id: Myth
+    shows: misconception
+    say:
+      - {id: s1, pace: normal, text: "学长还补了一句：{@w}弧度只是度数换了个写法，和弧长没关系。", en: "An older student adds: {@w}radians are just degrees written differently, nothing to do with arc length."}
+    do:
+      - {at: s1@w, act: show, target: wrong}
+
+  - id: Setup
+    say:
+      - {id: s1, pace: normal, text: "看这个半径为一的圆，{@p}一个点从最右边出发，{@go}沿着圆往上走。", en: "Here is a circle of radius one. {@p}A point starts at the far right and {@go}walks up around the circle."}
+      - {id: s2, pace: normal, text: "{@h}它的高度叫正弦，它的横坐标叫余弦。", en: "{@h}Its height is called the sine, and its horizontal position the cosine."}
+      - {id: s3, pace: normal, text: "半径是一，所以{@a}走过的弧长有多长，转过的角就是多少弧度。", en: "The radius is one, so {@a}however long the arc you've walked, that's how many radians you've turned."}
+      - {id: s4, pace: normal, text: "{@flat}横轴用弧度，就是把走过的路摊平，放到横轴上。", en: "{@flat}Using radians on the x-axis means laying the distance walked flat along the x-axis."}
+    do:
+      - {at: s1, act: hide, target: wrong}
+      - {at: s1@p, act: show, target: "g.point[0]"}
+      - {at: s1@go, act: tween, args: {t: 0.6}, dur: fit}
+      - {at: s2@h, act: show, target: pxy}
+      - {at: s3@a, act: show, target: arc}
+      - {with: prev, act: show, target: hgt}
+      - {at: s4@flat, act: show, target: "g.point[2]"}
+      - {with: prev, act: show, target: "g.point[3]"}
+      - {with: prev, act: show, target: "g.point[4]"}
+      - {after: prev, act: show, target: "g.line[0]"}
+      - {with: prev, act: show, target: "g.plot[2]"}
+      - {with: prev, act: show, target: "g.point[1]"}
+
+  - id: Predict
+    pause: {type: predict, prompt: 点匀速走一圈，高度摊在横轴上会画出什么？, hold: 3, app_item: ep28-why-2}
+    say:
+      - {id: s1, pace: ask, text: "{@ask}点匀速走一圈，高度摊在横轴上，会画出什么形状？", en: "{@ask}If the point walks one lap at a steady pace, what shape does its height trace along the x-axis?"}
+    do:
+      - {at: s1@ask, act: show, target: ask}
+
+  - id: Trace
+    say:
+      - {id: s1, pace: normal, text: "{@q}走到四分之一圈，弧长是二分之派，高度最高，到了一。", en: "{@q}A quarter lap: the arc is pi over two, and the height reaches its top, one."}
+      - {id: s2, pace: normal, text: "{@h}走到半圈，弧长是派，高度又落回零。", en: "{@h}Half a lap: the arc is pi, and the height falls back to zero."}
+      - {id: s3, pace: normal, text: "{@d}下半圈高度变成负的，走完一整圈，弧长二派，回到起点。", en: "{@d}On the bottom half the height goes negative. After a full lap, an arc of two pi, it's back where it started."}
+      - {id: s4, pace: normal, text: "接着走，同样的一段会一遍遍重复，这就是波浪。", en: "Keep walking and the same stretch repeats again and again. That's the wave."}
+    do:
+      - {at: s1, act: hide, target: ask}
+      - {at: s1@q, act: tween, args: {t: 1.5708}, dur: fit, ease: linear}
+      - {at: s2@h, act: tween, args: {t: 3.1416}, dur: fit, ease: linear}
+      - {at: s3@d, act: tween, args: {t: 6.2832}, dur: fit, ease: linear}
+
+  - id: NonExample
+    shows: non_example
+    say:
+      - {id: s1, pace: ask, text: "{@q}要是横轴改用度数，转一圈记成三百六十呢？", en: "{@q}What if the x-axis used degrees, so one lap counts as three hundred sixty?"}
+      - {id: s2, pace: normal, text: "走同样长的路，横轴却要记到三百六十，{@flat}波浪被拉得几乎是平的。", en: "The same walk now has to stretch out to three hundred sixty, and {@flat}the wave is pulled almost flat."}
+      - {id: s3, pace: normal, text: "高度和走过的路不再一比一，{@x}这就是弧度和弧长的关系。", en: "Height and distance walked are no longer one to one. {@x}That's how radians are tied to arc length."}
+    do:
+      - {at: s1@q, act: show, target: degq}
+      - {at: s2@flat, act: draw, target: g, args: {plot: 5}}
+      - {at: s3@x, act: show, target: wrong2}
+      - {after: prev, act: cross, target: "wrong2#m"}
+
+  - id: Landing
+    shows: landing
+    say:
+      - {id: s1, pace: slow, text: "所以弧度就是单位圆上走过的弧长，{@law}正弦是这时的高度。", en: "So radians are the arc walked on the unit circle, and {@law}the sine is the height at that point."}
+      - {id: s2, pace: normal, text: "{@lap}圆一圈一圈地转，高度一遍遍重复，图像自然是波浪。", en: "{@lap}The circle goes round lap after lap, the height repeats, so the graph is naturally a wave."}
+      - {id: s3, pace: normal, text: "还记得提前出现就是左移吗？{@cos}余弦的波浪正好提前四分之一圈。", en: "Remember that showing up early means shifting left? {@cos}The cosine wave is exactly a quarter lap ahead."}
+    do:
+      - {at: s1, act: hide, target: "g.plot[5]"}
+      - {with: prev, act: hide, target: degq}
+      - {with: prev, act: hide, target: wrong2}
+      - {at: s1@law, act: show, target: law}
+      - {at: s2@lap, act: tween, args: {t: 0}, dur: 0.01}
+      - {after: prev, act: tween, args: {t: 6.2832}, dur: fit, ease: linear}
+      - {at: s3@cos, act: draw, target: g, args: {plot: 6}}
+
+  - id: Close
+    say:
+      - {id: s1, pace: normal, text: "下次看到弧度，就想成在圆上走了多远。", en: "Next time you see radians, think of how far you've walked around the circle."}
+      - {id: s2, pace: ask, text: "{@q}要是圆的半径变成二，这条波浪会变高，还是变长？", en: "{@q}One to think about: if the radius becomes two, does the wave get taller, or longer?"}
+    do:
+      - {at: s2@q, act: hide, target: pxy}
+      - {with: prev, act: hide, target: arc}
+      - {with: prev, act: hide, target: hgt}
+      - {after: prev, act: show, target: nq}

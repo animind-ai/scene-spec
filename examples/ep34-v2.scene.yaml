@@ -1,0 +1,206 @@
+# v2 版式副本：与 ep34.scene.yaml 相同，只加 style.layout: v2（无右侧栏、顶栏 1.0、满宽 stage；字幕仍是双语两行烧录带）。
+# 洞察系列 #34 矩阵是把整个平面变形（高二拓展）。单集。第 2 版：橡皮膜上的小房子（2026-10-18 用户定）。
+# 按脚本 insight/ep34-matrix-transform/script.yaml 写；第 1 版留在 ep34-v1-grid.scene.yaml。
+# 一个洞察：两列 = 地板箭头、墙箭头的去处。修图软件只记四个数开场，停三秒，说出"只是一张数表"；
+# 网格上画小房子和两支箭头（组件 plane：shape + vector，warp 时一起变形，reset 复原）；四个动作 放大 / 横拉 / 转 90° / 推斜，
+# 每做一个在侧栏记下矩阵；看见结论在推斜；预测暂停 (2 1; 0 1)；非例按行读 (2 0; 1 1)；落到"第一列地板、第二列墙"。
+spec: "0.1"
+
+meta:
+  id: ep34
+  title: 矩阵是把整个平面变形
+  line: insight
+  units: [S8, S9]
+  episode: 34
+  grade: 高二拓展
+  author: Boxi Yu
+  license: CC-BY-4.0
+
+pedagogy:
+  insight: 矩阵把整个平面像橡皮膜一样变形；第一列写着地板箭头去了哪，第二列写着墙箭头去了哪
+  misconception: 矩阵只是四个数排成的一张表，跟拉、转、推没什么关系
+  non_example: 把同样四个数按行来读，房子歪到另一边，和按列读完全不同
+  status: proof
+  landing: Landing
+
+style:
+  layout: v2  # 培玉视觉规范 v2（style-v2 批量重渲，2026-10-20）
+  theme: paper
+  canvas: "16:9"
+  voice:
+    persona: teacher-hs
+    speed: 1.0
+  segmented: true
+  step_hold: 1.0
+
+objects:
+  q:
+    type: text
+    text: '四个数 $\begin{pmatrix}a&b\\c&d\end{pmatrix}$ 在做什么？'
+    level: title
+    in: top
+  myth:
+    type: text
+    text: '[只是一张数表？]{#m}'
+    role: "NO"
+    level: title
+    right_of: q
+    gap: lg
+  plane:
+    widget: plane
+    x: [-2, 4]
+    y: [-1, 3]
+    numbers: false
+    mesh: true
+    mesh_role: DIM
+    in: stage
+  m1:
+    type: text
+    text: '放大 $\begin{pmatrix}2&0\\0&2\end{pmatrix}$'
+    level: title
+    in: side
+  m2:
+    type: text
+    text: '横拉 $\begin{pmatrix}2&0\\0&1\end{pmatrix}$'
+    level: title
+    below: m1
+    gap: sm
+  m3:
+    type: text
+    text: '转 90° $\begin{pmatrix}0&-1\\1&0\end{pmatrix}$'
+    level: title
+    below: m2
+    gap: sm
+  m4:
+    type: text
+    text: '推斜 $\begin{pmatrix}1&1\\0&1\end{pmatrix}$'
+    level: title
+    below: m3
+    gap: sm
+  m5:
+    type: text
+    text: '[$\begin{pmatrix}2&1\\0&1\end{pmatrix}$]{#m}'
+    role: HL
+    level: title
+    in: side
+  mr:
+    type: text
+    text: '[按行读 $\begin{pmatrix}2&0\\1&1\end{pmatrix}$]{#m}'
+    role: "NO"
+    level: title
+    below: m5
+    gap: md
+
+i18n:
+  en:
+    meta: {title: "A Matrix Transforms the Whole Plane"}
+    objects:
+      q: {text: 'What do these four numbers $\begin{pmatrix}a&b\\c&d\end{pmatrix}$ do?'}
+      myth: {text: "[Just a table?]{#m}"}
+      m1: {text: 'Scale $\begin{pmatrix}2&0\\0&2\end{pmatrix}$'}
+      m2: {text: 'Stretch $\begin{pmatrix}2&0\\0&1\end{pmatrix}$'}
+      m3: {text: 'Turn 90° $\begin{pmatrix}0&-1\\1&0\end{pmatrix}$'}
+      m4: {text: 'Shear $\begin{pmatrix}1&1\\0&1\end{pmatrix}$'}
+      mr: {text: '[By rows $\begin{pmatrix}2&0\\1&1\end{pmatrix}$]{#m}'}
+    beats:
+      Hook: {pause: {prompt: "What are these four numbers actually doing? Think first."}}
+      Predict: {pause: {prompt: "First column two, zero; second column one, one. What does the house become?"}}
+
+beats:
+  - id: Hook
+    pause: {type: predict, prompt: 这四个数到底在做什么？先在心里想一想。, hold: 3, app_item: ep34-before-1}
+    say:
+      - {id: s1, pace: normal, text: "在修图软件里拉宽、转动、推歪一张图，{@q}程序只记下四个数。", en: "In a photo editor, when you stretch a picture, turn it or push it sideways, the program only records {@q}four numbers."}
+      - {id: s2, pace: normal, text: "这四个数到底在做什么？先在心里想一想。", en: "What are those four numbers actually doing? Think about it first."}
+    do:
+      - {at: s1, act: show, target: plane}
+      - {with: prev, act: hide, target: plane.mesh, dur: 0.1}
+      - {at: s1@q, act: show, target: q}
+
+  - id: Myth
+    shows: misconception
+    say:
+      - {id: s1, pace: normal, text: "看上去{@m}它们只是排成一张表，跟拉、转、推好像没什么关系。", en: "They look like {@m}just a table of numbers, with nothing to do with stretching, turning or pushing."}
+    do:
+      - {at: s1@m, act: show, target: myth}
+
+  - id: Setup
+    say:
+      - {id: s1, pace: normal, text: "我们一起看。{@g}把平面想成一张橡皮膜，{@h}上面画一座小房子。", en: "Let's look together. {@g}Think of the plane as a rubber sheet with {@h}a little house drawn on it."}
+      - {id: s2, pace: normal, text: "{@f}地板方向放一支箭头，{@w}墙的方向也放一支箭头。", en: "Put one arrow {@f}along the floor and one {@w}up the wall."}
+    do:
+      - {at: s1@g, act: show, target: plane.mesh}
+      - {at: s1@h, act: shape, target: plane, args: {name: house, points: [[0, 0], [1, 0], [1, 1], [0.5, 1.4], [0, 1]], role: HL}}
+      - {at: s2@f, act: vector, target: plane, args: {name: e1, v: [1, 0]}, dur: 0.6}
+      - {at: s2@w, act: vector, target: plane, args: {name: e2, v: [0, 1], role: C}, dur: 0.6}
+
+  - id: Moves
+    say:
+      - {id: s1, pace: normal, text: "先把整张膜{@w}放大两倍：地板箭头到了二、零，墙的到了零、二。", en: "First {@w}blow the whole sheet up by two: the floor arrow goes to two, zero; the wall arrow to zero, two."}
+      - {id: s2, pace: normal, text: "把这两个去处竖着写成两列，{@m}就是一个矩阵。", en: "Write those two places as two columns, and {@m}that's a matrix."}
+      - {id: s3, pace: normal, text: "{@r}变回原样，只往横里{@w}拉两倍：地板到二、零，墙还在零、一。", en: "{@r}Back to normal, then {@w}stretch sideways by two: the floor goes to two, zero; the wall stays at zero, one."}
+      - {id: s4, pace: normal, text: "{@r}再变回来，{@w}转九十度：地板转到零、一，墙转到负一、零。", en: "{@r}Back again, then {@w}turn ninety degrees: the floor turns to zero, one; the wall to minus one, zero."}
+      - {id: s5, pace: normal, text: "{@r}最后像推一摞书那样{@w}往右推：地板不动，墙推歪到一、一。", en: "{@r}Last, {@w}push it to the right like a stack of books: the floor stays put, the wall leans over to one, one."}
+      - {id: s6, pace: slow, text: "{@k}房子推歪了，矩阵记下的，就是两支箭头的去处。", en: "{@k}The house leans over, and what the matrix records is where the two arrows went."}
+    do:
+      - {at: s1@w, act: warp, target: plane, args: {matrix: [[2, 0], [0, 2]]}, dur: 1.5}
+      - {at: s2@m, act: show, target: m1}
+      - {at: s3@r, act: reset, target: plane, dur: 0.8}
+      - {at: s3@w, act: warp, target: plane, args: {matrix: [[2, 0], [0, 1]]}, dur: 1.3}
+      - {after: prev, act: show, target: m2}
+      - {at: s4@r, act: reset, target: plane, dur: 0.8}
+      - {at: s4@w, act: warp, target: plane, args: {matrix: [[0, -1], [1, 0]]}, dur: 1.5}
+      - {after: prev, act: show, target: m3}
+      - {at: s5@r, act: reset, target: plane, dur: 0.8}
+      - {at: s5@w, act: warp, target: plane, args: {matrix: [[1, 1], [0, 1]]}, dur: 1.6}
+      - {after: prev, act: show, target: m4}
+      - {at: s6@k, act: mark, target: plane.items}
+
+  - id: Predict
+    pause: {type: predict, prompt: 第一列二、零，第二列一、一，房子会变成什么样？, hold: 3, app_item: ep34-why-1}
+    say:
+      - {id: s1, pace: ask, text: "{@c}那第一列二、零，第二列一、一，{@p}房子会变成什么样？", en: "{@c}So with a first column of two, zero and a second of one, one, {@p}what will the house look like?"}
+    do:
+      - {at: s1@c, act: unmark, target: plane.items}
+      - {with: prev, act: reset, target: plane, dur: 0.8}
+      - {with: prev, act: hide, target: m1}
+      - {with: prev, act: hide, target: m2}
+      - {with: prev, act: hide, target: m3}
+      - {with: prev, act: hide, target: m4}
+      - {after: prev, act: show, target: m5}
+
+  - id: Answer
+    say:
+      - {id: s1, pace: normal, text: "{@w}地板箭头到二、零，拉长一倍；墙到一、一，推歪了。", en: "{@w}The floor arrow goes to two, zero: twice as long. The wall goes to one, one: pushed over."}
+      - {id: s2, pace: normal, text: "房子又拉长又推歪，{@m}跟两列说的一模一样。", en: "The house is both stretched and pushed over, {@m}exactly as the two columns say."}
+    do:
+      - {at: s1@w, act: warp, target: plane, args: {matrix: [[2, 1], [0, 1]]}, dur: 1.8}
+      - {at: s2@m, act: mark, target: "m5#m"}
+
+  - id: NonExample
+    shows: non_example
+    say:
+      - {id: s1, pace: normal, text: "{@n}按行来读就错了：{@w}地板会去二、一，墙去零、一。", en: "{@n}Reading by rows is wrong: {@w}the floor would go to two, one and the wall to zero, one."}
+      - {id: s2, pace: normal, text: "房子歪到另一边，跟刚才完全不一样。", en: "The house leans the other way, nothing like before."}
+    do:
+      - {at: s1@n, act: unmark, target: "m5#m"}
+      - {with: prev, act: show, target: mr}
+      - {with: prev, act: reset, target: plane, dur: 0.8}
+      - {at: s1@w, act: warp, target: plane, args: {matrix: [[2, 0], [1, 1]]}, dur: 1.6}
+
+  - id: Landing
+    shows: landing
+    say:
+      - {id: s1, pace: slow, text: "{@r}所以矩阵不是一张死表，{@w}它把整个平面一起变形。", en: "{@r}So a matrix isn't a dead table: {@w}it deforms the whole plane at once."}
+      - {id: s2, pace: normal, text: "{@m}第一列是地板箭头的去处，第二列是墙箭头的去处。", en: "{@m}The first column is where the floor arrow goes; the second is where the wall arrow goes."}
+    do:
+      - {at: s1@r, act: hide, target: mr}
+      - {with: prev, act: reset, target: plane, dur: 0.8}
+      - {at: s1@w, act: warp, target: plane, args: {matrix: [[2, 1], [0, 1]]}, dur: 1.6}
+      - {at: s2@m, act: mark, target: "m5#m"}
+
+  - id: Close
+    say:
+      - {id: s1, pace: ask, text: "{@x}要是两支箭头被压到同一条线上，房子会变成什么？", en: "{@x}If the two arrows got squashed onto one line, what would become of the house?"}
+    do:
+      - {at: s1@x, act: cross, target: "myth#m"}

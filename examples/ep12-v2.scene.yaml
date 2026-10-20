@@ -1,0 +1,292 @@
+# v2 版式副本：与 ep12.scene.yaml 相同，只加 style.layout: v2（无右侧栏、顶栏 1.0、满宽 stage；字幕仍是双语两行烧录带）。
+# 洞察系列 #12 三角形为什么要"除以 2"（五年级）。面积系列（area）第二集，接 #11、#13。
+# 按脚本 insight/ep12-triangle-area/script.yaml（第 1 轮）写。
+# 开场就是 #11 的片尾画面（拼好的长方形、S = a × h）；钩子问为什么除以二、停三秒、说出"规定的"；
+# 三角形套进底 × 高的长方形框里，明显只占一部分；预测暂停后复制一个、转半圈拼上，成平行四边形，一个是一半；
+# 非例：钝角三角形斜边不是高，高在外面，加倍照样成平行四边形；落到 S = a × h ÷ 2。结尾留一个圆（#13 的开头画面）。
+spec: "0.1"
+
+meta:
+  id: ep12
+  title: 三角形为什么要"除以 2"
+  line: insight
+  units: [M5]
+  episode: 12
+  grade: 五年级
+  author: Boxi Yu
+  license: CC-BY-4.0
+
+pedagogy:
+  insight: 再拿一个一模一样的三角形，转半圈拼上去，就成了底乘高的平行四边形；一个三角形正好是它的一半，所以要除以二
+  misconception: 除以二是规定的，背下来就行；钝角三角形的高在外面，公式就用不上了
+  non_example: 把钝角三角形的斜边当成高去乘，算出来就大了；真正的高在外面，两个钝角三角形照样拼成平行四边形
+  status: proof
+  landing: Landing
+
+style:
+  layout: v2  # 培玉视觉规范 v2（style-v2 批量重渲，2026-10-20）
+  theme: paper
+  canvas: "16:9"
+  voice:
+    persona: friend-ps
+    speed: 1.0
+  segmented: true
+  step_hold: 1.0
+
+objects:
+  # 开场：#11 的片尾（同样的定义）
+  para:
+    widget: dissect
+    role: A
+    in: stage
+    shapes:
+      P:
+        polygon: [[0, 0], [6, 0], [9, 3], [3, 3]]
+        edges:
+          - {at: [[0, 0], [6, 0]], text: '底 $a$'}
+          - {at: [[0, 0], [3, 3]], text: '斜边 $b$'}
+    cuts:
+      c1: {piece: P, line: [[3, 3], [3, 0]], into: [T, Q]}
+    pieces:
+      T: {role: B}
+    guides:
+      h: {from: [3, 3], to: [3, 0], label: '高 $h$', role: HL}
+      tall: {from: [0, 4.243], to: [6, 4.243], label: '$a\times b$ 的高', role: NO}
+      base: {from: [3, 0], to: [9, 0], label: '$a$', role: HL, side: below, solid: true}
+      seam: {from: [6, 0], to: [9, 3], label: '$b$', role: NO}
+    merges:
+      R: {pieces: [T, Q], role: HL}
+  law0:
+    # #11 片尾里的 law：右侧只有它一个，居中。Myth 一开始变成下面挂着 myth、law2 的 law（整叠居中，位置偏上）
+    type: text
+    text: '[$S$]{#s} [$=$]{#e} [$a$]{#a .HL} [$\times$]{#x} [$h$]{#h .HL}'
+    level: display
+    in: side
+  law:
+    type: text
+    text: '[$S$]{#s} [$=$]{#e} [$a$]{#a .HL} [$\times$]{#x} [$h$]{#h .HL}'
+    level: display
+    in: side
+  myth:
+    type: text
+    text: '[规定的？]{#m}'
+    role: "NO"
+    level: title
+    below: law
+    gap: md
+  flag:
+    # 开场情境：和 myth 同一个位置，Myth 里换成 myth
+    type: text
+    text: '[彩旗要多少布？]{#g}'
+    level: title
+    below: law
+    gap: md
+  law2:
+    type: text
+    text: '[$S=a\times h$]{#ah} [$\div 2$]{#half .HL}'
+    level: display
+    below: myth
+    gap: md
+  tri:
+    widget: dissect
+    role: A
+    in: stage
+    view: [[-1, -1], [13, 4]]
+    shapes:
+      T:
+        polygon: [[0, 0], [6, 0], [2, 3]]
+        edges: [{at: [[0, 0], [6, 0]], text: '底 $a$'}]
+    copies: {T2: T}
+    pieces:
+      T2: {role: B}
+    guides:
+      h: {from: [2, 3], to: [2, 0], label: '高 $h$', role: HL}
+      top: {from: [0, 3], to: [6, 3], label: '$a\times h$ 的长方形', role: NO}
+      left: {from: [0, 0], to: [0, 3], role: NO}
+      right: {from: [6, 0], to: [6, 3], role: NO}
+    merges:
+      P2: {pieces: [T, T2], role: HL}
+  obtuse:
+    widget: dissect
+    role: A
+    in: stage
+    view: [[-1, -1], [12, 4]]
+    shapes:
+      O:
+        polygon: [[0, 0], [3, 0], [5, 2.5]]
+        edges:
+          - {at: [[0, 0], [3, 0]], text: '底 $a$'}
+          - {at: [[3, 0], [5, 2.5]], text: '斜边'}
+    copies: {O2: O}
+    pieces:
+      O2: {role: B}
+    guides:
+      h: {from: [5, 2.5], to: [5, 0], label: '高 $h$', role: HL}
+      ext: {from: [3, 0], to: [5, 0], role: DIM}
+    merges:
+      Q2: {pieces: [O, O2], role: HL}
+  noth:
+    type: text
+    text: '[斜边 $\ne$ 高]{.NO}'
+    level: title
+    in: footer
+  # 结尾：#13 的开头（同样的定义写在 ep13 里）
+  circle:
+    widget: dissect
+    role: A
+    in: stage
+    view: [[-2.6, -2.6], [10, 2.6]]
+    shapes:
+      C:
+        circle: 2
+    guides:
+      r: {from: [0, 0], to: [2, 0], label: '$r$', role: HL}
+
+i18n:
+  en:
+    meta: {title: "Where Does the ½ in Triangle Area Come From?"}
+    objects:
+      para:
+        shapes:
+          P:
+            edges:
+              - {at: [[0, 0], [6, 0]], text: 'Base $a$'}
+              - {at: [[0, 0], [3, 3]], text: 'Slant $b$'}
+        guides:
+          h: {label: 'Height $h$'}
+          tall: {label: 'Height for $a\times b$'}
+      myth: {text: '[A rule?]{#m}'}
+      flag: {text: '[Cloth needed?]{#g}'}
+      tri:
+        shapes:
+          T:
+            edges: [{at: [[0, 0], [6, 0]], text: 'Base $a$'}]
+        guides:
+          h: {label: '$h$'}
+          top: {label: 'Rectangle $a\times h$'}
+      obtuse:
+        shapes:
+          O:
+            edges:
+              - {at: [[0, 0], [3, 0]], text: 'Base $a$'}
+              - {at: [[3, 0], [5, 2.5]], text: 'Side'}
+        guides:
+          h: {label: '$h$'}
+      noth: {text: '[Slant $\ne$ height]{.NO}'}
+    beats:
+      Hook: {pause: {prompt: "Why does a triangle's area have a divide-by-two?"}}
+      Predict: {pause: {prompt: "Fit a second identical triangle on with a half turn. What do you get?"}}
+
+beats:
+  - id: Hook
+    pause: {type: predict, prompt: 三角形的面积为什么要除以二？, hold: 3, app_item: ep12-before-1}
+    say:
+      - {id: s1, pace: normal, text: "班里做三角形小彩旗，{@g}老师说面积是底乘高再除以二。", en: "Our class is making little triangle flags, and {@g}the teacher says the area is base times height, divided by two."}
+      - {id: s2, pace: normal, text: "为什么偏偏要除以二？先自己琢磨一下。", en: "Why divide by two, of all things? Mull it over first."}
+    do:
+      # 开场：一下子摆出 #11 的片尾画面
+      - {at: s1, act: show, target: para, dur: 0.01}
+      - {with: prev, act: show, target: law0, dur: 0.01}
+      - {after: prev, act: cut, target: para, args: {cut: c1}, dur: 0.01}
+      - {after: prev, act: snap, target: para, args: {piece: T, edge: [[0, 0], [3, 3]], to: Q, to_edge: [[6, 0], [9, 3]]}, dur: 0.01}
+      - {after: prev, act: merge, target: para, args: {name: R}, dur: 0.01}
+      - {with: prev, act: show, target: "para#h", dur: 0.01}
+      - {with: prev, act: show, target: "para#base", dur: 0.01}
+      # 情境：S = a × h 换成同样的 law（下面挂着 flag / myth / law2），再出 flag
+      - {at: s1@g, act: transform, from: law0, to: law, dur: 0.6}
+      - {with: prev, act: hide, target: law0}
+      - {with: prev, act: show, target: flag}
+
+  - id: Myth
+    shows: misconception
+    say:
+      - {id: s1, pace: normal, text: "旁边的同学说：{@m}规定的呗，背下来就行。", en: "The kid next to you says: {@m}it's just the rule, memorise it."}
+    do:
+      - {at: s1@m, act: hide, target: flag}
+      - {with: prev, act: show, target: myth}
+
+  - id: Setup
+    say:
+      - {id: s1, pace: normal, text: "我们一起看。{@t}这是一个三角形，底是 a，{@h}从顶点往下量的高是 h。", en: "Let's look together. {@t}Here's a triangle with base a, and its {@h}height h measured straight down from the top."}
+      - {id: s2, pace: normal, text: "上一集我们知道，{@l}平行四边形的面积是底乘高，三角形是不是也一样？", en: "Last time we saw {@l}a parallelogram's area is base times height. Is a triangle the same?"}
+    do:
+      - {at: s1@t, act: hide, target: para}
+      - {after: prev, act: show, target: tri}
+      - {at: s1@h, act: show, target: "tri#h"}
+      - {at: s2@l, act: mark, target: law}
+
+  - id: Wrong
+    shows: misconception
+    say:
+      - {id: s1, pace: normal, text: "要是三角形也是底乘高，{@r}它就得把这个长方形占满。", en: "If a triangle were base times height too, {@r}it would have to fill this whole rectangle."}
+      - {id: s2, pace: normal, text: "可三角形的两边空出了两大块，{@e}它明显只占了长方形的一部分。", en: "But there are two big empty pieces at the sides. {@e}The triangle only takes up part of the rectangle."}
+    do:
+      - {at: s1, act: unmark, target: law}
+      - {at: s1@r, act: show, target: "tri#top"}
+      - {with: prev, act: show, target: "tri#left"}
+      - {with: prev, act: show, target: "tri#right"}
+      - {at: s2@e, act: focus, target: "tri#T"}
+      - {after: prev, act: unfocus, target: tri}
+      - {with: prev, act: hide, target: "tri#top"}
+      - {with: prev, act: hide, target: "tri#left"}
+      - {with: prev, act: hide, target: "tri#right"}
+
+  - id: Predict
+    pause: {type: predict, prompt: 再拿一个一样的三角形，转半圈拼上去，能拼成什么？, hold: 3, app_item: ep12-predict-1}
+    say:
+      - {id: s1, pace: ask, text: "{@c}再拿一个一样的三角形，转半圈拼上去，能拼成什么？", en: "{@c}Take another triangle just like it, turn it half a turn and fit it on. What do you get?"}
+    do:
+      - {at: s1@c, act: copy, target: tri, args: {piece: T2, by: [6.5, 0]}, dur: 0.8}
+
+  - id: Double
+    say:
+      - {id: s1, pace: normal, text: "{@r}把它转半圈，{@s}斜边对着斜边，正好严丝合缝地拼在一起。", en: "{@r}Turn it half a turn, {@s}slanted edge to slanted edge, and it fits exactly."}
+      - {id: s2, pace: slow, text: "{@p}拼成了平行四边形，底还是 a，高还是 h。", en: "{@p}It's a parallelogram, still with base a and height h."}
+      - {id: s3, pace: normal, text: "平行四边形的面积是底乘高，{@one}一个三角形正好是它的一半。", en: "A parallelogram's area is base times height, and {@one}one triangle is exactly half of it."}
+    do:
+      - {at: s1@r, act: rotate, target: tri, args: {piece: T2, angle: 180}, dur: 1.0}
+      - {at: s1@s, act: snap, target: tri, args: {piece: T2, edge: [[6, 0], [2, 3]], to: T, to_edge: [[2, 3], [6, 0]]}, dur: 1.2}
+      - {at: s2@p, act: merge, target: tri, args: {name: P2}, dur: 0.8}
+      - {at: s3, act: step}
+      - {at: s3@one, act: set, target: "tri#T", args: {role: HL}}
+
+  - id: NonExample
+    shows: non_example
+    say:
+      - {id: s1, pace: normal, text: "{@o}那钝角三角形呢？{@h}它的高跑到三角形外面去了，在底边的延长线上。", en: "{@o}What about an obtuse triangle? {@h}Its height has moved outside it, onto the base line extended."}
+      - {id: s2, pace: normal, text: "{@x}要是把斜着的那条边当成高去乘，算出来就太大了。", en: "{@x}If you used the slanted side as the height, you'd get too much."}
+      - {id: s3, pace: normal, text: "{@c}再拿一个转半圈拼上，{@m}照样是平行四边形，照样是一半。", en: "{@c}Fit a second one on with a half turn, and it's {@m}still a parallelogram, still half."}
+    do:
+      - {at: s1@o, act: hide, target: tri}
+      - {after: prev, act: show, target: obtuse}
+      - {at: s1@h, act: show, target: "obtuse#h"}
+      - {with: prev, act: show, target: "obtuse#ext"}
+      - {at: s2@x, act: show, target: noth}
+      - {at: s3@c, act: hide, target: "obtuse#h"}
+      - {with: prev, act: hide, target: "obtuse#ext"}
+      - {with: prev, act: labels, target: obtuse, args: {piece: O, show: false}}
+      - {with: prev, act: copy, target: obtuse, args: {piece: O2, by: [6, 0]}, dur: 0.6}
+      - {after: prev, act: snap, target: obtuse, args: {piece: O2, edge: [[3, 0], [5, 2.5]], to: O, to_edge: [[5, 2.5], [3, 0]]}, dur: 1.2}
+      - {at: s3@m, act: merge, target: obtuse, args: {name: Q2}, dur: 0.6}
+
+  - id: Landing
+    shows: landing
+    say:
+      - {id: s1, pace: slow, text: "{@l}所以三角形的面积，是底乘高，再除以二。", en: "{@l}So a triangle's area is base times height, divided by two."}
+      - {id: s2, pace: normal, text: "{@h}除以二，是因为两个一样的三角形，正好拼成一个平行四边形。", en: "{@h}We divide by two because two identical triangles make exactly one parallelogram."}
+    do:
+      - {at: s1@l, act: show, target: law2}
+      - {at: s2@h, act: mark, target: "law2#half"}
+
+  - id: Close
+    say:
+      - {id: s1, pace: normal, text: "{@x}所以除以二不是谁规定的，是两个一样的三角形拼出来的。", en: "{@x}So dividing by two isn't anyone's rule. It comes from fitting two identical triangles together."}
+      - {id: s2, pace: ask, text: "{@c}圆没有底也没有高，它的面积怎么算？", en: "{@c}A circle has no base and no height. How do we find its area?"}
+    do:
+      - {at: s1, act: unmark, target: "law2#half"}
+      - {at: s1@x, act: cross, target: "myth#m"}
+      # 收成 #13 的开头画面：一个圆，右侧两个公式
+      - {at: s2@c, act: hide, target: obtuse}
+      - {with: prev, act: hide, target: noth}
+      - {with: prev, act: hide, target: myth}
+      - {after: prev, act: show, target: circle}

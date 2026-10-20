@@ -1,0 +1,333 @@
+# v2 版式副本：与 ep30-derivative-zoom.scene.yaml 相同，只加 style.layout: v2（无右侧栏、顶栏 1.0、满宽 stage；字幕仍是双语两行烧录带）。
+# 洞察系列 #30 导数：把曲线放大到变成直线（高二）。sums 系列第二集，接 #29、#31。
+# 按脚本 insight/ep30-derivative-zoom/script.yaml（第 1 轮）写。旧样片 spec ep30 留给截图回归，这一份是成片用的。
+# 开场就是 #29 的片尾画面（3 到 11 的台阶拼成的长方形、右侧下一集的问题、底部 S = n(a₁ + aₙ) ÷ 2），收起后画抛物线；
+# 钩子问切线到底是哪条直线、停三秒、说出"只碰一个点"；竖线反例；割线、预测暂停、h → 0 两边逼近切线；
+# 放大 10 倍、60 倍（演示，不是证明）；非例 y = |x| 放大还是尖角；落到导数的定义。片尾画面是 #31 的开头画面。
+spec: "0.1"
+
+meta:
+  id: ep30-derivative-zoom
+  title: 导数：把曲线放大到变成直线
+  line: insight
+  units: [S7]
+  episode: 30
+  grade: 高二
+  author: Boxi Yu
+  license: CC-BY-4.0
+
+pedagogy:
+  insight: 切线是割线在 h 趋近于零时逼近的那条直线；把能求导的曲线在切点附近不断放大，弯曲越来越不明显，曲线越来越贴近这条切线
+  misconception: 切线就是只碰曲线一个点的直线；任何曲线放大都会变直
+  non_example: y 等于 x 的绝对值在原点是尖角：放大多少倍都还是尖角，右边割线斜率总是一，左边总是负一，没有切线
+  status: demo
+  landing: Landing
+
+style:
+  layout: v2  # 培玉视觉规范 v2（style-v2 批量重渲，2026-10-20）
+  theme: paper
+  canvas: "16:9"
+  voice:
+    persona: teacher-hs
+    speed: 1.0
+  segmented: true
+  step_hold: 1.0
+
+objects:
+  # 开场：#29 的片尾（同样的定义）
+  nq:
+    type: text
+    text: '曲线每一点涨得多快？'
+    role: HL
+    level: title
+    in: side
+  law:
+    type: text
+    text: '[$S=$]{#s} [$n(a_1+a_n)$]{#nw .HL} [$\div 2$]{#h}'
+    level: display
+    in: footer
+  odd:
+    widget: dissect
+    role: A
+    in: stage
+    view: [[-1.6, -0.8], [14.4, 10.0]]
+    shapes:
+      D:
+        dots: {rows: [3, 5, 7, 9, 11]}
+    copies:
+      E: D
+    pieces:
+      E: {role: B}
+    guides:
+      rows: {from: [-0.7, 0], to: [-0.7, 4], label: '5 排', role: HL, side: left}
+      cols: {from: [0, 4.7], to: [13, 4.7], label: '每排 $3+11=14$ 个', role: HL, side: above}
+      n: {from: [-0.7, 0], to: [-0.7, 4], label: '$n$ 排', role: HL, side: left}
+      w: {from: [0, 4.7], to: [13, 4.7], label: '每排 $a_1+a_n$ 个', role: HL, side: above}
+  # 本集
+  g:
+    widget: graph
+    x: [-2.0, 5.0]
+    y: [-0.7, 4.8]
+    readout_at: [3.05, 2.2]
+    plots:
+      - {f: "x^2", label: "y=x^2"}
+    points:
+      - {x: 1, label: P}
+    secants:
+      - {point: 0, h: 1, label: Q, readout: true, readout_text: 右侧割线斜率}
+      - {point: 0, h: -1, label: "Q'", role: C, label_dir: ul, readout: true, readout_text: 左侧割线斜率}
+    tangents:
+      - {point: 0, role: HL}
+    lines:
+      - {x: 1}
+    in: stage
+  ab:
+    widget: graph
+    x: [-2.2, 2.2]
+    y: [-0.7, 2.4]
+    readout_at: [0.3, 2.35]
+    plots:
+      - {f: "abs(x)", label: "y=|x|"}
+    points:
+      - {x: 0, label: O, label_dir: d}
+    secants:
+      - {point: 0, h: 1.6, label: Q, readout: true, readout_text: 右侧割线斜率}
+      - {point: 0, h: -1.6, label: "Q'", role: C, label_dir: ul, readout: true, readout_text: 左侧割线斜率}
+    in: stage
+  wrong:
+    type: text
+    text: '[切线 = 只碰一个点的直线？]{#m}'
+    role: "NO"
+    in: side
+  ksec:
+    type: math
+    tex: 'k=\frac{f(1+h)-f(1)}{h}'
+    role: B
+    in: side
+  ask:
+    type: text
+    text: Q 滑向 P，斜率靠近几？
+    role: HL
+    below: ksec
+    gap: lg
+  calc:
+    type: math
+    tex: '=\frac{(1+h)^2-1}{h}=2+h'
+    below: ksec
+    gap: md
+  cap10:
+    type: text
+    text: 放大 10 倍
+    role: FG
+    in: footer
+  cap60:
+    type: text
+    text: 放大 60 倍：几乎贴在一起
+    role: FG
+    in: footer
+  wrong2:
+    type: text
+    text: '[任何曲线放大都会变直？]{#m}'
+    role: "NO"
+    in: side
+  capabs:
+    type: text
+    text: 放大 60 倍：还是尖角
+    role: "NO"
+    in: footer
+  nq30:
+    type: text
+    text: '换一个点呢？'
+    role: HL
+    level: title
+    in: side
+  deriv:
+    type: math
+    tex: "f'(x_0)=\\lim_{h\\to 0}\\frac{f(x_0+h)-f(x_0)}{h}"
+    role: HL
+    in: footer
+
+i18n:
+  en:
+    meta: {title: "The Derivative: Zoom In Until the Curve Is Straight"}
+    objects:
+      nq: {text: "How fast is it rising?"}
+      odd:
+        guides:
+          rows: {label: '5 rows'}
+          cols: {label: '$3+11=14$ per row'}
+          n: {label: '$n$ rows'}
+          w: {label: '$a_1+a_n$ per row'}
+      g:
+        secants:
+          - {point: 0, h: 1, label: Q, readout: true, readout_text: "Right secant slope"}
+          - {point: 0, h: -1, label: "Q'", role: C, label_dir: ul, readout: true, readout_text: "Left secant slope"}
+      ab:
+        secants:
+          - {point: 0, h: 1.6, label: Q, readout: true, readout_text: "Right secant slope"}
+          - {point: 0, h: -1.6, label: "Q'", role: C, label_dir: ul, readout: true, readout_text: "Left secant slope"}
+      wrong: {text: '[Tangent = touches once?]{#m}'}
+      ask: {text: "Slope as Q nears P?"}
+      cap10: {text: "10x zoom"}
+      cap60: {text: "60x zoom: almost together"}
+      wrong2: {text: '[Every curve turns straight?]{#m}'}
+      capabs: {text: "60x zoom: still a corner"}
+      nq30: {text: "Another point?"}
+    beats:
+      Hook: {pause: {prompt: "Which line is the tangent at this point?"}}
+      Predict: {pause: {prompt: "Slide Q along the curve towards P. What does the slope approach?"}}
+
+beats:
+  - id: Hook
+    pause: {type: predict, prompt: 这一点的切线，到底是哪一条直线？, hold: 3, app_item: ep30-before-1}
+    say:
+      - {id: s1, pace: normal, text: "夜里骑车过弯，{@g}车灯照出去的那条直线，就是弯路在这一点的切线。", en: "Riding a bike round a bend at night, {@g}the straight beam of your headlight is the tangent to the road at that point."}
+      - {id: s2, pace: ask, text: "你会把这一点的切线画成哪一条直线？", en: "Which line would you draw as the tangent at this point?"}
+    do:
+      # 开场：一下子摆出 #29 的片尾画面
+      - {at: s1, act: show, target: odd, dur: 0.01}
+      - {with: prev, act: show, target: law, dur: 0.01}
+      - {with: prev, act: show, target: nq, dur: 0.01}
+      - {after: prev, act: copy, target: odd, args: {piece: E, by: [0, 0]}, dur: 0.01}
+      - {after: prev, act: rotate, target: odd, args: {piece: E, angle: 180}, dur: 0.01}
+      - {after: prev, act: shift, target: odd, args: {piece: E, to: [9.428571, 1.428571]}, dur: 0.01}
+      - {after: prev, act: show, target: "odd#n", dur: 0.01}
+      - {with: prev, act: show, target: "odd#w", dur: 0.01}
+      # 收起，画抛物线
+      - {at: s1@g, act: hide, target: odd}
+      - {with: prev, act: hide, target: law}
+      - {with: prev, act: hide, target: nq}
+      - {after: prev, act: show, target: g.axes}
+      - {after: prev, act: draw, target: g, args: {plot: 0}}
+      - {with: prev, act: show, target: g.plot_label}
+      - {after: prev, act: show, target: "g.point[0]"}
+
+  - id: Myth
+    shows: misconception
+    say:
+      - {id: s1, pace: normal, text: "同伴随口一说：{@w}只碰曲线一个点的直线，就是切线。", en: "Your friend says offhand: {@w}a line that touches the curve at just one point is the tangent."}
+    do:
+      - {at: s1@w, act: show, target: wrong}
+
+  - id: Setup
+    say:
+      - {id: s1, pace: normal, text: "{@v}可过 P 点的这条竖线也只碰一个点，{@x}却显然不是切线。", en: "{@v}But this vertical line through P also touches just once, and {@x}it's clearly not a tangent."}
+      - {id: s2, pace: normal, text: "{@go}换个问法：在 P 点附近，曲线到底有多陡？", en: "{@go}Let's ask a different question: near P, how steep is the curve?"}
+      - {id: s3, pace: normal, text: "在曲线上再取一点 Q，{@q}连成割线，{@k}算它的斜率。", en: "Take another point Q on the curve, {@q}join them with a secant, and {@k}find its slope."}
+      - {id: s4, pace: normal, text: "两点横坐标相差 h，现在 h 等于一，{@r}斜率是三。", en: "The two x-coordinates differ by h. Right now h is one, and {@r}the slope is three."}
+    do:
+      - {at: s1@v, act: show, target: "g.line[0]"}
+      - {at: s1@x, act: cross, target: "wrong#m"}
+      - {at: s2@go, act: hide, target: "g.line[0]"}
+      - {with: prev, act: hide, target: wrong}
+      - {at: s3@q, act: show, target: "g.qpoint[0]"}
+      - {with: prev, act: show, target: "g.secant[0]"}
+      - {at: s3@k, act: show, target: ksec}
+      - {at: s4@r, act: show, target: "g.slope[0]"}
+
+  - id: Predict
+    pause: {type: predict, prompt: 让 Q 沿着曲线一点一点滑向 P，斜率会靠近几？, hold: 3, app_item: ep30-why-1}
+    say:
+      - {id: s1, pace: ask, text: "{@ask}让 Q 沿着曲线一点一点滑向 P，斜率会靠近几？", en: "{@ask}Let Q slide along the curve towards P, bit by bit. What number does the slope approach?"}
+    do:
+      - {at: s1@ask, act: show, target: ask}
+
+  - id: Approach
+    say:
+      - {id: s1, pace: normal, text: "{@a1}h 缩到零点五、{@a2}零点一、{@a3}零点零一，斜率越来越接近二。", en: "Shrink h to {@a1}a half, {@a2}a tenth, {@a3}a hundredth: the slope gets closer and closer to two."}
+      - {id: s2, pace: normal, text: "{@left}从左边靠近也一样，{@l2}斜率从一往上，也接近二。", en: "{@left}From the left it's the same: {@l2}the slope climbs up from one, towards two as well."}
+      - {id: s3, pace: slow, text: "{@t}两边的割线逼近同一条直线，这就是 P 点的切线。", en: "{@t}Both secants close in on the same line. That's the tangent at P."}
+    do:
+      - {at: s1, act: hide, target: ask}
+      - {at: s1@a1, act: approach, target: g, args: {secant: 0, h: 0.5}, dur: fit}
+      - {at: s1@a2, act: approach, target: g, args: {secant: 0, h: 0.1}, dur: fit}
+      - {at: s1@a3, act: approach, target: g, args: {secant: 0, h: 0.01}, dur: fit}
+      - {at: s2@left, act: show, target: "g.qpoint[1]"}
+      - {with: prev, act: show, target: "g.secant[1]"}
+      - {with: prev, act: show, target: "g.slope[1]"}
+      - {at: s2@l2, act: approach, target: g, args: {secant: 1, h: -0.01}, dur: fit}
+      - {at: s3@t, act: show, target: "g.tangent[0]"}
+
+  - id: Zoom
+    say:
+      - {id: s1, pace: normal, text: "{@z}再把 P 点附近放大十倍，弯曲已经不太明显。", en: "{@z}Now zoom in ten times around P. The bend is already hard to see."}
+      - {id: s2, pace: normal, text: "{@z2}放大到六十倍，{@tan}曲线和切线几乎贴在一起。", en: "{@z2}At sixty times, {@tan}the curve and the tangent almost lie on top of each other."}
+      - {id: s3, pace: normal, text: "这是演示，不是证明：{@back}曲线始终是弯的，只是越来越像直线。", en: "This is a demonstration, not a proof: {@back}the curve is still curved, it just looks more and more like a line."}
+    do:
+      - {at: s1, act: hide, target: g.secant}
+      - {with: prev, act: hide, target: g.qpoint}
+      - {with: prev, act: hide, target: g.slope}
+      - {with: prev, act: hide, target: g.tangent}
+      - {with: prev, act: hide, target: ksec}
+      - {at: s1@z, act: camera, target: "g.dot[0]", args: {zoom: 10}, dur: 2.5}
+      - {with: prev, act: show, target: cap10}
+      - {at: s2@z2, act: camera, target: "g.dot[0]", args: {zoom: 60}, dur: fit}
+      - {with: prev, act: hide, target: cap10}
+      - {with: prev, act: show, target: cap60}
+      - {at: s2@tan, act: show, target: "g.tangent[0]"}
+      - {at: s3@back, act: camera, args: {reset: true}, dur: 2.5}
+      - {with: prev, act: hide, target: cap60}
+
+  - id: NonExample
+    shows: non_example
+    say:
+      - {id: s1, pace: ask, text: "{@w2}那么，任何曲线放大，都会变直吗？", en: "{@w2}So does every curve turn straight if you zoom in?"}
+      - {id: s2, pace: normal, text: "{@abs}看 y 等于 x 的绝对值，{@zoom}原点放大六十倍，还是尖角。", en: "{@abs}Take y equals the absolute value of x. {@zoom}Zoom sixty times at the origin: still a corner."}
+      - {id: s3, pace: normal, text: "右边割线{@r}斜率总是一，{@l}左边总是负一，{@x}原点处没有切线。", en: "Secants on the right {@r}always have slope one, on the left {@l}minus one. {@x}There's no tangent at the origin."}
+    do:
+      - {at: s1, act: hide, target: g}
+      - {at: s1@w2, act: show, target: wrong2}
+      - {at: s2@abs, act: show, target: ab.axes}
+      - {with: prev, act: draw, target: ab, args: {plot: 0}}
+      - {with: prev, act: show, target: ab.plot_label}
+      - {with: prev, act: show, target: "ab.point[0]"}
+      - {at: s2@zoom, act: camera, target: "ab.dot[0]", args: {zoom: 60}, dur: fit}
+      - {with: prev, act: show, target: capabs}
+      - {at: s3, act: camera, args: {reset: true}, dur: 0.8}
+      - {with: prev, act: hide, target: capabs}
+      - {at: s3@r, act: show, target: "ab.qpoint[0]"}
+      - {with: prev, act: show, target: "ab.secant[0]"}
+      - {with: prev, act: show, target: "ab.slope[0]"}
+      - {after: prev, act: approach, target: ab, args: {secant: 0, h: 0.3}, dur: 0.7}
+      - {at: s3@l, act: show, target: "ab.qpoint[1]"}
+      - {with: prev, act: show, target: "ab.secant[1]"}
+      - {with: prev, act: show, target: "ab.slope[1]"}
+      - {after: prev, act: approach, target: ab, args: {secant: 1, h: -0.3}, dur: 0.6}
+      - {at: s3@x, act: cross, target: "wrong2#m"}
+
+  - id: Landing
+    shows: landing
+    say:
+      - {id: s1, pace: normal, text: "{@back}回到抛物线，{@k}把割线斜率化简，{@calc}等于二加 h。", en: "{@back}Back to the parabola. {@k}Simplify the secant slope and {@calc}you get two plus h."}
+      - {id: s2, pace: slow, text: "{@lim}h 趋近于零，二加 h 的极限是二，这就是 P 点的切线斜率。", en: "{@lim}As h goes to zero, two plus h tends to two: the slope of the tangent at P."}
+      - {id: s3, pace: slow, text: "{@gen}割线斜率在 h 趋近于零时的极限，叫做导数。", en: "{@gen}The limit of the secant slope as h goes to zero is called the derivative."}
+    do:
+      - {at: s1@back, act: hide, target: ab}
+      - {with: prev, act: hide, target: wrong2}
+      - {after: prev, act: show, target: g}
+      - {at: s1@k, act: show, target: ksec}
+      - {with: prev, act: show, target: "g.qpoint[0]"}
+      - {with: prev, act: show, target: "g.secant[0]"}
+      - {with: prev, act: show, target: "g.slope[0]"}
+      - {after: prev, act: approach, target: g, args: {secant: 0, h: 1}, dur: 1.0}
+      - {at: s1@calc, act: show, target: calc}
+      - {at: s2@lim, act: approach, target: g, args: {secant: 0, h: 0.001}, dur: 2.5}
+      - {with: prev, act: mark, target: calc}
+      - {at: s3@gen, act: show, target: deriv}
+      - {after: prev, act: underline, target: deriv}
+
+  - id: Close
+    say:
+      - {id: s1, pace: normal, text: "所以切线不是只碰一个点的直线，{@t}而是割线逼近的那条直线。", en: "So a tangent isn't a line that touches once. {@t}It's the line the secants close in on."}
+      - {id: s2, pace: ask, text: "{@q}换一个点，抛物线的切线斜率又是多少？", en: "{@q}Next: at any other point, what's the slope of the parabola's tangent?"}
+    do:
+      # 片尾画面：抛物线、P 点、切线、底部导数的定义和右侧一句下一集的问题，不留叠加层，#31 开场好还原
+      - {at: s1, act: unmark, target: calc}
+      - {with: prev, act: clear, target: deriv}
+      - {with: prev, act: hide, target: ksec}
+      - {with: prev, act: hide, target: calc}
+      - {with: prev, act: hide, target: g.secant}
+      - {with: prev, act: hide, target: g.qpoint}
+      - {with: prev, act: hide, target: g.slope}
+      - {at: s1@t, act: show, target: "g.tangent[0]"}
+      - {at: s2@q, act: show, target: nq30}

@@ -1,0 +1,213 @@
+# v2 版式副本：与 ep06.scene.yaml 相同，只加 style.layout: v2（无右侧栏、顶栏 1.0、满宽 stage；字幕仍是双语两行烧录带）。
+# 洞察系列 #6 1/2 和 2/4 在数轴上是同一个点（分数小系列第一集，三到五年级）。
+# 钩子先问"哪个大"、停三秒让观众猜，再说出迷思"数字更大所以更大"；0–1 数轴先切两份点出 1/2；
+# 学生的猜测以一个带问号的点出现在 1/2 右边；把每份再切两份、从 0 数两小份，正好落回 1/2，猜的点淡出；
+# 再切成六份数三份，又落在同一个点上，顶部等式一个名字一个名字长出来：1/2 = 2/4 = 3/6。
+# 非例：上下都加一，切成三份后 2/3 另点一个点，明显跑到右边。落地：分母乘二、分子乘二各对应图里的一步。
+# 结尾画面（四等份数轴、1/2 上的点、两小份的跳跃、0–1/2 的涂色、轴下六格分数条涂三格、顶部等式、底部规则）就是 #7 的开头画面。
+# 英文一句对一句写在每句的 en 里：双语字幕的第二行，英文版合成时换进 text 即可。
+# 分数条用数轴自带的 bar 动作画在轴下方，和 0–1 等长，六格涂三格，和 1/2 的点上下对齐。
+spec: "0.1"
+
+meta:
+  id: ep06
+  title: 1/2 和 2/4 在数轴上是同一个点
+  line: insight
+  units: [P4]
+  episode: 6
+  grade: 三到五年级
+  author: Boxi Yu
+  license: CC-BY-4.0
+
+pedagogy:
+  insight: 分子分母同乘一个数，只是把每一份切得更细、拿的份数跟着变多，点还停在原地
+  misconception: 四分之二的数字更大，所以四分之二比二分之一大
+  non_example: 分子和分母同时加一，二分之一变成三分之二，点往右移，大小变了
+  status: proof
+  landing: Equation
+
+style:
+  layout: v2  # 培玉视觉规范 v2（style-v2 批量重渲，2026-10-20）
+  theme: paper
+  canvas: "16:9"
+  voice:
+    persona: friend-ps
+    speed: 1.0
+  segmented: true
+  step_hold: 1.0
+
+objects:
+  hook:
+    type: text
+    text: '[$\dfrac{1}{2}$]{#l .A}   [哪个大？]{#q}   [$\dfrac{2}{4}$]{#r .A}'
+    level: display
+    in: stage
+  line:
+    widget: number_line
+    range: [0, 1]
+    parts: 1
+    fractions: true
+    measures: ["1/4", "1/6"]
+    unit: 9
+    bars: true
+    role: A
+    in: stage
+  eq:
+    type: text
+    text: '[$\dfrac{1}{2}$]{#a} [$=\dfrac{2}{4}$]{#b} [$=\dfrac{3}{6}$]{#c}'
+    role: HL
+    level: title
+    in: top
+  plusone:
+    type: text
+    text: '上下都加一：[$\dfrac{1+1}{2+1}=\dfrac{2}{3}$]{#f}'
+    role: NO
+    level: title
+    in: footer
+  rule:
+    type: text
+    text: '[分母 $2\to 4$：每份切两份，$\times 2$]{#den}[　·　分子 $1\to 2$：拿的也切两份，$\times 2$]{#num}[　·　切三份：都 $\times 3$]{#x3}'
+    in: footer
+
+i18n:
+  en:
+    meta: {title: "1/2 and 2/4 Are the Same Point"}
+    objects:
+      hook: {text: '[$\dfrac{1}{2}$]{#l .A}   [Which is bigger?]{#q}   [$\dfrac{2}{4}$]{#r .A}'}
+      plusone: {text: 'Add 1 to both: [$\dfrac{1+1}{2+1}=\dfrac{2}{3}$]{#f}'}
+      rule: {text: '[Bottom $2\to 4$: cut each piece in two, $\times 2$]{#den}[  ·  Top $1\to 2$: take two, $\times 2$]{#num}[  ·  Cut in three: $\times 3$]{#x3}'}
+    beats:
+      Hook: {pause: {prompt: "Big brother walked one half, little sister two fourths. Who went farther?"}}
+      Predict: {pause: {prompt: "Two fourths: count two small pieces from zero. Where do we land?"}}
+
+beats:
+  - id: Hook
+    pause: {type: predict, prompt: 哥哥走了二分之一，妹妹走了四分之二，谁走得远？, hold: 3, app_item: ep06-before-1}
+    say:
+      - {id: s1, pace: ask, text: "同一条上学的路，哥哥走了{@q}二分之一，妹妹走了四分之二，谁走得远？", en: "On the same road to school, big brother has walked {@q}one half and little sister two fourths. Who has gone farther?"}
+      - {id: s2, pace: normal, text: "先别急着下结论，在心里比一比。", en: "Don't decide too fast. Compare them in your head."}
+    do:
+      - {at: s1@q, act: show, target: hook}
+
+  - id: Myth
+    shows: misconception
+    say:
+      - {id: s1, pace: normal, text: "妹妹很得意：{@big}四分之二，数字更大，我走得更远。", en: "Little sister is proud: {@big}two fourths has bigger numbers, so I went farther."}
+    do:
+      - {at: s1@big, act: focus, target: "hook#r"}
+
+  - id: NumberLine
+    say:
+      - {id: s1, pace: normal, text: "{@l}我们画一条从零到一的数轴，{@cut}切成一样长的两份。", en: "{@l}Let's draw a number line from zero to one, and {@cut}cut it into two equal pieces."}
+      - {id: s2, pace: slow, text: "{@p}正中间这一点就是二分之一，亮的是数，淡的是尺子。", en: "{@p}Right in the middle is one half. The bright dot is the number; the faint line is the ruler."}
+    do:
+      - {at: s1, act: unfocus, target: hook}
+      - {with: prev, act: hide, target: hook}
+      - {with: prev, act: hide, target: "eq#b"}
+      - {with: prev, act: hide, target: "eq#c"}
+      - {at: s1@l, act: show, target: line}
+      - {at: s1@cut, act: subdivide, target: line, args: {parts: 2}, dur: 1.2}
+      - {at: s2@p, act: mark_point, target: line, args: {at: "1/2"}}
+      - {after: prev, act: set, target: eq, args: {opacity: 1}}
+
+  - id: Guess
+    say:
+      - {id: s1, pace: normal, text: "如果四分之二更大，它该在右边，{@g}比如这儿。", en: "If two fourths were bigger, it would be to the right, {@g}maybe about here."}
+    do:
+      - {at: s1@g, act: mark_point, target: line, args: {at: "5/8", label: '\frac{2}{4}\,?'}}
+
+  - id: Cut
+    say:
+      - {id: s1, pace: normal, text: "{@cut}现在把每一份再切成两小份，一共四份。", en: "{@cut}Now cut each piece into two smaller pieces. That makes four."}
+    do:
+      - {at: s1@cut, act: subdivide, target: line, args: {parts: 4}, dur: 1.2}
+      - {after: prev, act: hold, dur: 0.5}
+
+  - id: Predict
+    pause: {type: predict, prompt: 四分之二，从零数两小份，会数到哪？, hold: 2, app_item: ep06-rep-1}
+    say:
+      - {id: s1, pace: ask, text: "四分之二，就是从零数两小份。{@where}会数到哪？", en: "Two fourths means counting two small pieces from zero. {@where}Where will we land?"}
+
+  - id: Count
+    say:
+      - {id: s1, pace: slow, text: "{@one}一份，两份，{@stop}正好停在二分之一上。", en: "{@one}One piece, two pieces, and we {@stop}stop exactly on one half."}
+      - {id: s2, pace: slow, text: "{@gone}这个点一步没动，只是多了个名字。", en: "{@gone}The dot hasn't moved at all; it just got a new name."}
+      - {id: s3, pace: normal, text: "换个切法：{@three}每一份切成三小份。", en: "Another cut: {@three}split each piece into three."}
+      - {id: s4, pace: brisk, text: "一共六份，{@cnt}从零数三份，还是停在这个点上。", en: "Six pieces in all. {@cnt}Count three from zero, and we land on the same dot again."}
+    do:
+      - {at: s1@one, act: jump, target: line, args: {length: "1/4", count: 2}, dur: fit}
+      - {at: s1@stop, act: show, target: "eq#b"}
+      - {at: s2, act: step}        # 子步：落回 1/2 之后定住，再说"一步没动"
+      - {at: s2@gone, act: hide, target: "line.point[1]"}
+      - {after: prev, act: hold, dur: 1.5}
+      - {at: s3, act: hide, target: "line.jump[0]"}
+      - {with: prev, act: hide, target: "line.jump[1]"}
+      - {with: prev, act: hide, target: "line.count[0]"}
+      - {with: prev, act: hide, target: "line.count[1]"}
+      - {at: s3@three, act: subdivide, target: line, args: {parts: 6}, dur: 1.2}
+      - {at: s4@cnt, act: jump, target: line, args: {length: "1/6", count: 3}, dur: fit}
+      - {after: prev, act: show, target: "eq#c"}
+      - {after: prev, act: hold, dur: 0.5}
+
+  - id: SamePoint
+    say:
+      - {id: s1, pace: slow, text: "{@names}同一个点，三个名字：二分之一、四分之二、六分之三。", en: "{@names}One dot, three names: one half, two fourths, three sixths."}
+    do:
+      - {at: s1@names, act: mark, target: eq}
+      - {after: prev, act: hold, dur: 2}
+
+  - id: NonExample
+    shows: non_example
+    say:
+      - {id: s1, pace: normal, text: "{@q}要是上下都加一呢？{@show}二分之一变成三分之二。", en: "{@q}What if we add one to the top and the bottom? {@show}One half becomes two thirds."}
+      - {id: s2, pace: slow, text: "{@right}点跑到右边了。{@add}加一会改变大小，乘同一个数不会。", en: "{@right}The dot ran off to the right. {@add}Adding one changes the size; multiplying by the same number doesn't."}
+    do:
+      - {at: s1, act: unmark, target: eq}
+      - {with: prev, act: hide, target: "line.jump[0]"}
+      - {with: prev, act: hide, target: "line.jump[1]"}
+      - {with: prev, act: hide, target: "line.jump[2]"}
+      - {with: prev, act: hide, target: "line.count[0]"}
+      - {with: prev, act: hide, target: "line.count[1]"}
+      - {with: prev, act: hide, target: "line.count[2]"}
+      - {at: s1@q, act: show, target: plusone}
+      - {at: s1@show, act: subdivide, target: line, args: {parts: 3}, dur: 1.2}
+      - {after: prev, act: mark_point, target: line, args: {at: "2/3"}}
+      - {at: s2@right, act: highlight, target: line, args: {from: "1/2", to: "2/3"}}
+      - {at: s2@add, act: cross, target: "plusone#f"}
+      - {after: prev, act: hold, dur: 1.5}
+
+  - id: Equation
+    shows: landing
+    say:
+      - {id: s1, pace: normal, text: "{@back}回到切成四份这一步。", en: "{@back}Back to the step with four pieces."}
+      - {id: s2, pace: slow, text: "{@den}下面的数叫分母，是一共几份。两份变四份，分母乘二。", en: "{@den}The bottom number counts all the pieces. Two pieces became four, so the bottom is times two."}
+      - {id: s3, pace: slow, text: "{@num}上面的数叫分子，是拿了几份。一份变两份，分子也乘二。", en: "{@num}The top number counts the pieces we take. One piece became two, so the top is times two as well."}
+      - {id: s4, pace: brisk, text: "{@x3}切成三份那次也一样，分子分母都乘三。", en: "{@x3}The cut into three works the same way: top and bottom are both times three."}
+      - {id: s5, pace: normal, text: "{@half}从零到这个点，正好涂了一半。", en: "{@half}From zero to this dot, we've shaded exactly one half."}
+    do:
+      - {at: s1, act: hide, target: "line.point[2]"}
+      - {with: prev, act: hide, target: plusone}
+      - {with: prev, act: hide, target: "line.span[0]"}
+      - {with: prev, act: hide, target: "rule#num"}
+      - {with: prev, act: hide, target: "rule#x3"}
+      - {at: s1@back, act: subdivide, target: line, args: {parts: 4}, dur: 1.2}
+      - {at: s2@den, act: set, target: rule, args: {opacity: 1}}
+      - {with: prev, act: mark, target: "eq#b"}
+      - {at: s3@num, act: show, target: "rule#num"}
+      - {with: prev, act: jump, target: line, args: {length: "1/4", count: 2}, dur: fit}
+      - {at: s4, act: step}        # 子步：分子、分母都对上了图
+      - {at: s4@x3, act: show, target: "rule#x3"}
+      - {with: prev, act: mark, target: "eq#c"}
+      - {after: prev, act: hold, dur: 0.5}
+      - {at: s5@half, act: highlight, target: line, args: {to: "1/2"}}
+      - {with: prev, act: bar, target: line, args: {parts: 6}}
+      - {after: prev, act: fill, target: line, args: {cells: "0:3", role: A}}
+      - {after: prev, act: hold, dur: 1}
+
+  - id: LookBack
+    say:
+      - {id: s1, pace: slow, text: "{@so}所以四分之二和二分之一一样大。数字变大，是因为每一份变小了。", en: "{@so}So two fourths and one half are the same size. The numbers got bigger because each piece got smaller."}
+      - {id: s2, pace: ask, text: "同一个点有很多名字。{@next}那二分之一加三分之一，该怎么加？", en: "One point can have many names. {@next}So how do we add one half and one third?"}
+    do:
+      - {at: s1@so, act: mark, target: "eq#a"}
+      - {after: prev, act: hold, dur: 1}
