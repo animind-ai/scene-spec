@@ -105,7 +105,7 @@ i18n:
   en:
     meta: {title: "Multiplying Fractions: A Part of a Part"}
     objects:
-      myth: {text: "Multiplying always makes things bigger?"}
+      myth: {text: "Multiplying always\nmakes things bigger?"}  # v2：侧栏里分两行
       take: {text: '[$\times\dfrac{2}{3}$]{#x .B}: take $\dfrac{2}{3}$ of it'}
       sq_eq: {text: '$6$ cells overlap, $12$ in all: [$\dfrac{6}{12}=\dfrac{1}{2}$]{#r .HL}'}
     beats:

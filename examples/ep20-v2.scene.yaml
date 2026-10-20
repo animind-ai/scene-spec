@@ -138,7 +138,7 @@ i18n:
   en:
     meta: {title: "Why √2 Is Not a Fraction"}
     objects:
-      myth: {text: '[Measure finer and a fraction fits?]{#m}'}
+      myth: {text: '[Measure finer and a fraction fits?]{#m}', in: footer}  # v2 英文版：句子长，放底栏（这一集底栏空着），不和右栏的算式叠挤
       fmin: {text: '[$b$ smallest]{#min}'}
       paper: {guides: {diag: {label: 'Crease $\sqrt{2}$'}}}
     beats:

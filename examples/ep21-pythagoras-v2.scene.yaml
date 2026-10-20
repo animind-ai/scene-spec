@@ -82,7 +82,7 @@ i18n:
     meta: {title: "The Pythagorean Theorem: Rearrange and See"}
     objects:
       wrong: {text: '[$a+b=c$]{#w}?'}
-      practice: {lines: ["[Try it]{.HL}", "Short sides $3$ and $4$", "Long side $=$ ?"]}
+      practice: {lines: ["[Try it]{.HL}", "Short sides", "$3$ and $4$", "Long side $=$ ?"]}  # v2 英文版：拆成四行，框窄一些，字不用缩
     beats:
       Hook: {pause: {prompt: "The ladder's foot is a from the wall and its top is b high. How is the ladder c related to a and b?"}}
       Predict: {pause: {prompt: "Keep the big square still and pair the triangles into rectangles. What does the empty space become?"}}

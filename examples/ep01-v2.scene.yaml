@@ -89,7 +89,7 @@ i18n:
   en:
     meta: {title: "Make Ten: Why Split the 5 in 8+5?"}
     objects:
-      myth: {text: "Do we lose some if we split?"}
+      myth: {text: "Do we lose some\nif we split?"}  # v2：侧栏里分两行
       ten: {text: 'Full frame = one [$10$]{#t .HL}'}
       split: {text: '[$2+3=5$]{#s .B}: none lost'}
       nonex: {text: '$3+4=7$: not ten, no help'}

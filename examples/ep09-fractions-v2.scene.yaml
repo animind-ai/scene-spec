@@ -133,7 +133,7 @@ i18n:
   en:
     meta: {title: "Why Dividing by a Fraction Means Flip and Multiply"}
     objects:
-      myth: {text: "Dividing always makes things smaller?"}
+      myth: {text: "Dividing always\nmakes things smaller?"}  # v2：侧栏里分两行
       ask: {text: 'How many [$\dfrac{2}{3}$]{#d .A} in $6$?'}
       inone: {text: '$1$ holds [$\dfrac{3}{2}$]{#n .HL} of $\dfrac{2}{3}$'}
       recap_a: {text: '$\dfrac{1}{2}=\dfrac{2}{4}$'}

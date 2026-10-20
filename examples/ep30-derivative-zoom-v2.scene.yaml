@@ -165,8 +165,9 @@ i18n:
           - {point: 0, h: -1, label: "Q'", role: C, label_dir: ul, readout: true, readout_text: "Left secant slope"}
       ab:
         secants:
-          - {point: 0, h: 1.6, label: Q, readout: true, readout_text: "Right secant slope"}
-          - {point: 0, h: -1.6, label: "Q'", role: C, label_dir: ul, readout: true, readout_text: "Left secant slope"}
+          # v2 英文版：|x| 的读数放在 V 形里面，写全了会伸到右边那条线上，缩成 Right / Left slope
+          - {point: 0, h: 1.6, label: Q, readout: true, readout_text: "Right slope"}
+          - {point: 0, h: -1.6, label: "Q'", role: C, label_dir: ul, readout: true, readout_text: "Left slope"}
       wrong: {text: '[Tangent = touches once?]{#m}'}
       ask: {text: "Slope as Q nears P?"}
       cap10: {text: "10x zoom"}
