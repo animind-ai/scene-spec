@@ -57,3 +57,27 @@ def parse_slice(value: object) -> tuple[int, int] | None:
     if isinstance(value, str) and re.fullmatch(r"[0-9]+(:[0-9]+)?", value):
         return _index(value)
     return None
+
+
+def transform_replaces(action: dict) -> bool:
+    """transform 结束后源（from）是否被替换掉（淡出、不再可见）：只有显式写了 replace: true 才是。
+
+    match（tex / auto / shape）只管片段怎么配对，不隐含替换：不写 replace 时源保持不动，和以前一样。
+    """
+    return action.get("replace") is True
+
+
+def transform_replaced(action: dict) -> str | None:
+    """被这个 transform 整个替换掉、之后不再可见的对象：from 是整个对象、且替换源时才有；否则 None。
+
+    from 是片段或子元素时，替换只让这几项淡出，对象本身仍然可见。
+    """
+    if action.get("act") != "transform" or not isinstance(action.get("from"), str) or not transform_replaces(action):
+        return None
+    src = parse(action["from"])
+    if src is None or src.span is not None or src.part is not None or src.index is not None:
+        return None
+    to = parse(action["to"]) if isinstance(action.get("to"), str) else None
+    if to is not None and to.obj == src.obj:
+        return None
+    return src.obj

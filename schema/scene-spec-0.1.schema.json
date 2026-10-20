@@ -544,10 +544,42 @@
           ]
         },
         "side": {
-          "type": [
-            "string",
-            "number"
+          "description": "shape：square 的边长、line / arrow 的长度（水平方向，不写 points 时）；rectangle 写 [宽, 高]。单位是画面单位（画面高 8），排版时整体随区域缩放",
+          "anyOf": [
+            {
+              "type": [
+                "string",
+                "number"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 2,
+              "maxItems": 2,
+              "items": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              }
+            }
           ]
+        },
+        "radius": {
+          "description": "shape：circle / dot 的半径（画面单位）",
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "points": {
+          "description": "shape：polygon 的顶点（至少三个）或 line / arrow 的起点和终点（两个），[x, y]，y 向上；只表示形状，位置由布局决定",
+          "type": "array",
+          "minItems": 2,
+          "items": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 2,
+            "items": {
+              "type": "number"
+            }
+          }
         },
         "children": {
           "type": "array",
@@ -572,7 +604,7 @@
         "label": {
           "type": "string",
           "minLength": 1,
-          "description": "readout：值前面的文字，可混排 $...$ 公式"
+          "description": "readout：值前面的文字；shape：图形的标注（圆、多边形写在中间，线、箭头写在中点上方，点写在右上）。都可混排 $...$ 公式"
         },
         "digits": {
           "type": "integer",
@@ -902,11 +934,16 @@
           "$ref": "#/$defs/selector"
         },
         "match": {
+          "description": "transform：tex 按同名片段 #id 配对（配上的平移缩放过去，新片段淡入，消失的淡出）；auto 两边有同名片段时同 tex，否则整体变形；shape 整体变形。只管配对，不替换源：要源淡出请写 replace: true",
           "enum": [
             "tex",
             "shape",
             "auto"
           ]
+        },
+        "replace": {
+          "description": "transform：true 时源（from）在变形期间淡出，结束后不再可见（等于同时 hide）；默认 false（源保持不动），不管 match 写的是什么",
+          "type": "boolean"
         },
         "style": {
           "type": "string",

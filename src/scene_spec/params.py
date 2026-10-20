@@ -87,6 +87,9 @@ def states(doc: dict) -> list[tuple[dict[str, float], frozenset[str]]]:
                 sel = selectors.parse(action["to"])
                 if sel is not None:
                     visible.add(sel.obj)
+                gone = selectors.transform_replaced(action)
+                if gone is not None:
+                    visible.discard(gone)
             out.append((dict(env), frozenset(visible)))
     return out
 
