@@ -17,6 +17,11 @@
 
 `localize(doc, "en")` 返回一份普通的英文场景文档（`say[].text` 换成英文句，`style.lang: en`，没有 `i18n`），
 voice 和 kit 像读别的场景一样读它。
+
+源语言默认是中文；文件写了 `style.lang`（比如直接用英文写的场景，`style: {lang: en}`）就以它为源语言：
+`localize(doc, "en")` 原样返回（只去掉 `i18n`），不要求每句再写 `en`。
+English-first files: a scene whose `style.lang` is `en` is already the English version; `localize(doc, "en")`
+returns it unchanged (minus `i18n`).
 """
 
 from __future__ import annotations
@@ -50,13 +55,18 @@ def bookmarks(text: str) -> list[str]:
     return _BOOKMARK.findall(text)
 
 
+def source_lang(doc: dict) -> str:
+    """文件本身是哪种语言写的：`style.lang`，没写就是中文（SOURCE）。"""
+    return (doc.get("style") or {}).get("lang") or SOURCE
+
+
 def localize(doc: dict, lang: str) -> dict:
-    """lang 版本的场景。源语言只去掉 `i18n`。"""
+    """lang 版本的场景。源语言（`style.lang`，默认中文）只去掉 `i18n`。"""
     if lang not in LANGS:
         raise LocalizeError(f"不认识的语言 {lang!r}（可用：{'、'.join(LANGS)}）")
     out = copy.deepcopy(doc)
     overlays = out.pop("i18n", None) or {}
-    if lang == SOURCE:
+    if lang == source_lang(doc):
         return out
     missing = []
     for beat in out.get("beats", []):
@@ -110,8 +120,9 @@ def _strings(x, path: str):
 def check(doc: dict, report: Report) -> None:
     """对 `i18n` 里的每种语言：每句都有译文、书签和中文一致、本地化后画面上不再有中文。"""
     for lang in doc.get("i18n") or {}:
-        if lang == SOURCE or lang not in LANGS:
-            report.error("SS501", f"i18n.{lang}", f"i18n 只放其他语言：{'、'.join(sorted(set(LANGS) - {SOURCE}))}")
+        if lang == source_lang(doc) or lang not in LANGS:
+            others = "、".join(sorted(set(LANGS) - {source_lang(doc)}))
+            report.error("SS501", f"i18n.{lang}", f"i18n 只放其他语言：{others}")
             continue
         for b, beat in enumerate(doc.get("beats", [])):
             for i, s in enumerate(beat.get("say", [])):

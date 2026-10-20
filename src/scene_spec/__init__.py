@@ -10,11 +10,11 @@ from __future__ import annotations
 from pathlib import Path
 
 from . import i18n, semantic, structure
-from .i18n import LocalizeError, localize
+from .i18n import LocalizeError, localize, source_lang
 from .loader import SpecLoadError, load_text
 from .report import Issue, Report
 
-__all__ = ["check", "check_file", "check_text", "localize", "Issue", "LocalizeError", "Report", "SPEC_VERSION"]
+__all__ = ["check", "check_file", "check_text", "localize", "source_lang", "Issue", "LocalizeError", "Report", "SPEC_VERSION"]
 __version__ = "0.1.0"
 SPEC_VERSION = "0.1"
 
