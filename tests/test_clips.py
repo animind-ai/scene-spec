@@ -3,6 +3,7 @@
 from pathlib import Path
 
 from scene_spec import check
+from scene_spec.clips import _frames
 
 ROOT = Path(__file__).resolve().parents[1]
 PNG = (
@@ -166,6 +167,83 @@ def test_example_clip_scene_passes():
 
     report = check_file(ROOT / "examples" / "clip-hook.scene.yaml")
     assert report.issues == [], report.issues
+
+
+def test_hide_at_zero_on_the_explanation_beat(insight):
+    with_plate(insight, **{"in": "stage"})
+    rearrange = next(b for b in insight["beats"] if b["id"] == "Rearrange")
+    rearrange["do"].insert(0, {"at": 0, "act": "hide", "target": "plate"})
+    assert "SS474" not in codes(insight)
+    rearrange["do"][0]["at"] = "0"
+    assert "SS474" not in codes(insight)
+
+
+def test_hide_at_a_later_bookmark_still_blocks(insight):
+    with_plate(insight, **{"in": "stage"})
+    rearrange = next(b for b in insight["beats"] if b["id"] == "Rearrange")
+    rearrange["do"].append({"at": "s1", "act": "hide", "target": "plate"})
+    found = [i.path for i in check(insight).issues if i.code == "SS474"]
+    assert found == ["beats[2]"]
+
+
+def test_same_time_actions_use_the_final_state(insight):
+    with_plate(insight, **{"in": "stage"})
+    rearrange = next(b for b in insight["beats"] if b["id"] == "Rearrange")
+    rearrange["do"] = [
+        {"at": 0, "act": "show", "target": "plate"},
+        {"with": "prev", "act": "hide", "target": "plate"},
+    ]
+    assert "SS474" not in codes(insight)
+    rearrange["do"] = [
+        {"at": 0, "act": "hide", "target": "plate"},
+        {"with": "prev", "act": "show", "target": "plate"},
+    ]
+    assert [i.path for i in check(insight).issues if i.code == "SS474"] == ["beats[2]", "beats[3]", "beats[4]"]
+
+
+def test_consecutive_at_zero_settles_before_the_check(insight):
+    with_plate(insight, **{"in": "stage"})
+    rearrange = next(b for b in insight["beats"] if b["id"] == "Rearrange")
+    rearrange["do"] = [
+        {"at": 0, "act": "show", "target": "plate"},
+        {"at": 0, "act": "hide", "target": "plate"},
+    ]
+    assert "SS474" not in codes(insight)
+    rearrange["do"] = [
+        {"at": 0, "act": "hide", "target": "plate"},
+        {"at": "0", "act": "show", "target": "plate"},
+    ]
+    assert "beats[2]" in [i.path for i in check(insight).issues if i.code == "SS474"]
+
+
+def test_later_show_after_a_zero_hide_still_blocks(insight):
+    with_plate(insight, **{"in": "stage"})
+    rearrange = next(b for b in insight["beats"] if b["id"] == "Rearrange")
+    rearrange["do"] = [
+        {"at": 0, "act": "hide", "target": "plate"},
+        {"at": "s1", "act": "show", "target": "plate"},
+    ]
+    assert [i.path for i in check(insight).issues if i.code == "SS474"] == ["beats[2]", "beats[3]", "beats[4]"]
+
+
+def test_muted_can_only_be_true(insight):
+    with_plate(insight, muted=False)
+    assert codes(insight) == ["SS100"]
+    insight["objects"]["plate"]["muted"] = True
+    assert codes(insight) == []
+    del insight["objects"]["plate"]["muted"]
+    assert codes(insight) == []
+
+
+def test_frames_use_natural_order(tmp_path):
+    frames = tmp_path / "seq"
+    frames.mkdir()
+    for name in ("10.png", "frame_2.png", "1.png", "frame_10.png", "2.png", "frame_1.png", "notes.txt"):
+        path = frames / name
+        path.write_bytes(b"x" if name.endswith(".txt") else PNG)
+    assert [p.name for p in _frames(frames)] == [
+        "1.png", "2.png", "10.png", "frame_1.png", "frame_2.png", "frame_10.png",
+    ]
 
 
 def test_group_show_reveals_child_clip(insight):

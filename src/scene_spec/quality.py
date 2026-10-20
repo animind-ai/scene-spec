@@ -14,6 +14,8 @@
 
 from __future__ import annotations
 
+import math
+import re
 from functools import lru_cache
 from importlib import resources
 from pathlib import Path
@@ -31,6 +33,10 @@ DEFAULT_CUE_LATE = 0.4
 DEFAULT_SKIP_BEFORE = 0.5
 
 ALLOWLIST_NAME = "quality-allowlist.yaml"
+# 和 schema 的 timeRef 同一条：非负整数，或 s1、s1@d0、s1+0.5。
+_TIME_REF = re.compile(
+    r"^([A-Za-z_][A-Za-z0-9_]*|[0-9]+)(@[A-Za-z_][A-Za-z0-9_]*)?(\+[0-9]+(\.[0-9]+)?)?$"
+)
 
 
 @lru_cache(maxsize=1)
@@ -138,7 +144,7 @@ def _check_gaps(beat: dict, n: int, cues: object, report: Report) -> None:
         return
     for i, cue in enumerate(cues):
         if not isinstance(cue, dict) or not _number(cue.get("start")) or not _number(cue.get("end")):
-            report.error("SS481", f"{path}[{i}]", "每一句要有 start 和 end（秒）")
+            report.error("SS481", f"{path}[{i}]", "每一句要有有限的 start 和 end（秒）")
             return
         if cue["end"] < cue["start"]:
             report.error("SS481", f"{path}[{i}]", "end 不能早于 start")
@@ -161,8 +167,11 @@ def _check_cues(doc, beat, n, actions, tolerance, skip_before, report, entries) 
         return
     allowed = _allow_late(beat)
     for i, item in enumerate(actions):
-        if not isinstance(item, dict) or "at" not in item or not _number(item.get("want")) or not _number(item.get("start")):
-            report.error("SS481", f"{path}[{i}]", "每一条要有 at、want、start（want 是书签时刻，start 是画面真正开始的时刻）")
+        if not isinstance(item, dict) or not _time_ref(item.get("at")) or not _number(item.get("want")) or not _number(item.get("start")):
+            report.error(
+                "SS481", f"{path}[{i}]",
+                "每一条要有 at（非负整数或 s1@d0 这种时刻）、以及有限的 want 和 start（秒）",
+            )
             continue
         want, start = float(item["want"]), float(item["start"])
         late = start - want
@@ -205,8 +214,18 @@ def _speed_ok(speed: object) -> bool:
     return _number(speed) and abs(float(speed) - REQUIRED_SPEED) <= 1e-6
 
 
+def _time_ref(value: object) -> bool:
+    if isinstance(value, bool) or isinstance(value, float):
+        return False
+    if isinstance(value, int):
+        return value >= 0
+    if isinstance(value, str):
+        return _TIME_REF.fullmatch(value) is not None
+    return False
+
+
 def _number(value: object) -> bool:
-    return isinstance(value, (int, float)) and not isinstance(value, bool)
+    return isinstance(value, (int, float)) and not isinstance(value, bool) and math.isfinite(value)
 
 
 def _kind_zh(kind: str) -> str:

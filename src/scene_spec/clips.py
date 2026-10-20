@@ -13,6 +13,7 @@
 
 from __future__ import annotations
 
+import re
 import subprocess
 from pathlib import Path
 
@@ -26,6 +27,8 @@ VIDEO_SUFFIXES = {".mp4", ".mov"}
 FRAME_SUFFIXES = {".png", ".jpg", ".jpeg"}
 INSET_MAX = 0.5  # size 的宽和高都不超过这个比例，算角落里的小窗，不算占住主讲区
 STAGE_REGIONS = {"top", "footer", "side"}
+# 和 moxian collect_frames() 同一把钥匙：frame_2 排在 frame_10 前面。
+_NATURAL = re.compile(r"(\d+)")
 
 
 def check(doc: dict, report: Report, root: Path | None) -> None:
@@ -166,7 +169,19 @@ def _resolve(root: Path, src: str) -> Path | None:
 
 
 def _frames(directory: Path) -> list[Path]:
-    return sorted(p for p in directory.iterdir() if p.is_file() and p.suffix.lower() in FRAME_SUFFIXES)
+    """目录里的 PNG/JPEG，按文件名自然排序（1.png、2.png、10.png）。
+
+    与 moxian `collect_frames()` 的 `_natural_key` 一致：数字段按整数比，其余按小写字符串。
+    时长是张数 ÷ fps，顺序不改变时长，但和渲染用的是同一列帧。
+    """
+    frames = [p for p in directory.iterdir() if p.is_file() and p.suffix.lower() in FRAME_SUFFIXES]
+    frames.sort(key=_natural_key)
+    return frames
+
+
+def _natural_key(path: Path) -> tuple:
+    parts = _NATURAL.split(path.name)
+    return tuple(int(part) if part.isdigit() else part.lower() for part in parts)
 
 
 def occupies_stage(definition: dict) -> bool:
@@ -190,17 +205,87 @@ def _inset(definition: dict) -> bool:
 
 
 def _check_stage(doc: dict, clips: dict, report: Report) -> None:
+    """讲解段的可见性看动作做完的结果，不看继承下来、还没被开头动作改掉的那一帧。
+
+    开头连续的 `at: 0`（含紧跟的 `with: prev`，以及同样写着 `at: 0` 的下一批）先全部做完再判断。
+    同一时刻的一批只看最终状态：先 show 再在 `with: prev` 里 hide，等于没占住。
+    更晚的书签（`at: s1`）才 hide，开场那段仍然算占住。
+    """
     objects = doc.get("objects", {})
     visible: set[str] = set()
     for n, beat in enumerate(doc.get("beats", [])):
+        actions = beat.get("do") if isinstance(beat.get("do"), list) else []
+        if not _explanation(beat):
+            for action in actions:
+                _apply(visible, action, objects)
+            continue
         flagged: set[str] = set()
-        explanation = _explanation(beat)
-        if explanation:
+        groups = _time_groups(actions)
+        index = 0
+        while index < len(groups) and _zero_time(groups[index]):
+            for action in groups[index]:
+                _apply(visible, action, objects)
+            index += 1
+        _flag(visible, clips, beat, n, report, flagged)
+        while index < len(groups):
+            for action in groups[index]:
+                _apply(visible, action, objects)
             _flag(visible, clips, beat, n, report, flagged)
-        for action in beat.get("do", []):
-            _apply(visible, action, objects)
-            if explanation:
-                _flag(visible, clips, beat, n, report, flagged)
+            index += 1
+
+
+def _time_groups(actions: list) -> list[list[dict]]:
+    """一批是头动作加上紧跟的 `with: prev`。连续几批的 `at` 相同，就合成同一时刻。
+
+    `after: prev` 是更晚的时刻，不并进上一批。
+    """
+    batches: list[list[dict]] = []
+    current: list[dict] = []
+    for action in actions:
+        if not isinstance(action, dict):
+            if current:
+                batches.append(current)
+                current = []
+            continue
+        if action.get("with") == "prev" and current:
+            current.append(action)
+            continue
+        if current:
+            batches.append(current)
+        current = [action]
+    if current:
+        batches.append(current)
+
+    groups: list[list[dict]] = []
+    for batch in batches:
+        key = _at_key(batch[0])
+        if groups and key is not None and _at_key(groups[-1][0]) == key:
+            groups[-1].extend(batch)
+        else:
+            groups.append(list(batch))
+    return groups
+
+
+def _at_key(action: dict) -> str | None:
+    if "at" not in action or action.get("with") == "prev":
+        return None
+    value = action["at"]
+    if _zero_at(value):
+        return "0"
+    return str(value)
+
+
+def _zero_time(group: list[dict]) -> bool:
+    head = group[0]
+    return "at" in head and head.get("with") != "prev" and _zero_at(head.get("at"))
+
+
+def _zero_at(value: object) -> bool:
+    if isinstance(value, bool):
+        return False
+    if isinstance(value, (int, float)):
+        return value == 0
+    return value == "0"
 
 
 def _explanation(beat: dict) -> bool:
@@ -225,11 +310,14 @@ def _flag(visible: set[str], clips: dict, beat: dict, n: int, report: Report, fl
             report.error(
                 "SS474", f"beats[{n}]",
                 f"讲解 beat {beat.get('id')!r} 里 clip {oid} 占住了主讲区。"
-                f"钩子段可以；讲解段请先 hide，或在 clip 上写 explain: allow，或在这个 beat 上写 plate: allow",
+                f"钩子段可以。讲解段请在开头用 at: 0 先 hide（同一时刻的 with: prev 一起算），"
+                f"或在 clip 上写 explain: allow，或在这个 beat 上写 plate: allow",
             )
 
 
 def _apply(visible: set[str], action: dict, objects: dict) -> None:
+    if not isinstance(action, dict):
+        return
     act = action.get("act")
     if act == "show" and "target" in action:
         _reveal(visible, _obj(action["target"]), objects)

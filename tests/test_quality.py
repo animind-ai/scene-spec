@@ -156,3 +156,33 @@ def test_timing_report_shape(insight):
     # Hook 只有一句，一份对得上的 cues 不报句间问题
     one = {"beats": {"Hook": {"cues": [{"start": 0.3, "end": 1.2}]}}}
     assert codes(insight, timing=one) == []
+
+
+def test_nonfinite_timing_is_malformed_not_a_bypass(insight):
+    nan = float("nan")
+    inf = float("inf")
+    late_nan = {"beats": {"Rearrange": {"actions": [{"at": 0, "want": nan, "start": 2.5}]}}}
+    assert codes(insight, timing=late_nan) == ["SS481"]
+    late_inf = {"beats": {"Rearrange": {"actions": [{"at": 0, "want": inf, "start": 2.5}]}}}
+    assert codes(insight, timing=late_inf) == ["SS481"]
+    start_inf = {"beats": {"Rearrange": {"actions": [{"at": "s1@d0", "want": 2.0, "start": inf}]}}}
+    assert codes(insight, timing=start_inf) == ["SS481"]
+    bad_at = {"beats": {"Rearrange": {"actions": [{"at": {}, "want": 2.0, "start": 3.0}]}}}
+    assert codes(insight, timing=bad_at) == ["SS481"]
+    mixed = {"beats": {"Rearrange": {"actions": [
+        {"at": {}, "want": 2.0, "start": 3.0},
+        {"at": 0, "want": 2.0, "start": 2.5},
+    ]}}}
+    assert codes(insight, timing=mixed) == ["SS481", "SS480"]
+    assert codes(insight, timing={"beats": {"Rearrange": {"actions": [
+        {"at": 0, "want": 2.0, "start": 2.5},
+        {"at": "s1@d0+0.5", "want": 2.0, "start": 2.2},
+    ]}}}) == ["SS480"]
+
+    say = insight["beats"][0]["say"]
+    say.append({"id": "s2", "pace": "normal", "text": "再看一眼。"})
+    gap = {"beats": {"Hook": {"cues": [
+        {"start": 0.3, "end": inf},
+        {"start": inf, "end": inf},
+    ]}}}
+    assert codes(insight, timing=gap) == ["SS481"]

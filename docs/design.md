@@ -374,7 +374,7 @@ SS469 预留。动作的多余参数报 SS281。完整的例子见 `animind/scen
 objects:
   plate:
     type: clip
-    src: assets/hook-plate          # 相对场景文件。video：.mp4 / .mov；frames：PNG/JPEG 目录
+    src: assets/hook-plate          # 相对场景文件。video：.mp4 / .mov；frames：PNG/JPEG 目录（自然排序）
     kind: frames                    # video | frames
     content_kind: plate             # plate 空镜 | simulation 模拟 | broll 无字空镜
     fps: 12                         # frames 必填。video 不写
@@ -386,12 +386,14 @@ objects:
     opacity: 1                      # 默认 1
     z: -2                           # z-order，和墨线 Node.z 一致：小的先画。不写时 kit 用 -1
     end: hold                       # hold 停在最后一帧（默认）| loop 回到 trim.in
-    start: 0                        # 成片时间轴上，源时间 trim.in 对准的秒数
-    muted: true                     # 不写也是 true：不混入素材声音
+    start: 0                        # 成片时间轴上，源时间 trim.in 对准的秒数。早于 start 不画
+    muted: true                     # 只能为 true。不写也静音；音轨不参与合成
     explain: forbid                 # forbid（默认）| allow。见下
 ```
 
-成片时刻 t 的源时间是 `trim.in + (t - start) * rate`。早于 `start` 就停在入点那一帧。落到 trim 窗口外面时，`end: hold` 停在最后一帧，`end: loop` 回到入点。`muted` 不写时 kit 不混音轨。
+成片时刻 t ≥ `start` 时，源时间是 `trim.in + (t - start) * rate`。早于 `start` 不画（没有入点那一帧的定格）。落到 trim 窗口外面时，`end: hold` 停在最后一帧，`end: loop` 回到入点。素材音轨不参与合成：`muted` 只能是 `true`，不写时 kit 同样静音。
+
+帧序列（`kind: frames`）按文件名自然排序，和 moxian `collect_frames()` 一致：`1.png`、`2.png`、`10.png`，而不是字典序。时长是张数 ÷ fps。
 
 **讲解段不让底板占住主讲区。** 主讲区是 `in: stage`，或者没写 `in`、又不是小窗（`size.max_width` 和 `max_height` 都 ≤ 0.5）。`in: top / footer / side` 和 `pin: top` 不算。讲解 beat 是写了 `say`、又不是钩子的 beat。钩子是 `id: Hook`，或写了 `role: hook`。
 
@@ -400,7 +402,9 @@ objects:
 - 这条 clip 写 `explain: allow`（这段模拟就是讲解本身），或
 - 这个 beat 写 `plate: allow`
 
-钩子里播、进讲解之前 `hide`，是给实拍开场用的写法。完整例子见 `examples/clip-hook.scene.yaml`。
+可见性按动作做完的结果判断。讲解 beat 开头连续的 `at: 0`（以及同一条上的 `with: prev`、紧跟着且同样是 `at: 0` 的动作）先全部做完，再看主讲区还在不在。同一时刻的动作只看这一批的最终状态：先 `show` 再在 `with: prev` 里 `hide`，等于没占住。开场就已经在画面上、却要等到 `at: s1` 才 `hide`，仍然报 SS474。
+
+钩子里播，进讲解时收掉：可以在讲解 beat 之前 `hide`，也可以在讲解 beat 开头用 `at: 0` `hide`。完整例子见 `examples/clip-hook.scene.yaml`（收在没有旁白的 Predict）。
 
 检查器只有在知道素材根（`check_file` 用场景文件所在目录，或 `check(..., root=)`）时才要求 `src` 真实存在。探得到时长（帧序列用张数 ÷ fps；视频用 ffprobe）时，trim 必须落在时长里面。探不到就不查时长，只查入点早于出点。
 
@@ -739,7 +743,7 @@ style:
 - `cues`：和这一 beat 的 `say` 等长，按顺序。`start` / `end` 是这一句说话的起止，**不含**后面的静音。下一句 `start` 减这一句 `end` 就是句间静音，要等于 `silence_after`（容差 0.05 秒），否则 SS487。voice 现在写的 `<beat>.timing.json` 里的 `cues` 就是这个形状，按 beat id 收进 `beats` 即可。
 - `actions`：每个挂在 `at` 上的动作批次一条。`want` 是 `timing.resolve(at)`（书签时刻），`start` 是画面真正开始的时刻（kit 里 `max(want, 上一批结束)`，或 Manim 的 `scene.time`）。`start - want` 大于容差、且 `want` 大于 `cue_late_skip_before`，报 SS480。`at` 和场景里动作的 `at` 写成同一个字符串（整数下标也按它的十进制写法对）。
 
-报告本身写错（不是映射、beat 不存在、句数对不上、缺 start/end/want）报 SS481。
+报告本身写错（不是映射、beat 不存在、句数对不上、缺字段、`start` / `end` / `want` 不是有限数、`actions[].at` 不是时刻）报 SS481。NaN 和 Infinity 不能拿来绕过 SS480 / SS487。
 
 | 码 | 内容 |
 |---|---|

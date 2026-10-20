@@ -607,7 +607,7 @@
           "const": "clip"
         },
         "src": {
-          "description": "相对场景文件的路径：kind video 时是 .mp4 / .mov 文件；kind frames 时是只含 PNG/JPEG 的目录。",
+          "description": "相对场景文件的路径：kind video 时是 .mp4 / .mov 文件；kind frames 时是只含 PNG/JPEG 的目录。帧按文件名自然排序（1.png、2.png、10.png），和 moxian collect_frames() 一致。",
           "type": "string",
           "minLength": 1
         },
@@ -644,7 +644,7 @@
           "maximum": 4
         },
         "fps": {
-          "description": "帧序列的帧率。kind: frames 时必填。视频不写，由容器自己的帧率决定。",
+          "description": "帧序列的帧率。kind: frames 时必填。视频不写，由容器自己的帧率决定。帧文件按文件名自然排序（1、2、10）。",
           "type": "number",
           "exclusiveMinimum": 0,
           "maximum": 120
@@ -675,13 +675,13 @@
           ]
         },
         "start": {
-          "description": "成片时间轴上，源时间 trim.in 对准的秒数，默认 0。这之前若已可见，停在入点那一帧。",
+          "description": "成片时间轴上，源时间 trim.in 对准的秒数，默认 0。早于 start 不画出这一帧。",
           "type": "number",
           "minimum": 0
         },
         "muted": {
-          "description": "不写或 true：不混入素材音轨（默认）。false 才把素材声音叠在旁白下面。",
-          "type": "boolean"
+          "description": "只能为 true。素材音轨不参与合成；不写时 kit 也按静音处理。",
+          "const": true
         },
         "explain": {
           "description": "forbid（默认）：讲解 beat 里不能占住主讲区 stage。allow：明确允许（例如这段模拟就是讲解本身）。",
