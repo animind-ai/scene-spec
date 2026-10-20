@@ -319,8 +319,8 @@
           ]
         },
         "layout": {
-          "description": "分区模板：default（默认，题卡在上）| lecture（讲座：顶上一条窄带放页眉，side 是右半边），见 docs/cs-lecture.md",
-          "enum": ["default", "lecture"]
+          "description": "分区模板：default（默认，题卡在上）| lecture（讲座：顶上一条窄带放页眉，side 是右半边），见 docs/cs-lecture.md | v2（培玉规范 v2：无右侧栏，side 并入顶栏，stage 占满宽度，烧录字幕一行贴底）",
+          "enum": ["default", "lecture", "v2"]
         },
         "fonts": {
           "description": "西文正文和代码的字体（字体族名）；系统里没有时 kit 退回默认字体",
