@@ -46,8 +46,24 @@ for issue in report.issues:
 | 语义 | 组件参数与数据自洽、片段与书签语法、选择器和时间点能解析、动作合法、不写色值与表达式、绝对坐标规则、产品线要求的教学信息 | SS201–SS381 |
 | 参数 | 场景参数 `params`、`tween` 动作、`readout` 读数、参数表达式（白名单语法、只引用声明过的参数）；按参数会经过的关键取值代入，检查几何不出界、表达式有定义（设计稿 §7.5） | SS400–SS411 |
 | 分段 | `ghost` / `unghost` 残影、`step` 子步定格、`pin` 常驻公式：目标是整个对象、常驻后不能再 hide / move、残影和子步数量（设计稿 §7.6） | SS440–SS459 |
+| clip | 外部画面（mp4/mov 或 PNG/JPEG 帧序列）：素材存在且类型相符、裁切落在时长内、不拿来写字、讲解段不占主讲区（设计稿 §6.8） | SS470–SS474 |
+| 质量 | 旁白必须是 Gemini `google/gemini-3.8-flash-tts` / `Kore` / 1.0 倍（豁免名单除外）；句间静音按标点；时间报告里画面晚于书签超过容差（设计稿 §7.8） | SS480–SS487 |
 
-结构不通过时不运行语义检查。时间检查（旁白时长对动作）和布局检查属于后续版本。
+结构不通过时不运行语义检查。布局求解仍不在本仓库。
+
+画面是否晚于旁白、句间静音是否按标点，要等 kit / voice 交出时间报告再查：
+
+```bash
+uv run scene-spec check examples/s67-p01.scene.yaml --timing build/timing-report.json
+```
+
+```python
+from scene_spec import check_file, check_timing
+
+report = check_file("examples/s67-p01.scene.yaml", timing=timing_report)
+# 或者只查时间报告，不重复跑结构：
+report = check_timing(doc, timing_report)
+```
 
 ## 开发
 

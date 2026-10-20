@@ -107,7 +107,9 @@ style:
   canvas: 16:9
   voice:
     persona: teacher-hs     # voice 仓库里的人设，含声音和语气说明
-    speed: 1.0              # 2026-10-16 老师确认 1 倍速（1.25 倍太快）
+    model: google/gemini-3.8-flash-tts   # 发布内容必须是这个模型；不写也按这个
+    voice: Kore             # Gemini 声音名；发布内容必须是 Kore
+    speed: 1.0              # 2026-10-16 老师确认 1 倍速（1.25 倍太快）；发布内容必须是 1.0
   segmented: false          # true：小学默认分段播放（每个 beat 结束定格，播放器自动暂停）
   step_hold: 1.0            # 分段时每个子步（step）结束定格几秒，见 §7.6
   subtitles: burned         # burned 烧进画面（默认，2026-10-17 定）| soft 只封装可关的软字幕轨 | none；都导出 .vtt/.srt
@@ -364,6 +366,52 @@ zu:
 
 SS469 预留。动作的多余参数报 SS281。完整的例子见 `animind/scene-spec/examples/solids.scene.yaml`。
 
+### 6.8 clip：外部画面当底板
+
+钩子镜头、已经渲好的物理模拟，可以嵌进场景。它是普通对象，布局约束和别的对象一样（`in` / `below` / `size` / `at` ……）。画面上的字和公式仍然用 `text` / `math`，不能烤进素材。
+
+```yaml
+objects:
+  plate:
+    type: clip
+    src: assets/hook-plate          # 相对场景文件。video：.mp4 / .mov；frames：PNG/JPEG 目录
+    kind: frames                    # video | frames
+    content_kind: plate             # plate 空镜 | simulation 模拟 | broll 无字空镜
+    fps: 12                         # frames 必填。video 不写
+    trim: {in: 0.0, out: 1.5}       # 源时间轴上的入点/出点（秒）。out 默认到结尾
+    rate: 1                         # 播放速率。裁切按源时间，速率只改变播完这段要多久
+    fit: cover                      # contain（默认，整幅可见）| cover（铺满，裁切）| stretch
+    in: stage                       # 和别的对象同一套布局
+    size: {max_width: 0.4, max_height: 0.4}   # 宽和高都不超过 0.5 时算小窗，不算占住主讲区
+    opacity: 1                      # 默认 1
+    z: -2                           # z-order，和墨线 Node.z 一致：小的先画。不写时 kit 用 -1
+    end: hold                       # hold 停在最后一帧（默认）| loop 回到 trim.in
+    start: 0                        # 成片时间轴上，源时间 trim.in 对准的秒数
+    muted: true                     # 不写也是 true：不混入素材声音
+    explain: forbid                 # forbid（默认）| allow。见下
+```
+
+成片时刻 t 的源时间是 `trim.in + (t - start) * rate`。早于 `start` 就停在入点那一帧。落到 trim 窗口外面时，`end: hold` 停在最后一帧，`end: loop` 回到入点。`muted` 不写时 kit 不混音轨。
+
+**讲解段不让底板占住主讲区。** 主讲区是 `in: stage`，或者没写 `in`、又不是小窗（`size.max_width` 和 `max_height` 都 ≤ 0.5）。`in: top / footer / side` 和 `pin: top` 不算。讲解 beat 是写了 `say`、又不是钩子的 beat。钩子是 `id: Hook`，或写了 `role: hook`。
+
+占住了就报 SS474，除非：
+
+- 这条 clip 写 `explain: allow`（这段模拟就是讲解本身），或
+- 这个 beat 写 `plate: allow`
+
+钩子里播、进讲解之前 `hide`，是给实拍开场用的写法。完整例子见 `examples/clip-hook.scene.yaml`。
+
+检查器只有在知道素材根（`check_file` 用场景文件所在目录，或 `check(..., root=)`）时才要求 `src` 真实存在。探得到时长（帧序列用张数 ÷ fps；视频用 ffprobe）时，trim 必须落在时长里面。探不到就不查时长，只查入点早于出点。
+
+| 码 | 内容 |
+|---|---|
+| SS470 | `kind: frames` 没写 `fps`，或 fps 不是正数 |
+| SS471 | `content_kind` 是 text / formula / caption 这类（字必须是矢量），或不是 plate / simulation / broll |
+| SS472 | 给了素材根，但 src 不存在，或文件类型和 kind 不符 |
+| SS473 | `trim.out` 不大于 `trim.in`，或探得到时长时落在时长外面 |
+| SS474 | 讲解 beat 里 clip 占住了主讲区，又没有 `explain: allow` / `plate: allow` |
+
 ---
 
 ## 7. beats：旁白与动作
@@ -388,6 +436,7 @@ SS469 预留。动作的多余参数报 SS281。完整的例子见 `animind/scen
 - 旁白文本就是读法。需要显示和读法不同时，在 `say` 里写读法，在对象里写显示：例如对象显示 `$A_8$`，旁白写"A 八"。也可以在旁白里写 `$A_8$`，交给读法规则自动转换。
 - 句子可以不写 `id`，此时按下标引用；建议给会被动作引用的句子写 `id`，插句子时不会错位。
 - `en`（可选）：这句的英文。中文版里是双语字幕的第二行（每条两行，中文在上），不念、不影响配音和音频缓存；英文版里就是要念的旁白（§7.7）。
+- `hold`（可选）：这句说完之后的句间静音（秒），覆盖标点默认值，必须落在该标点的区间里（§7.8）。
 
 ### 7.2 动作
 
@@ -476,6 +525,7 @@ SS469 预留。动作的多余参数报 SS281。完整的例子见 `animind/scen
 
 - 播放器根据 `pause` 生成章节点；`style.segmented: true` 时每个 beat 末尾自动成为分段点。
 - `pause` 本身也是 beat，可以有旁白。
+- `pause.hold` 和句与句之间的静音不是同一个数。句间静音看句末标点（§7.8），`pause.hold` 是停下来给学生看的时长，predict / think 要在 0.5–8 秒，segment 要在 0–10 秒。
 
 ### 7.4 教学标注
 
@@ -623,6 +673,85 @@ i18n:
 - `scene_spec.localize(doc, "en")` 得到一份普通的英文场景（`say[].text` = 英文句、`style.lang: en`、没有 `i18n`）；`check` 会把它也完整查一遍（问题标 `[en]`），本地化后画面上还剩中文报 SS507。
 - 工具：`animind-voice synth|align|pitch --lang en`（英文合成指令、en-US、英文听写，数字拼成单词再对齐），`animind-kit render|inspect --lang en`（字幕只有英文一行，按小句切条）。英文版用单独的音频目录。
 
+### 7.8 质量门槛：声音、句间静音、画面晚于书签
+
+这三件原来是软的（voice 用固定间隙，kit 只在日志里打印 `CUE LATE`）。发布内容改成硬错误。豁免不写在场景里，写在 `schema/quality-allowlist.yaml`：`meta.id` 落在 `ids` 里，或 `meta.series` 等于 `series`，就不报该条目列出的码。
+
+#### 旁白声音（SS482）
+
+`style.voice` 不写某项时，按发布默认值，voice **不能**改去读环境变量里的另一个模型或声音：
+
+| 字段 | 发布内容必须是 |
+|---|---|
+| `model` | `google/gemini-3.8-flash-tts` |
+| `voice` | `Kore` |
+| `speed` | `1.0` |
+
+`persona` 仍是人设文案（teacher-hs / peer-ms / friend-ps），不在这三条里。写了别的模型、声音或语速就报 SS482。`week-1 competition 20 problems` 这一系列例外：场景写 `meta.series: week-1-competition`（或把 `meta.id` 加进名单的 `ids`），可以换声音和语速。名单里目前只豁免 SS482。
+
+#### 句间静音（SS485、SS486、SS487）
+
+句和句之间的静音看**这一句的句末标点**，不再按 `pace` 取一个固定值。`pace` 仍只影响合成时的语气说明。最后一句后面不插静音。voice 用 `scene_spec.silence_after(text, hold)` 取秒数。
+
+| 句末 | 中文 | 英文 | 默认 | 允许区间 |
+|---|---|---|---|---|
+| 逗号 | `，` | `,` | 0.22 | 0.12–0.40 |
+| 分号 | `；` | `;` | 0.35 | 0.20–0.60 |
+| 句号 | `。` | `.` | 0.45 | 0.25–0.80 |
+| 问号 | `？` | `?` | 0.60 | 0.35–1.00 |
+| 叹号 | `！` | `!` | 0.55 | 0.30–0.95 |
+| 省略号 | `…` 或 `...` | 同左 | 0.75 | 0.40–1.40 |
+| 其他 | | | 0.35 | 0.15–0.70 |
+
+书签和收尾引号不算句末。句子写了 `hold` 就用它代替默认值，但必须落在区间里，否则 SS485。`pause.hold` 超出上面 §7.3 的区间报 SS486。
+
+#### 画面晚于书签（SS480）
+
+书签时刻来自 voice 的 Whisper 对齐，画面真正开始的时刻来自 kit 的排期（现在打印 `CUE LATE` 的那个比较：`start - want`，容差 0.4 秒，书签在 0.5 秒及更早的不报，和 `moxian_backend` / `manim_backend` 里的 `CUE_LATE` 一致）。scene-spec 不自己排期。kit 把结果放进时间报告，`check(..., timing=)` 或 `check_timing(doc, timing)` 来消费。容差写在场景里：
+
+```yaml
+style:
+  quality:
+    cue_late: 0.4               # 晚于书签超过这么多秒才报，默认 0.4
+    cue_late_skip_before: 0.5   # 书签时刻 ≤ 这个值不报，默认 0.5
+```
+
+单条动作可以写 `allow_late: true` 放行。整集放行就把 `SS480` 写进豁免名单。
+
+时间报告（一个文件可以只含其中一块；缺的那块不查）：
+
+```json
+{
+  "beats": {
+    "Down": {
+      "cues": [
+        {"id": "s1", "start": 0.30, "end": 2.10},
+        {"id": "s2", "start": 2.70, "end": 4.00}
+      ],
+      "actions": [
+        {"at": "s1@d0", "want": 1.20, "start": 1.85}
+      ]
+    }
+  }
+}
+```
+
+- `cues`：和这一 beat 的 `say` 等长，按顺序。`start` / `end` 是这一句说话的起止，**不含**后面的静音。下一句 `start` 减这一句 `end` 就是句间静音，要等于 `silence_after`（容差 0.05 秒），否则 SS487。voice 现在写的 `<beat>.timing.json` 里的 `cues` 就是这个形状，按 beat id 收进 `beats` 即可。
+- `actions`：每个挂在 `at` 上的动作批次一条。`want` 是 `timing.resolve(at)`（书签时刻），`start` 是画面真正开始的时刻（kit 里 `max(want, 上一批结束)`，或 Manim 的 `scene.time`）。`start - want` 大于容差、且 `want` 大于 `cue_late_skip_before`，报 SS480。`at` 和场景里动作的 `at` 写成同一个字符串（整数下标也按它的十进制写法对）。
+
+报告本身写错（不是映射、beat 不存在、句数对不上、缺 start/end/want）报 SS481。
+
+| 码 | 内容 |
+|---|---|
+| SS480 | 画面比旁白书签晚，超过容差 |
+| SS481 | 时间报告格式不对 |
+| SS482 | 旁白不是规定的模型、声音或语速，且不在豁免名单 |
+| SS485 | 句子的 `hold` 超出句末标点的区间 |
+| SS486 | `pause.hold` 超出该 pause 类型的区间 |
+| SS487 | 时间报告里的句间静音和标点规则不一致 |
+
+钩子检查不动：迷思要被某个 beat 标 `shows: misconception`（SS362），insight 线要有 `pause: {type: predict}`（SS365）。外部流水线如果另有 `HOOK_MYTH_BY_S` 这类代码，不由本仓库产生，豁免名单也不吞它们。
+
 ## 8. 检查规则（渲染前）
 
 检查分四层，前三层都不需要渲染，几秒内出结果：
@@ -631,7 +760,7 @@ i18n:
 |---|---|---|
 | 1. 结构 | JSON Schema：字段、类型、枚举值 | 报错 |
 | 2. 语义 | 引用的对象、片段、句子、书签都存在；没有色值；`line` 要求的字段齐全；`pedagogy.non_example` / `misconception` / `landing` 都被某个 beat 标注引用；`status: demo` 时旁白里有说明 | 报错 |
-| 3. 时间 | 按 `voice` 缓存的真实时长（没有缓存时按字数估算），挂在同一句上的动作总时长不超过这一句；预测出来的"画面跟不上旁白"直接报出，对应现在渲染日志里的 `CUE LATE` | 报错或警告 |
+| 3. 时间 | 消费 kit/voice 的时间报告（§7.8）：画面晚于书签超过容差报 SS480（对应渲染日志里的 `CUE LATE`）；句间静音按标点，对不上报 SS487。没有时间报告时不查这两项。句末 `hold` 和 `pause.hold` 的区间不需要报告，直接查 | 报错 |
 | 4. 布局 | 求解器跑一遍：出框、重叠、字号低于下限；字形级检查（线穿字、字压字、小字、出画面，见 §6.4）需要排版结果，由 kit 的 `inspect` 在不编码视频的情况下几秒内给出 | 报错 |
 
 不同产品线的必填项：

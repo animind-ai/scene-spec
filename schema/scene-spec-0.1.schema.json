@@ -188,6 +188,11 @@
           ],
           "minimum": 1
         },
+        "series": {
+          "description": "系列 id，供质量门槛豁免名单匹配（例如 week-1-competition）。不写则只按 meta.id 匹配。",
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9-]*$"
+        },
         "grade": {
           "type": "string"
         },
@@ -293,10 +298,38 @@
               "type": "string",
               "pattern": "^[a-z][a-z0-9-]*$"
             },
+            "model": {
+              "description": "Gemini TTS 模型。发布内容必须是 google/gemini-3.8-flash-tts；不写时检查器按这个默认值，voice 也必须用它，不能改用环境变量里的别的模型。",
+              "type": "string",
+              "minLength": 1
+            },
+            "voice": {
+              "description": "Gemini TTS 声音名。发布内容必须是 Kore；不写时按 Kore。",
+              "type": "string",
+              "pattern": "^[A-Za-z][A-Za-z0-9_-]*$"
+            },
             "speed": {
+              "description": "语速。发布内容必须是 1.0；不写时按 1.0。",
               "type": "number",
               "minimum": 0.5,
               "maximum": 2
+            }
+          }
+        },
+        "quality": {
+          "description": "硬门槛的容差。不写时 cue_late 为 0.4 秒，cue_late_skip_before 为 0.5 秒（和 kit 渲染日志里的 CUE LATE 一致）。",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "cue_late": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 5
+            },
+            "cue_late_skip_before": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 5
             }
           }
         },
@@ -457,6 +490,9 @@
         },
         {
           "$ref": "#/$defs/widgetObject"
+        },
+        {
+          "$ref": "#/$defs/clipObject"
         }
       ]
     },
@@ -552,6 +588,111 @@
       },
       "unevaluatedProperties": false
     },
+    "clipObject": {
+      "description": "外部画面：mp4/mov 或 PNG/JPEG 帧序列，只能当背景板或模拟画面。画面上的字和公式仍用 text / math，不能烤进素材。",
+      "type": "object",
+      "required": [
+        "type",
+        "src",
+        "kind",
+        "content_kind"
+      ],
+      "allOf": [
+        {
+          "$ref": "#/$defs/layout"
+        }
+      ],
+      "properties": {
+        "type": {
+          "const": "clip"
+        },
+        "src": {
+          "description": "相对场景文件的路径：kind video 时是 .mp4 / .mov 文件；kind frames 时是只含 PNG/JPEG 的目录。",
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "enum": [
+            "video",
+            "frames"
+          ]
+        },
+        "content_kind": {
+          "description": "素材里有什么。只能是 plate（空镜/钩子）、simulation（物理模拟）、broll（无字空镜）。text / formula 等会被检查器拒绝。",
+          "type": "string",
+          "minLength": 1
+        },
+        "trim": {
+          "description": "源时间轴上的入点/出点（秒）。in 默认 0；out 默认到素材结尾。",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "in": {
+              "type": "number",
+              "minimum": 0
+            },
+            "out": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            }
+          }
+        },
+        "rate": {
+          "description": "播放速率，默认 1。裁切按源时间，速率只改变播完 trim 窗口要多久。",
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 4
+        },
+        "fps": {
+          "description": "帧序列的帧率。kind: frames 时必填。视频不写，由容器自己的帧率决定。",
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 120
+        },
+        "fit": {
+          "description": "放进布局槽位的方式，默认 contain。",
+          "enum": [
+            "contain",
+            "cover",
+            "stretch"
+          ]
+        },
+        "opacity": {
+          "description": "整体不透明度，默认 1。",
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "z": {
+          "description": "z-order，和墨线 Node.z 一致：小的先画。不写时 kit 用 -1，让底板落在矢量对象后面。",
+          "type": "number"
+        },
+        "end": {
+          "description": "trim 窗口播完之后：hold 停在最后一帧（默认），loop 回到 trim.in。",
+          "enum": [
+            "loop",
+            "hold"
+          ]
+        },
+        "start": {
+          "description": "成片时间轴上，源时间 trim.in 对准的秒数，默认 0。这之前若已可见，停在入点那一帧。",
+          "type": "number",
+          "minimum": 0
+        },
+        "muted": {
+          "description": "不写或 true：不混入素材音轨（默认）。false 才把素材声音叠在旁白下面。",
+          "type": "boolean"
+        },
+        "explain": {
+          "description": "forbid（默认）：讲解 beat 里不能占住主讲区 stage。allow：明确允许（例如这段模拟就是讲解本身）。",
+          "enum": [
+            "forbid",
+            "allow"
+          ]
+        }
+      },
+      "unevaluatedProperties": false
+    },
     "widgetObject": {
       "type": "object",
       "required": [
@@ -605,6 +746,16 @@
       "properties": {
         "id": {
           "$ref": "#/$defs/beatId"
+        },
+        "role": {
+          "description": "hook：这一段是钩子，不是讲解。id 为 Hook 的 beat 不必再写。",
+          "enum": [
+            "hook"
+          ]
+        },
+        "plate": {
+          "description": "allow：这一段明确允许主讲区里放 clip 底板。",
+          "const": "allow"
         },
         "say": {
           "type": "array",
@@ -675,6 +826,12 @@
           "description": "这句的英文：中文版里是双语字幕的第二行（不念）；英文版（localize 成 en）里是要念的旁白，书签要和 text 一致",
           "type": "string",
           "minLength": 1
+        },
+        "hold": {
+          "description": "这句说完之后的句间静音（秒），覆盖标点默认值。必须落在该标点的允许区间里，见设计稿 §7.8。",
+          "type": "number",
+          "minimum": 0,
+          "maximum": 2
         }
       }
     },
@@ -782,6 +939,10 @@
             "in_out"
           ],
           "description": "tween 的缓动（默认 smooth）"
+        },
+        "allow_late": {
+          "description": "true：这一条视觉提示允许晚于旁白书签，不报 SS480。",
+          "const": true
         }
       }
     },

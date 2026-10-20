@@ -13,8 +13,8 @@ from __future__ import annotations
 
 import re
 
+from . import clips, quality, segments, selectors, widgets
 from . import params as P
-from . import segments, selectors, widgets
 from .report import Report
 from .textmarks import parse_object_text, parse_say_text
 
@@ -40,9 +40,12 @@ _COLOR = re.compile(r"^(#[0-9a-fA-F]{3}|#[0-9a-fA-F]{6}|#[0-9a-fA-F]{8}|(rgb|rgb
 
 
 class _Checker:
-    def __init__(self, doc: dict, report: Report):
+    def __init__(self, doc: dict, report: Report, root=None, timing=None, allowlist=None):
         self.doc = doc
         self.r = report
+        self.root = root
+        self.timing = timing
+        self.allowlist = allowlist
         self.meta = doc["meta"]
         self.line = self.meta["line"]
         self.data = doc.get("data", {})
@@ -417,8 +420,13 @@ class _Checker:
         self.check_pedagogy()
         self.check_misc()
         segments.check(self.doc, self.r, self.stats)
+        clips.check(self.doc, self.r, self.root)
+        quality.check_voice(self.doc, self.r, self.allowlist)
+        quality.check_pauses(self.doc, self.r)
+        if self.timing is not None:
+            quality.check_timing(self.doc, self.timing, self.r, self.allowlist)
         self.r.stats.update(self.stats)
 
 
-def check(doc: dict, report: Report) -> None:
-    _Checker(doc, report).run()
+def check(doc: dict, report: Report, *, root=None, timing=None, allowlist=None) -> None:
+    _Checker(doc, report, root, timing, allowlist).run()
