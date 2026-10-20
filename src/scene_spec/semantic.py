@@ -13,7 +13,7 @@ from __future__ import annotations
 
 import re
 
-from . import clips, quality, segments, selectors, widgets
+from . import clips, curves, quality, segments, selectors, widgets
 from . import params as P
 from .report import Report
 from .textmarks import parse_object_text, parse_say_text
@@ -64,7 +64,7 @@ class _Checker:
         self.allowlist = allowlist
         self.meta = doc["meta"]
         self.line = self.meta["line"]
-        self.data = doc.get("data", {})
+        self.data = curves.resolve_data(doc.get("data", {}), root, report)  # {src} 项读成文件里的内容（SS490–SS492）
         self.objects: dict[str, dict] = doc.get("objects", {})
         self.beats: list[dict] = doc["beats"]
         self.exposed: dict[str, widgets.Exposed] = {}

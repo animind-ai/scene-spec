@@ -11,9 +11,11 @@
 
 from __future__ import annotations
 
+import sys
 from collections.abc import Callable
 from dataclasses import dataclass, field
 
+from . import curves as _curves
 from . import selectors
 from .report import Report
 from .textmarks import ROLES, parse_object_text
@@ -244,6 +246,9 @@ def _expose_diff(definition: dict, data: dict) -> Exposed:
     for row in definition.get("rows") or []:
         if isinstance(row, dict) and isinstance(row.get("data"), str):
             values = data.get(row["data"])
+            if isinstance(values, _curves.Unavailable):  # {src} 读不出来 / 没给场景目录：长度未知，下标不查
+                exposed.parts[row["data"]] = sys.maxsize
+                continue
             exposed.parts[row["data"]] = len(values) if isinstance(values, list) else 0
     return exposed
 
@@ -257,6 +262,8 @@ def _validate_diff(ctx: WidgetContext, report: Report, path: str) -> None:
         if values is None:
             report.error("SS220", f"{path}.rows[{n}].data", f"data 段里没有 {name!r}")
             return
+        if isinstance(values, _curves.Unavailable):
+            return  # {src} 读不出来（已经报过），或没给场景目录、查不了
         if not isinstance(values, list) or not all(isinstance(v, (int, float)) and not isinstance(v, bool) for v in values):
             report.error("SS221", f"{path}.rows[{n}].data", f"{name!r} 应为数字列表")
             return
@@ -1418,9 +1425,9 @@ def _num_or_expr(v: object) -> bool:
 
 
 _graph_plots = _graph_entries(
-    {"f": lambda v: isinstance(v, str) and _is_expr(v), "role": _is_role, "label": _is_text,
-     "domain": lambda v: _graph_range(v) is None},
-    ("f",), "一条曲线 {f: \"x^2\", role?, label?, domain?}")
+    {"f": lambda v: isinstance(v, str) and _is_expr(v), "data": _is_text, "role": _is_role, "label": _is_text,
+     "domain": lambda v: _graph_range(v) is None, "progress": _num_or_expr, "along": lambda v: v in _curves.ALONG},
+    (), "一条曲线 {f: \"x^2\", role?, label?, domain?}，或数据曲线 {data: 键, progress?, along?, role?, label?}")
 _graph_points = _graph_entries(
     {"x": _num_or_expr, "plot": _is_index, "label": _is_text, "role": _is_role,
      "label_dir": lambda v: v in GRAPH_LABEL_DIRS},
@@ -1550,8 +1557,30 @@ def _graph_check_states(ctx: WidgetContext, report: Report, path: str) -> None:
                     report.error("SS411", f"{path}.lines[{n}].{field_}", f"参数取 {where} 时没有定义")
 
 
+def _graph_check_data(ctx: WidgetContext, report: Report, path: str) -> None:
+    """数据曲线 {data: 键}：f 和 data 只写一个；点列合规、在坐标范围里；progress 在 [0, 1] 里（SS490–SS499）。"""
+    d = ctx.definition
+    xr, yr = (d.get(k) if _graph_range(d.get(k)) is None else None for k in ("x", "y"))
+    box = (xr[0], yr[0], xr[1], yr[1]) if xr and yr else None
+    for n, plot in enumerate(_graph_list(d, "plots")):
+        ppath = f"{path}.plots[{n}]"
+        if ("f" in plot) == ("data" in plot):
+            report.error("SS496", ppath, "曲线写 {f: \"x^2\"}（函数）或 {data: 键}（数据点列），只写一个")
+            continue
+        if "data" not in plot:
+            for key in ("progress", "along"):
+                if key in plot:
+                    report.error("SS496", f"{ppath}.{key}", f"{key} 只用于数据曲线 {{data: 键}}（函数曲线用 draw 动作画出来）")
+            continue
+        if "domain" in plot:
+            report.error("SS496", f"{ppath}.domain", "数据曲线不写 domain：画的就是 data 里的全部点")
+        _curves.check_data(plot, ppath, ctx.data, box, report)
+        _curves.check_common(plot, ppath, ctx.ex, ctx.obj_id, report)
+
+
 def _validate_graph(ctx: WidgetContext, report: Report, path: str) -> None:
     d = ctx.definition
+    _graph_check_data(ctx, report, path)
     if not _graph_check_exprs(ctx, report, path):
         return
     env = ctx.ex.states[0] if ctx.ex is not None else None  # 参数的初值
@@ -1561,6 +1590,10 @@ def _validate_graph(ctx: WidgetContext, report: Report, path: str) -> None:
         k = p.get("plot", 0)
         if _is_index(k) and k >= len(plots):
             report.error("SS291", f"{path}.points[{n}].plot", f"只有 {len(plots)} 条曲线，没有第 {k} 条（从 0 数）")
+            continue
+        if _is_index(k) and "data" in plots[k]:
+            report.error("SS496", f"{path}.points[{n}].plot",
+                         f"第 {k} 条是数据曲线：graph 的点只能放在函数曲线上；沿数据走的点请用 plane 的 curves + points")
             continue
         xy = _graph_point_xy(d, n, env)
         if xy is None:

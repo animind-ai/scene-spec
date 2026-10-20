@@ -24,6 +24,7 @@
       "$ref": "#/$defs/style"
     },
     "data": {
+      "description": "数据：每项是字面量，或 {src: \"相对场景文件的路径.json\"} 从 JSON 文件读（不能是绝对路径、不能含 ..，见 curves.py，SS490–SS492）。当曲线用的点列是 [[x, y], …]，2 到 4096 个点。",
       "type": "object",
       "propertyNames": {
         "$ref": "#/$defs/name"

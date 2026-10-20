@@ -1,0 +1,67 @@
+# 预计算的数值轨迹驱动曲线（data + plane 的 curves / points）：阻尼振子 x'' + 0.2x' + x = 0 的相轨线。
+# 轨迹点由脚本用 RK4 积分好（等时间间隔 500 个点，x₀ = 3、v₀ = 0），放在 assets/damped-phase.json，data 段用 {src} 引用。
+# 参数 p 从 0 补间到 1：轨迹按 progress: p 长出来，点按 at: p 走在轨迹的头上（along: param——按采样时刻走，快慢就是真实的快慢）。
+# 不是一集成片：给 kit 的截图回归和 inspect 用。
+spec: "0.1"
+
+meta:
+  id: phase-portrait
+  title: 阻尼振子的相轨线
+  line: worked
+  units: [H9]
+  author: Boxi Yu
+  license: CC-BY-4.0
+  sources:
+    - kind: other
+      cite: 原创
+
+pedagogy:
+  insight: 有阻尼时，位置和速度一圈圈绕回原点：相轨线是一条往里收的螺线
+  status: demo
+  landing: Spiral
+
+style:
+  theme: paper
+  canvas: "16:9"
+  voice:
+    persona: teacher-hs
+    speed: 1.0
+  subtitles: none
+
+params:
+  p: {value: 0, min: 0, max: 1}
+
+data:
+  damped: {src: assets/damped-phase.json}
+
+objects:
+  title:
+    type: text
+    text: 阻尼振子的相轨线
+    level: title
+    in: top
+  phase:
+    widget: plane
+    x: [-3, 4]
+    y: [-3, 3]
+    axis_labels: ['位置 $x$', '速度 $v$']
+    curves:
+      - {data: damped, progress: p, along: param, role: A}
+    points:
+      - {curve: 0, at: p, label: P, role: HL, dir: ur}
+    in: stage
+
+beats:
+  - id: Start
+    say:
+      - {id: s1, pace: normal, text: 横轴是位置，纵轴是速度，这只是演示。}
+    do:
+      - {at: s1, act: show, target: title}
+      - {with: prev, act: show, target: phase}
+
+  - id: Spiral
+    shows: landing
+    say:
+      - {id: s1, pace: normal, text: 振子一边来回摆，一边慢下来，轨线一圈圈收向原点。}
+    do:
+      - {at: s1, act: tween, args: {p: 1}, dur: 6, ease: linear}
