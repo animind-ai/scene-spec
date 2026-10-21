@@ -19,7 +19,7 @@ from .report import Report
 ACTS = {"ghost", "unghost", "step", "pin"}
 NO_TARGET = {"step"}
 MAX_GHOSTS = 2  # 同时在画面上的残影超过这个数就警告：残影是"上一步"，不是全部历史
-MAX_STEPS = 5  # 一个 beat 里子步超过这个数就警告：规划要求核心变形拆成 3–5 个子步
+MAX_STEPS = 5  # 一个 beat 里子步超过这个数就警告：核心变形建议拆成 3–5 个子步
 DEFAULT_STEP_HOLD = 1.0
 
 
