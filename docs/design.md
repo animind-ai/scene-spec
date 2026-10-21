@@ -629,6 +629,21 @@ beats:
 - **读数 `readout`**：`label` 是值前面的文字（可混排公式），`value` 是表达式；`digits` 定小数位，`format: fraction` 时能写成分母不超过 12 的分数就写成分数（例如 1/2），否则按 2 位小数。值变宽时左端不动、往右长。
 - **graph 里能用参数的属性**：`plots[].f`、`points[].x`、`lines[].x / slope / through`、`triangles[].run`、数据曲线的 `plots[].progress`。割线、切线跟着它们的点走。
 - **plane 里能用参数的属性**：`curves[].progress`、参数曲线的 `curves[].x / y`（变量是 `t`）、`points[].at`。见 §7.5.1。
+- **参数驱动的平面变形**：`plane.matrix: [[a, b], [c, d]]`，每一项是数或参数表达式。整个平面（彩色网格、箭头、点、多边形；`fixed` 的点除外）
+  在 `warp` 等动作之外再按这个矩阵变形，`tween` 参数时连续地跟着变；行列式、面积、矩阵元素用 `readout` 显示（例如 `value: "a*d-b*c"`）。
+  参数的每组关键取值下矩阵都不能奇异（SS411）；不能和 `curves` 同时写（SS496）。箭头是否出坐标范围不按这个矩阵检查，取值范围自己留余量。
+
+```yaml
+params:
+  k: {value: 0, min: -1, max: 2}
+objects:
+  pl: {widget: plane, x: [-4, 4], y: [-3, 3], mesh: true, matrix: [[1, k], [0, 1]]}   # 推斜 k
+  area: {type: readout, label: "面积 =", value: "1", in: side}
+beats:
+  - id: Shear
+    do:
+      - {at: s1, act: tween, args: {k: 1.5}, dur: 3}
+```
 
 时间语义：参数在 beat 内时刻 t 的值只由 t 决定（同一参数的后一个补间从前一个补间当时的值接管），逐帧渲染、跳着预览、往回拖都得到同一画面。
 
