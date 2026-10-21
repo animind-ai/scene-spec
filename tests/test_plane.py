@@ -66,3 +66,34 @@ def test_shape_takes_a_label(example):
     assert add(example, P, ("shape", {"name": "sq", "points": [[0, 0], [1, 0], [1, 1]], "label": "a^2"})) == []
     assert "SS281" in add(example, P, ("shape", {"name": "sq2", "points": [[0, 0], [1, 0], [1, 1]], "label": 3}))
     assert "SS281" in add(example, P, ("shape", {"name": "sq3", "points": [[0, 0], [1, 0], [1, 1]], "fill": "no"}))
+
+
+def test_flip_path_ends_at_the_matrix():
+    from scene_spec.plane import det, flip_at, mul, polar_flip
+    for m in (((1.0, 0.0), (0.0, -1.0)), ((1.2, 3.4), (1.6, 1.2)), ((0.0, 1.0), (1.0, 0.0)), ((-2.0, 0.5), (0.3, 1.0))):
+        S, u = polar_flip(m)
+        end = flip_at(S, u, 1.0)
+        assert all(abs(end[i][j] - m[i][j]) < 1e-9 for i in range(2) for j in range(2)), (m, end)
+        assert abs(flip_at(S, u, 0.0)[0][0] - 1) < 1e-12 and det(flip_at(S, u, 0.5)) > 0  # 伸缩完还没翻
+        ref = mul(m, ((S[1][1] / det(S), -S[0][1] / det(S)), (-S[1][0] / det(S), S[0][0] / det(S))))
+        assert abs(ref[0][0] * u[0] + ref[0][1] * u[1] - u[0]) < 1e-9  # u 在镜面上：Q u = u
+
+
+def test_warp_flip_is_checked(example):
+    assert add(example, P, ("vector", {"name": "a", "v": [1, 1]}), ("warp", {"matrix": [[1, 0], [0, -1]], "path": "flip"})) == []
+
+
+@pytest.mark.parametrize("args", [
+    {"matrix": [[2, 0], [0, 1]], "path": "flip"},  # 行列式为正
+    {"matrix": [[1, 0], [0, -1]], "path": "spin"},
+])
+def test_warp_flip_rejects(example, args):
+    assert "SS281" in add(example, P, ("warp", args))
+
+
+def test_reset_flip(example):
+    assert add(example, P, ("warp", {"matrix": [[1, 0], [0, -1]], "path": "flip"}), ("reset", {"path": "flip"})) == []
+
+
+def test_reset_flip_needs_a_reflection(example):
+    assert "SS281" in add(example, P, ("warp", {"matrix": [[2, 0], [0, 1]]}), ("reset", {"path": "flip"}))
