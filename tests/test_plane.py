@@ -66,3 +66,23 @@ def test_shape_takes_a_label(example):
     assert add(example, P, ("shape", {"name": "sq", "points": [[0, 0], [1, 0], [1, 1]], "label": "a^2"})) == []
     assert "SS281" in add(example, P, ("shape", {"name": "sq2", "points": [[0, 0], [1, 0], [1, 1]], "label": 3}))
     assert "SS281" in add(example, P, ("shape", {"name": "sq3", "points": [[0, 0], [1, 0], [1, 1]], "fill": "no"}))
+
+
+def test_highlight_pass(example):
+    result = add(example, P, ("vector", {"name": "a", "v": [3, 1]}), ("shape", {"name": "sq", "points": [[0, 0], [1, 0], [1, 1]]}),
+                 ("highlight", {"name": "a", "pulse": True}), ("highlight", {"name": ["sq"]}),
+                 ("warp", {"matrix": [[1, 0.5], [0, 1]]}), ("unhighlight", {"name": "a"}), ("unhighlight", None),
+                 ("highlight", {"name": "a"}), ("remove", {"name": "a"}))
+    assert result == []
+
+
+@pytest.mark.parametrize("actions", [
+    [("highlight", {"name": "nope"})],
+    [("highlight", None)],  # 要写 name
+    [("vector", {"name": "a", "v": [1, 1]}), ("highlight", {"name": "a", "pulse": 2})],
+    [("vector", {"name": "a", "v": [1, 1]}), ("highlight", {"name": "a", "role": "A"})],
+    [("vector", {"name": "a", "v": [1, 1]}), ("highlight", {"name": "a"}), ("highlight", {"name": "a"})],
+    [("vector", {"name": "a", "v": [1, 1]}), ("unhighlight", {"name": "a"})],
+])
+def test_highlight_is_checked(example, actions):
+    assert "SS281" in add(example, P, *actions)
