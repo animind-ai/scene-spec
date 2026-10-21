@@ -1,0 +1,68 @@
+# 三维坐标空间 space 的示例（LA101 列空间 / 零空间 / 投影 / 行列式是体积要用的画面）：单位正方体按矩阵变成平行六面体、
+# 奇异矩阵把空间压成列空间那个平面、零空间那条直线压成原点、向量投影到平面上（投影和误差向量）、相机绕着转。
+# 不是一集成片，每个 beat 演一组动作，给 kit 的截图回归和 inspect 分镜用。
+spec: "0.1"
+
+meta:
+  id: space
+  title: 三维空间：组件示例
+  line: worked
+  author: Boxi Yu
+  license: CC-BY-4.0
+  sources:
+    - kind: other
+      cite: 原创（LA101 第 4、16、20 讲要用的画面）
+
+pedagogy:
+  insight: 矩阵把单位正方体变成平行六面体，体积乘上 |det A|；投影是离平面最近的点，误差垂直于平面
+  status: proof
+
+style:
+  theme: paper
+  canvas: "16:9"
+  voice:
+    persona: teacher-hs
+    speed: 1.0
+
+objects:
+  sp:
+    widget: space
+    x: [-3, 3]
+    y: [-3, 3]
+    z: [-2, 3]
+    mesh: true
+    view: {azimuth: 30, elevation: 20}
+    in: stage
+
+beats:
+  - id: Volume
+    say:
+      - {id: v1, pace: normal, text: "{@a}这是单位正方体，体积是一。{@b}用矩阵 A 变一下，它变成一个平行六面体，体积是 A 的行列式的绝对值。{@c}转过去看看。"}
+    do:
+      - {at: v1@a, act: show, target: sp}
+      - {with: prev, act: box, target: sp, args: {name: Q, edges: [[1, 0, 0], [0, 1, 0], [0, 0, 1]], role: C, label: '\det = 1'}}
+      - {at: v1@b, act: warp, target: sp, args: {matrix: [[1.5, 0.5, 0], [0, 1, 0.5], [0, 0, 2]]}}
+      - {after: prev, act: relabel, target: sp, args: {name: Q, label: '\det = 3'}}
+      - {at: v1@c, act: orbit, target: sp, args: {d_azimuth: 30, d_elevation: 10}}
+      - {after: prev, act: reset, target: sp}
+
+  - id: Columns
+    say:
+      - {id: c1, pace: normal, text: "{@a}这个矩阵的第一列和第二列一样。{@b}整个空间被压到列空间这个平面上，{@c}零空间那条直线压成了原点。"}
+    do:
+      - {at: c1@a, act: remove, target: sp}
+      - {with: prev, act: line, target: sp, args: {name: N, dir: [1, -1, 0], role: HL, dashed: true, label: 'N(A)'}}
+      - {with: prev, act: box, target: sp, args: {name: Q, edges: [[1, 0, 0], [0, 1, 0], [0, 0, 1]], role: C}}
+      - {at: c1@b, act: plane, target: sp, args: {name: CA, span: [[1, 1, 0], [0, 0, 1]], role: B, label: 'C(A)'}}
+      - {after: prev, act: warp, target: sp, args: {matrix: [[1, 1, 0], [1, 1, 0], [0, 0, 1]]}}
+      - {at: c1@c, act: hold, dur: 0.5}
+
+  - id: Project
+    say:
+      - {id: p1, pace: normal, text: "{@a}向量 b 不在平面上。{@b}它在平面上的投影是 p，误差 e 垂直于平面。{@c}换个角度看，直角更清楚。"}
+    do:
+      - {at: p1@a, act: remove, target: sp}
+      - {with: prev, act: plane, target: sp, args: {name: P, span: [[1, 0, 0], [0, 1, 0.4]], role: B}}
+      - {after: prev, act: vector, target: sp, args: {name: b, v: [1, 1.5, 2.5], label: '\mathbf b'}}
+      - {at: p1@b, act: project, target: sp, args: {name: b, onto: P, as: p, error: e, label: '\mathbf p', error_label: '\mathbf e'}}
+      - {at: p1@c, act: orbit, target: sp, args: {azimuth: 70, elevation: 15}}

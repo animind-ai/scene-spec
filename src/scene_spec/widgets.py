@@ -1710,6 +1710,12 @@ from .solid import register as _register_solid  # noqa: E402
 
 _register_solid(REGISTRY)
 
+# ---------- 三维坐标空间（space）：向量、直线、平面、平行六面体、3×3 矩阵变形、投影；检查在 space.py ----------
+
+from .space import register as _register_space  # noqa: E402
+
+_register_space(REGISTRY, Widget, Exposed, _unknown_args)
+
 
 def lookup(name: str) -> Widget | None:
     """按名字找组件，忽略 @版本。"""
