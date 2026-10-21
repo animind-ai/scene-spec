@@ -7,7 +7,7 @@
 - segment / line 是线段和直线：线段两端、直线上的一点和方向都跟着 rotate / scale / warp / reset 变换，
   所以特征向量方向上的直线（span）在 warp 时一直盖着那支特征向量；
 - highlight / unhighlight 的名字存在，不重复高亮、不取消没高亮的；
-- warp 的矩阵不能是奇异的（整个平面压成一条线，网格画不出来），SS281；
+- warp 的矩阵不能是奇异的（整个平面压成一条线，网格画不出来），SS281；path: flip（翻面）只用于行列式为负的矩阵；
 - curves（数据曲线、参数曲线）和沿曲线走的 points：引用的 data 存在、点列合规、整条曲线在坐标范围里，
   progress / at 在 [0, 1] 里（SS490–SS499，见 curves.py）；有 curves 的平面不能整体 rotate / scale / warp / reset
   （曲线不跟着变换），SS496；
@@ -138,6 +138,28 @@ def crosses(p: tuple[float, float], d: tuple[float, float], b: tuple[float, floa
         s0, s1 = (a - p[k]) / d[k], (c - p[k]) / d[k]
         lo, hi = max(lo, min(s0, s1)), min(hi, max(s0, s1))
     return hi - lo > 1e-9
+
+
+def polar_flip(m: Mat) -> tuple[Mat, tuple[float, float]]:
+    """行列式为负的 m = Q S：S = sqrt(mᵀm) 是对称正定的伸缩，Q 是沿直线 u 的镜面反射。返回 (S, u)。"""
+    a = mul(((m[0][0], m[1][0]), (m[0][1], m[1][1])), m)  # mᵀm
+    r = math.sqrt(det(a))
+    k = math.sqrt(a[0][0] + a[1][1] + 2 * r)
+    S = (((a[0][0] + r) / k, a[0][1] / k), (a[1][0] / k, (a[1][1] + r) / k))
+    q = mul(m, inv(S))  # [[cos φ, sin φ], [sin φ, −cos φ]]：沿 φ/2 方向的直线反射
+    half = math.atan2(q[1][0], q[0][0]) / 2
+    return S, (math.cos(half), math.sin(half))
+
+
+def flip_at(S: Mat, u: tuple[float, float], t: float) -> Mat:
+    """翻面路径的第 t（0 到 1）处：前一半按 (1−s)I + sS 伸缩，后一半绕镜面直线 u 在空中转半圈
+    （正投影到平面上：uuᵀ + cos θ (I − uuᵀ)，θ 从 0 到 π）。"""
+    if t <= 0.5:
+        return lerp(S, 2 * t)
+    c = math.cos(math.pi * (2 * t - 1))
+    uu = ((u[0] * u[0], u[0] * u[1]), (u[1] * u[0], u[1] * u[1]))
+    F = tuple(tuple(uu[i][j] + c * (EYE[i][j] - uu[i][j]) for j in range(2)) for i in range(2))
+    return mul(F, S)  # type: ignore[arg-type]
 
 
 def register(registry: dict, Widget, Exposed, unknown_args) -> None:  # noqa: N803
@@ -344,7 +366,7 @@ def register(registry: dict, Widget, Exposed, unknown_args) -> None:  # noqa: N8
             return None
         return [(float(at[0]), float(at[1])), (at[0] + d[0], at[1] + d[1])]
 
-    def apply(ctx, report: Report, path: str, names: list[str], m: Mat, whole: bool) -> None:
+    def apply(ctx, report: Report, path: str, names: list[str], m: Mat, whole: bool, how: str = "lerp") -> None:
         """names 按 m 变换（和 kit 一样：纯旋转走圆弧，其他矩阵走 (1−t)I + tM），途中按 16 步取样检查范围。"""
         state = ctx.exposed.state
         if whole and ctx.definition.get("curves"):
@@ -352,10 +374,14 @@ def register(registry: dict, Widget, Exposed, unknown_args) -> None:  # noqa: N8
                          "不能整体 rotate / scale / warp / reset（写 name 只转、只缩放某几个东西）")
             return
         angle = rotation_angle(m)
+        flip = polar_flip(m) if how == "flip" else None
         for n in names:
             p0 = state["items"][n]
             for k in range(1, 17):
-                mk = rot(angle * k / 16) if angle is not None else lerp(m, k / 16)
+                if flip is not None:
+                    mk = flip_at(*flip, k / 16)
+                else:
+                    mk = rot(angle * k / 16) if angle is not None else lerp(m, k / 16)
                 inside(ctx, report, path, n, act(mk, p0))
             state["items"][n] = act(m, p0)
         if whole:
@@ -384,18 +410,30 @@ def register(registry: dict, Widget, Exposed, unknown_args) -> None:  # noqa: N8
 
     def warp(args: dict, ctx, report: Report, path: str) -> None:
         m = _matrix(args.get("matrix"))
-        unknown_args(args, {"matrix"}, "warp", report, path)
+        unknown_args(args, {"matrix", "path"}, "warp", report, path)
         if m is None:
             report.error("SS281", f"{path}.args.matrix", "warp 需要 matrix：[[a, b], [c, d]]")
             return
         if abs(det(m)) < 1e-9:
             report.error("SS281", f"{path}.args.matrix", "矩阵的行列式是 0：整个平面压成一条线，画不出网格")
             return
-        apply(ctx, report, path, old_names({}, ctx, report, path, False), m, True)
+        how = args.get("path", "lerp")
+        if how not in ("lerp", "flip"):
+            report.error("SS281", f"{path}.args.path", "path 应为 lerp（默认：(1−t)I + tM）/ flip（先伸缩，再沿镜面直线翻面）")
+            return
+        if how == "flip" and det(m) > 0:
+            report.error("SS281", f"{path}.args.path", "path: flip 用于行列式为负的矩阵（带反射）；行列式为正的矩阵用默认的 lerp")
+            return
+        apply(ctx, report, path, old_names({}, ctx, report, path, False), m, True, how)
 
     def reset(args: dict, ctx, report: Report, path: str) -> None:
-        unknown_args(args, set(), "reset", report, path)
-        apply(ctx, report, path, old_names({}, ctx, report, path, False), inv(ctx.exposed.state["M"]), True)
+        unknown_args(args, {"path"}, "reset", report, path)
+        m = inv(ctx.exposed.state["M"])
+        how = args.get("path", "lerp")
+        if how not in ("lerp", "flip") or (how == "flip" and det(m) > 0):
+            report.error("SS281", f"{path}.args.path", "reset 的 path: flip 只在现在的变换带反射（行列式为负）时用；否则不写")
+            return
+        apply(ctx, report, path, old_names({}, ctx, report, path, False), m, True, how)
 
     def relabel(args: dict, ctx, report: Report, path: str) -> None:
         names = old_names(args, ctx, report, path, True)
