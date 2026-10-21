@@ -1437,7 +1437,8 @@
                   "place": {"enum": ["stay", "above", "below", "left_of", "right_of"]},
                   "gap": {"enum": ["xs", "sm", "md", "lg", "xl"]},
                   "scale": {"type": "number", "minimum": 0.3, "maximum": 1},
-                  "opacity": {"type": "number", "minimum": 0.1, "maximum": 0.6}
+                  "opacity": {"type": "number", "minimum": 0.1, "maximum": 0.6},
+                  "labels": {"type": "boolean", "description": "false：残影不带组件的标注（刻度数字、箭头和点的名字），只留图形"}
                 }
               }
             }

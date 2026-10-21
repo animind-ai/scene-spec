@@ -737,7 +737,7 @@ style: {segmented: true, step_hold: 1.0}
 | 动作 | 作用 | 参数 |
 |---|---|---|
 | `step` | 子步结束。`style.segmented: true` 时画面在这一刻定住 `hold` 秒，旁白在同一时刻插入等长静音，之后的动作、句子、书签全部顺延；不分段时不定格，只把位置写进 `chapters.json`（hold 为 0） | `hold`：0–10 秒，默认取 `style.step_hold`（默认 1.0）。不写 `target`、`dur` |
-| `ghost` | 给目标**此刻**的样子留一个淡色副本：全部改成 `DIM` 色、整体不透明度 0.3，画在所有对象后面；之后原对象怎么变，残影不动 | `place`：`stay`（原地，默认）/ `above` / `below` / `left_of` / `right_of`；`gap`：间距档位；`scale`：0.3–1；`opacity`：0.1–0.6 |
+| `ghost` | 给目标**此刻**的样子留一个淡色副本：全部改成 `DIM` 色、整体不透明度 0.3，画在所有对象后面；之后原对象怎么变，残影不动 | `place`：`stay`（原地，默认）/ `above` / `below` / `left_of` / `right_of`；`gap`：间距档位；`scale`：0.3–1；`opacity`：0.1–0.6；`labels: false`：不带组件的标注（`plane` / `number_line` 的刻度数字、箭头和点的名字），只留图形，原地残影的字不会和变形后的字叠在一起 |
 | `unghost` | 收掉目标留下的所有残影。目标被 `hide` 时残影也一起收掉 | 无 |
 | `pin` | 目标从此常驻：之后不能 `hide` / `move`（包括它的片段）；`clear` 只清它 pin 之后加的装饰，pin 时已有的下划线、圈跟着常驻；布局求解器把它当固定占位，后出现的对象让开它 | 无 |
 
