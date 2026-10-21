@@ -51,6 +51,14 @@ def test_ghost_stay_with_gap_warns(ep09):
     assert ("warning", "SS441") in codes(ep09)
 
 
+def test_ghost_labels_flag(ep09):
+    do = beat(ep09, "Count")["do"]
+    do.append({"after": "prev", "act": "ghost", "target": "line", "args": {"labels": False}})
+    assert not [c for c in codes(ep09, "SS1") if c[0] == "error"]
+    do[-1]["args"]["labels"] = "no"
+    assert ("error", "SS100") in codes(ep09, "SS1")
+
+
 def test_too_many_ghosts_warn(ep09):
     do = beat(ep09, "Count")["do"]
     for _ in range(3):
