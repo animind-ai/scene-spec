@@ -68,6 +68,48 @@ def test_shape_takes_a_label(example):
     assert "SS281" in add(example, P, ("shape", {"name": "sq3", "points": [[0, 0], [1, 0], [1, 1]], "fill": "no"}))
 
 
+def test_segments_and_lines_pass(example):
+    # 特征向量方向上的直线（span）跟着 warp：[[2, 0], [0, 3]] 的两条坐标轴方向不动，斜的那条转过去
+    result = add(example, {**P, "mesh": True},
+                 ("segment", {"name": "s", "from": [0, 0], "to": [2, 1], "role": "B", "label": "s"}),
+                 ("line", {"name": "span", "dir": [1, 2], "role": "A", "label": r"\mathrm{span}", "dashed": True}),
+                 ("line", {"name": "row", "eq": [1, 2, 3], "side": "r", "along": 0.8}),
+                 ("line", {"name": "v", "dir": [0, 1], "through": [3, 0]}),
+                 ("relabel", {"name": "span", "label": "L"}),
+                 ("warp", {"matrix": [[1, 0.5], [0, 1]]}), ("reset", None), ("remove", {"name": ["s", "row"]}))
+    assert result == []
+
+
+@pytest.mark.parametrize("args,code", [
+    ({"act": "segment", "name": "s", "from": [0, 0], "to": [6, 0]}, "SS262"),  # 线段伸出 x 范围
+    ({"act": "segment", "name": "s", "from": [1, 1], "to": [1, 1]}, "SS281"),  # 两端重合
+    ({"act": "segment", "name": "s", "from": [0, 0]}, "SS281"),
+    ({"act": "line", "name": "l", "dir": [0, 0]}, "SS281"),  # 零方向
+    ({"act": "line", "name": "l", "dir": [1, 0], "eq": [1, 0, 1]}, "SS281"),  # 二选一
+    ({"act": "line", "name": "l", "eq": [0, 0, 1]}, "SS281"),
+    ({"act": "line", "name": "l", "eq": [1, 0, 2], "through": [0, 0]}, "SS281"),
+    ({"act": "line", "name": "l", "dir": [1, 0], "through": [0, 9]}, "SS262"),  # 不经过坐标范围
+    ({"act": "line", "name": "l", "dir": [1, 0], "role": "Q"}, "SS281"),
+    ({"act": "line", "name": "l", "dir": [1, 0], "points": [[0, 0]]}, "SS281"),  # 多余参数
+])
+def test_lines_are_checked(example, args, code):
+    act = args.pop("act")
+    result = add(example, P, (act, args))
+    assert any(c.startswith(code) for c in result), result
+
+
+def test_lines_cannot_slide(example):
+    result = add(example, P, ("segment", {"name": "s", "from": [0, 0], "to": [1, 1]}), ("slide", {"name": "s", "at": [1, 0]}))
+    assert "SS281" in result
+
+
+def test_lines_follow_warps(example):
+    # 直线跟着整个平面缩放：y = 3 放大两倍成了 y = 6，出了 y 范围 [-1, 4]
+    result = add(example, P, ("line", {"name": "l", "eq": [0, 1, 3]}), ("scale", {"by": 2}))
+    assert "SS262" in result
+
+
+
 def test_highlight_pass(example):
     result = add(example, P, ("vector", {"name": "a", "v": [3, 1]}), ("shape", {"name": "sq", "points": [[0, 0], [1, 0], [1, 1]]}),
                  ("highlight", {"name": "a", "pulse": True}), ("highlight", {"name": ["sq"]}),
