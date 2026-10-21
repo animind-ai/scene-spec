@@ -109,7 +109,6 @@ def test_lines_follow_warps(example):
     assert "SS262" in result
 
 
-
 def test_highlight_pass(example):
     result = add(example, P, ("vector", {"name": "a", "v": [3, 1]}), ("shape", {"name": "sq", "points": [[0, 0], [1, 0], [1, 1]]}),
                  ("highlight", {"name": "a", "pulse": True}), ("highlight", {"name": ["sq"]}),
@@ -128,3 +127,36 @@ def test_highlight_pass(example):
 ])
 def test_highlight_is_checked(example, actions):
     assert "SS281" in add(example, P, *actions)
+
+
+
+def live_doc(matrix, tween: dict, **extra) -> dict:
+    from conftest import minimal_insight
+    doc = minimal_insight()
+    doc["params"] = {"a": {"value": 1, "min": -2, "max": 3}, "s": {"value": 0, "min": -2, "max": 2}}
+    doc["objects"]["pl"] = {"widget": "plane", "x": [-3, 3], "y": [-3, 3], "mesh": True, "in": "stage", "matrix": matrix, **extra}
+    doc["objects"]["det"] = {"type": "readout", "label": r"$\det$ =", "value": "a", "in": "side"}
+    doc["beats"][2]["do"] = [
+        {"at": 0, "act": "show", "target": "pl"},
+        {"with": "prev", "act": "show", "target": "det"},
+        {"after": "prev", "act": "vector", "target": "pl", "args": {"name": "e1", "v": [1, 0]}},
+        {"after": "prev", "act": "tween", "args": tween, "dur": 2},
+    ]
+    return doc
+
+
+def test_live_matrix_passes():
+    report = check(live_doc([["a", "s"], [0, 1]], {"a": 2, "s": 1}))
+    assert report.ok, report.errors
+    assert "SS409" not in report.codes()  # a、s 都用上了
+
+
+@pytest.mark.parametrize("matrix,tween,extra,code", [
+    ([["a", 0], [0, 1]], {"a": 0}, {}, "SS411"),  # 补间到 a = 0：奇异
+    ([["a", 0], [0, "1/s"]], {"s": 1}, {}, "SS411"),  # 初值 s = 0 时没有定义
+    ([["a", 0], [0, "q"]], {"a": 2}, {}, "SS402"),  # 没声明的参数
+    ([["a", 0], [0]], {"a": 2}, {}, "SS202"),  # 不是 2×2
+    ([["a", 0], [0, 1]], {"a": 2}, {"curves": [{"x": "cos(t)", "y": "sin(t)", "domain": [0, 6]}]}, "SS496"),
+])
+def test_live_matrix_is_checked(matrix, tween, extra, code):
+    assert code in check(live_doc(matrix, tween, **extra)).codes()

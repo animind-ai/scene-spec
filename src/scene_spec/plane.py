@@ -10,7 +10,10 @@
 - warp 的矩阵不能是奇异的（整个平面压成一条线，网格画不出来），SS281；
 - curves（数据曲线、参数曲线）和沿曲线走的 points：引用的 data 存在、点列合规、整条曲线在坐标范围里，
   progress / at 在 [0, 1] 里（SS490–SS499，见 curves.py）；有 curves 的平面不能整体 rotate / scale / warp / reset
-  （曲线不跟着变换），SS496。
+  （曲线不跟着变换），SS496；
+- matrix（参数驱动的变形）：[[a, b], [c, d]]，每一项是数或参数表达式；整个平面（网格、箭头、点、多边形，钉住的点除外）
+  再按它变形，tween 参数时平面连续地跟着变（行列式、矩阵元素的读数用 readout 对象）。参数取每组关键值时
+  这个矩阵都不能是奇异的（SS411）；不能和 curves 同时写（曲线不跟着变换，SS496）。
 """
 
 from __future__ import annotations
@@ -18,6 +21,7 @@ from __future__ import annotations
 import math
 
 from . import curves as C
+from . import expr
 from .report import Report
 from .textmarks import ROLES
 
@@ -63,6 +67,12 @@ def _entries(fields: tuple[str, ...], what: str):
 
 _curves = _entries(C.CURVE_FIELDS, "{data: 键} 或 {x: \"x(t)\", y: \"y(t)\", domain: [t0, t1]}，可加 progress、along、role")
 _points = _entries(C.POINT_FIELDS, "沿曲线走的点 {curve: i, at: 0 到 1, label?, role?, dir?}")
+
+
+def _live_matrix(value: object) -> str | None:
+    ok = (isinstance(value, list) and len(value) == 2
+          and all(isinstance(r, list) and len(r) == 2 and all(_num(x) or (isinstance(x, str) and x.strip()) for x in r) for r in value))
+    return None if ok else "应为 [[a, b], [c, d]]：每一项是数或参数表达式（字符串）"
 
 
 def _labels(value: object) -> str | None:
@@ -428,12 +438,41 @@ def register(registry: dict, Widget, Exposed, unknown_args) -> None:  # noqa: N8
             state["fixed"].discard(n)
             state["lit"].discard(n)
 
+    def check_live_matrix(ctx, report: Report, path: str) -> None:
+        """matrix 的每一项能解析；参数取每组关键值时矩阵不奇异；不和 curves 同时写。"""
+        if ctx.definition.get("curves"):
+            report.error("SS496", path, "这个平面有 curves：曲线不跟着变形，不能再写参数驱动的 matrix")
+        ex = ctx.ex
+        trees = []
+        for i, row in enumerate(ctx.definition["matrix"]):
+            for j, v in enumerate(row):
+                if _num(v):
+                    trees.append(("num", float(v)))
+                    continue
+                if ex is None:
+                    report.error("SS402", f"{path}[{i}][{j}]", f"{v!r}：场景没有声明 params，矩阵元素只能写数")
+                    return
+                tree = ex.parse(v, f"{path}[{i}][{j}]")
+                if tree is None:
+                    return
+                trees.append(tree)
+        for env in (ex.states_for(ctx.obj_id) if ex is not None else [{}]):
+            a, b_, c, d = (expr.evaluate(t, math.nan, env) for t in trees)
+            if not all(math.isfinite(v) for v in (a, b_, c, d)):
+                report.error("SS411", path, f"参数取 {ex.describe(env)} 时矩阵有一项没有定义")
+                return
+            if abs(a * d - b_ * c) < 1e-9:
+                report.error("SS411", path, f"参数取 {ex.describe(env)} 时矩阵的行列式是 0：整个平面压成一条线，画不出网格")
+                return
+
     def validate(ctx, report: Report, path: str) -> None:
         d = ctx.definition
         labels = d.get("axis_labels")
         if labels is not None and _labels(labels):
             report.error("SS202", f"{path}.axis_labels", _labels(labels))
         b = box(ctx)
+        if "matrix" in d and _live_matrix(d["matrix"]) is None:
+            check_live_matrix(ctx, report, f"{path}.matrix")
         cs = d.get("curves") if _curves(d.get("curves")) is None else []
         for n, entry in enumerate(cs):
             cpath = f"{path}.curves[{n}]"
@@ -469,7 +508,8 @@ def register(registry: dict, Widget, Exposed, unknown_args) -> None:  # noqa: N8
         "plane",
         params={"x": (True, _range), "y": (True, _range), "grid": (False, _bool), "numbers": (False, _bool),
                 "complex": (False, _bool), "mesh": (False, _bool), "mesh_role": (False, _role),
-                "axis_labels": (False, _labels), "curves": (False, _curves), "points": (False, _points)},
+                "axis_labels": (False, _labels), "curves": (False, _curves), "points": (False, _points),
+                "matrix": (False, _live_matrix)},
         expose=expose,
         actions={"vector": vector, "slide": slide, "point": point, "shape": shape, "segment": segment, "line": line,
                  "rotate": rotate, "scale": scale, "warp": warp, "reset": reset, "relabel": relabel,
