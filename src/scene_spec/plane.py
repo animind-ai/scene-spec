@@ -6,6 +6,7 @@
   直线（line）是无穷长的，画的时候裁在坐标范围里：只要求它一直穿过坐标范围；
 - segment / line 是线段和直线：线段两端、直线上的一点和方向都跟着 rotate / scale / warp / reset 变换，
   所以特征向量方向上的直线（span）在 warp 时一直盖着那支特征向量；
+- highlight / unhighlight 的名字存在，不重复高亮、不取消没高亮的；
 - warp 的矩阵不能是奇异的（整个平面压成一条线，网格画不出来），SS281；
 - curves（数据曲线、参数曲线）和沿曲线走的 points：引用的 data 存在、点列合规、整条曲线在坐标范围里，
   progress / at 在 [0, 1] 里（SS490–SS499，见 curves.py）；有 curves 的平面不能整体 rotate / scale / warp / reset
@@ -133,7 +134,7 @@ def register(registry: dict, Widget, Exposed, unknown_args) -> None:  # noqa: N8
     def expose(definition: dict, data: dict) -> Exposed:
         n = {k: len(v) if isinstance(v := definition.get(k), list) else 0 for k in ("curves", "points")}
         return Exposed(parts={"axes": 1, "grid": 1, "mesh": 1, "items": 1, "curve": n["curves"], "point": n["points"]},
-                       state={"items": {}, "M": EYE, "fixed": set(), "kinds": {}})
+                       state={"items": {}, "M": EYE, "fixed": set(), "kinds": {}, "lit": set()})
 
     def box(ctx):
         x, y = ctx.definition.get("x"), ctx.definition.get("y")
@@ -394,6 +395,29 @@ def register(registry: dict, Widget, Exposed, unknown_args) -> None:  # noqa: N8
         if names and len(names) != 1:
             report.error("SS281", f"{path}.args.name", "relabel 一次换一个名字")
 
+    def highlight(args: dict, ctx, report: Report, path: str) -> None:
+        """highlight {name, pulse?}：给平面上的东西加一圈同色光晕、描边加粗（取代 mark 的金色方块）。"""
+        names = old_names(args, ctx, report, path, True)
+        if "pulse" in args and _bool(args["pulse"]):
+            report.error("SS281", f"{path}.args.pulse", "pulse 应为 true / false（光晕亮起时跳两下）")
+        unknown_args(args, {"name", "pulse"}, "highlight", report, path)
+        lit = ctx.exposed.state["lit"]
+        for n in names or []:
+            if n in lit:
+                report.error("SS281", f"{path}.args.name", f"{n} 已经高亮了（先 unhighlight）")
+            lit.add(n)
+
+    def unhighlight(args: dict, ctx, report: Report, path: str) -> None:
+        lit = ctx.exposed.state["lit"]
+        unknown_args(args, {"name"}, "unhighlight", report, path)
+        if "name" not in args:
+            lit.clear()
+            return
+        for n in old_names(args, ctx, report, path, True) or []:
+            if n not in lit:
+                report.error("SS281", f"{path}.args.name", f"{n} 没有高亮")
+            lit.discard(n)
+
     def remove(args: dict, ctx, report: Report, path: str) -> None:
         state = ctx.exposed.state
         names = old_names(args, ctx, report, path, False) if "name" in args else list(state["items"])  # 不写 = 全部，钉住的点也收
@@ -402,6 +426,7 @@ def register(registry: dict, Widget, Exposed, unknown_args) -> None:  # noqa: N8
             state["items"].pop(n, None)
             state["kinds"].pop(n, None)
             state["fixed"].discard(n)
+            state["lit"].discard(n)
 
     def validate(ctx, report: Report, path: str) -> None:
         d = ctx.definition
@@ -447,7 +472,7 @@ def register(registry: dict, Widget, Exposed, unknown_args) -> None:  # noqa: N8
                 "axis_labels": (False, _labels), "curves": (False, _curves), "points": (False, _points)},
         expose=expose,
         actions={"vector": vector, "slide": slide, "point": point, "shape": shape, "segment": segment, "line": line,
-                 "rotate": rotate, "scale": scale,
-                 "warp": warp, "reset": reset, "relabel": relabel, "remove": remove},
+                 "rotate": rotate, "scale": scale, "warp": warp, "reset": reset, "relabel": relabel,
+                 "highlight": highlight, "unhighlight": unhighlight, "remove": remove},
         validate=validate,
     )

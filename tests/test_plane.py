@@ -107,3 +107,24 @@ def test_lines_follow_warps(example):
     # 直线跟着整个平面缩放：y = 3 放大两倍成了 y = 6，出了 y 范围 [-1, 4]
     result = add(example, P, ("line", {"name": "l", "eq": [0, 1, 3]}), ("scale", {"by": 2}))
     assert "SS262" in result
+
+
+
+def test_highlight_pass(example):
+    result = add(example, P, ("vector", {"name": "a", "v": [3, 1]}), ("shape", {"name": "sq", "points": [[0, 0], [1, 0], [1, 1]]}),
+                 ("highlight", {"name": "a", "pulse": True}), ("highlight", {"name": ["sq"]}),
+                 ("warp", {"matrix": [[1, 0.5], [0, 1]]}), ("unhighlight", {"name": "a"}), ("unhighlight", None),
+                 ("highlight", {"name": "a"}), ("remove", {"name": "a"}))
+    assert result == []
+
+
+@pytest.mark.parametrize("actions", [
+    [("highlight", {"name": "nope"})],
+    [("highlight", None)],  # 要写 name
+    [("vector", {"name": "a", "v": [1, 1]}), ("highlight", {"name": "a", "pulse": 2})],
+    [("vector", {"name": "a", "v": [1, 1]}), ("highlight", {"name": "a", "role": "A"})],
+    [("vector", {"name": "a", "v": [1, 1]}), ("highlight", {"name": "a"}), ("highlight", {"name": "a"})],
+    [("vector", {"name": "a", "v": [1, 1]}), ("unhighlight", {"name": "a"})],
+])
+def test_highlight_is_checked(example, actions):
+    assert "SS281" in add(example, P, *actions)
