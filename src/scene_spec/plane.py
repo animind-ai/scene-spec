@@ -3,10 +3,17 @@
 按动作顺序推演平面上有哪些东西（名字 → 数学坐标）和到目前为止的整体变换，检查：
 - 参数和动作参数的类型；名字不重复、引用的名字存在；
 - 每个东西在每个动作之后都还在坐标范围 x、y 里（伸出去会盖住刻度、出了组件排版时预留的框），SS262；
+  直线（line）是无穷长的，画的时候裁在坐标范围里：只要求它一直穿过坐标范围；
+- segment / line 是线段和直线：线段两端、直线上的一点和方向都跟着 rotate / scale / warp / reset 变换，
+  所以特征向量方向上的直线（span）在 warp 时一直盖着那支特征向量；
+- highlight / unhighlight 的名字存在，不重复高亮、不取消没高亮的；
 - warp 的矩阵不能是奇异的（整个平面压成一条线，网格画不出来），SS281；path: flip（翻面）只用于行列式为负的矩阵；
 - curves（数据曲线、参数曲线）和沿曲线走的 points：引用的 data 存在、点列合规、整条曲线在坐标范围里，
   progress / at 在 [0, 1] 里（SS490–SS499，见 curves.py）；有 curves 的平面不能整体 rotate / scale / warp / reset
-  （曲线不跟着变换），SS496。
+  （曲线不跟着变换），SS496；
+- matrix（参数驱动的变形）：[[a, b], [c, d]]，每一项是数或参数表达式；整个平面（网格、箭头、点、多边形，钉住的点除外）
+  再按它变形，tween 参数时平面连续地跟着变（行列式、矩阵元素的读数用 readout 对象）。参数取每组关键值时
+  这个矩阵都不能是奇异的（SS411）；不能和 curves 同时写（曲线不跟着变换，SS496）。
 """
 
 from __future__ import annotations
@@ -14,6 +21,7 @@ from __future__ import annotations
 import math
 
 from . import curves as C
+from . import expr
 from .report import Report
 from .textmarks import ROLES
 
@@ -59,6 +67,12 @@ def _entries(fields: tuple[str, ...], what: str):
 
 _curves = _entries(C.CURVE_FIELDS, "{data: 键} 或 {x: \"x(t)\", y: \"y(t)\", domain: [t0, t1]}，可加 progress、along、role")
 _points = _entries(C.POINT_FIELDS, "沿曲线走的点 {curve: i, at: 0 到 1, label?, role?, dir?}")
+
+
+def _live_matrix(value: object) -> str | None:
+    ok = (isinstance(value, list) and len(value) == 2
+          and all(isinstance(r, list) and len(r) == 2 and all(_num(x) or (isinstance(x, str) and x.strip()) for x in r) for r in value))
+    return None if ok else "应为 [[a, b], [c, d]]：每一项是数或参数表达式（字符串）"
 
 
 def _labels(value: object) -> str | None:
@@ -113,6 +127,19 @@ def rotation_angle(m: Mat) -> float | None:
     return None
 
 
+def crosses(p: tuple[float, float], d: tuple[float, float], b: tuple[float, float, float, float]) -> bool:
+    """直线 p + s·d 是否穿过矩形 b（x0, y0, x1, y1），只碰到一个角不算。"""
+    lo, hi = -math.inf, math.inf
+    for k, (a, c) in enumerate(((b[0], b[2]), (b[1], b[3]))):
+        if abs(d[k]) < 1e-12:
+            if not a - 1e-9 <= p[k] <= c + 1e-9:
+                return False
+            continue
+        s0, s1 = (a - p[k]) / d[k], (c - p[k]) / d[k]
+        lo, hi = max(lo, min(s0, s1)), min(hi, max(s0, s1))
+    return hi - lo > 1e-9
+
+
 def polar_flip(m: Mat) -> tuple[Mat, tuple[float, float]]:
     """行列式为负的 m = Q S：S = sqrt(mᵀm) 是对称正定的伸缩，Q 是沿直线 u 的镜面反射。返回 (S, u)。"""
     a = mul(((m[0][0], m[1][0]), (m[0][1], m[1][1])), m)  # mᵀm
@@ -139,7 +166,7 @@ def register(registry: dict, Widget, Exposed, unknown_args) -> None:  # noqa: N8
     def expose(definition: dict, data: dict) -> Exposed:
         n = {k: len(v) if isinstance(v := definition.get(k), list) else 0 for k in ("curves", "points")}
         return Exposed(parts={"axes": 1, "grid": 1, "mesh": 1, "items": 1, "curve": n["curves"], "point": n["points"]},
-                       state={"items": {}, "M": EYE, "fixed": set()})
+                       state={"items": {}, "M": EYE, "fixed": set(), "kinds": {}, "lit": set()})
 
     def box(ctx):
         x, y = ctx.definition.get("x"), ctx.definition.get("y")
@@ -150,6 +177,11 @@ def register(registry: dict, Widget, Exposed, unknown_args) -> None:  # noqa: N8
     def inside(ctx, report: Report, path: str, name: str, pts: list[tuple[float, float]]) -> None:
         b = box(ctx)
         if b is None:
+            return
+        if ctx.exposed.state["kinds"].get(name) == "line":
+            (px, py), (qx, qy) = pts
+            if not crosses((px, py), (qx - px, qy - py), b):
+                report.error("SS262", path, f"直线 {name} 不经过坐标范围 x {[b[0], b[2]]}、y {[b[1], b[3]]}")
             return
         out = max(pts, key=lambda p: max(b[0] - p[0], p[0] - b[2], b[1] - p[1], p[1] - b[3]))
         if max(b[0] - out[0], out[0] - b[2], b[1] - out[1], out[1] - b[3]) > 1e-9:
@@ -212,6 +244,7 @@ def register(registry: dict, Widget, Exposed, unknown_args) -> None:  # noqa: N8
         if name and _pair(v) and _pair(at):
             pts = [(at[0], at[1]), (at[0] + v[0], at[1] + v[1])]
             ctx.exposed.state["items"][name] = pts
+            ctx.exposed.state["kinds"][name] = "vector"
             inside(ctx, report, path, name, pts)
 
     def slide(args: dict, ctx, report: Report, path: str) -> None:
@@ -230,12 +263,13 @@ def register(registry: dict, Widget, Exposed, unknown_args) -> None:  # noqa: N8
             return
         items = ctx.exposed.state["items"]
         old = items[names[0]]
-        if len(old) != 2:
+        if len(old) != 2 or ctx.exposed.state["kinds"].get(names[0], "vector") != "vector":
             report.error("SS281", f"{path}.args.name", f"{names[0]} 不是箭头")
             return
         pts = [(at[0], at[1]), (at[0] + old[1][0] - old[0][0], at[1] + old[1][1] - old[0][1])]
         if copy:
             items[copy] = pts
+            ctx.exposed.state["kinds"][copy] = "vector"
         elif "copy" not in args:
             items[names[0]] = pts
         inside(ctx, report, path, copy or names[0], pts)
@@ -271,6 +305,66 @@ def register(registry: dict, Widget, Exposed, unknown_args) -> None:  # noqa: N8
         if name and ok:
             ctx.exposed.state["items"][name] = arr = [tuple(p) for p in pts]
             inside(ctx, report, path, name, arr)
+
+    def segment(args: dict, ctx, report: Report, path: str) -> None:
+        name = new_name(args, "name", ctx, report, path)
+        a, b = args.get("from"), args.get("to")
+        ok = _pair(a) and _pair(b)
+        if not ok:
+            report.error("SS281", f"{path}.args", "segment 需要 from、to：两端 [x, y]")
+        elif a == b:
+            report.error("SS281", f"{path}.args.to", "segment 的两端重合")
+            ok = False
+        lines_common(args, report, path, "segment", {"name", "from", "to"})
+        if name and ok:
+            ctx.exposed.state["items"][name] = pts = [tuple(a), tuple(b)]
+            ctx.exposed.state["kinds"][name] = "segment"
+            inside(ctx, report, path, name, pts)
+
+    def line(args: dict, ctx, report: Report, path: str) -> None:
+        """直线：dir（方向，through 是线上一点，默认原点 = span）或 eq: [p, q, r]（p x + q y = r）。"""
+        name = new_name(args, "name", ctx, report, path)
+        pts = line_points(args, report, path)
+        lines_common(args, report, path, "line", {"name", "dir", "through", "eq"})
+        if name and pts:
+            ctx.exposed.state["items"][name] = pts
+            ctx.exposed.state["kinds"][name] = "line"
+            inside(ctx, report, path, name, pts)
+
+    def lines_common(args: dict, report: Report, path: str, act: str, own: set[str]) -> None:
+        role(args, report, path)
+        label(args, report, path)
+        if "dashed" in args and _bool(args["dashed"]):
+            report.error("SS281", f"{path}.args.dashed", "dashed 应为 true / false")
+        if "side" in args and args["side"] not in ("l", "r"):
+            report.error("SS281", f"{path}.args.side", "side 应为 l / r（名字在线的左边或右边，顺着方向看）")
+        if "along" in args and not (_num(args["along"]) and 0 <= args["along"] <= 1):
+            report.error("SS281", f"{path}.args.along", "along 应为 0 到 1 的数（名字挨着画出来的那段线的哪一处）")
+        unknown_args(args, own | {"role", "label", "dashed", "side", "along"}, act, report, path)
+
+    def line_points(args: dict, report: Report, path: str) -> list[tuple[float, float]] | None:
+        if ("eq" in args) == ("dir" in args):
+            report.error("SS281", f"{path}.args", "line 写 dir: [dx, dy]（可加 through: [x, y]，默认过原点）或 eq: [p, q, r]（p x + q y = r），二选一")
+            return None
+        if "eq" in args:
+            eq = args["eq"]
+            if "through" in args:
+                report.error("SS281", f"{path}.args.through", "eq 已经定下直线，不再写 through")
+            if not (isinstance(eq, list) and len(eq) == 3 and all(_num(x) for x in eq) and (eq[0] or eq[1])):
+                report.error("SS281", f"{path}.args.eq", "eq 应为 [p, q, r]：p x + q y = r，p、q 不同时为 0")
+                return None
+            p, q, r = (float(x) for x in eq)
+            n2 = p * p + q * q
+            base = (p * r / n2, q * r / n2)  # 离原点最近的点
+            return [base, (base[0] - q, base[1] + p)]
+        d, at = args.get("dir"), args.get("through", [0, 0])
+        if not _pair(d) or not (d[0] or d[1]):
+            report.error("SS281", f"{path}.args.dir", "dir 应为 [dx, dy]：直线的方向，不为零向量")
+            return None
+        if not _pair(at):
+            report.error("SS281", f"{path}.args.through", "through 应为 [x, y]：直线经过的一点")
+            return None
+        return [(float(at[0]), float(at[1])), (at[0] + d[0], at[1] + d[1])]
 
     def apply(ctx, report: Report, path: str, names: list[str], m: Mat, whole: bool, how: str = "lerp") -> None:
         """names 按 m 变换（和 kit 一样：纯旋转走圆弧，其他矩阵走 (1−t)I + tM），途中按 16 步取样检查范围。"""
@@ -349,13 +443,65 @@ def register(registry: dict, Widget, Exposed, unknown_args) -> None:  # noqa: N8
         if names and len(names) != 1:
             report.error("SS281", f"{path}.args.name", "relabel 一次换一个名字")
 
+    def highlight(args: dict, ctx, report: Report, path: str) -> None:
+        """highlight {name, pulse?}：给平面上的东西加一圈同色光晕、描边加粗（取代 mark 的金色方块）。"""
+        names = old_names(args, ctx, report, path, True)
+        if "pulse" in args and _bool(args["pulse"]):
+            report.error("SS281", f"{path}.args.pulse", "pulse 应为 true / false（光晕亮起时跳两下）")
+        unknown_args(args, {"name", "pulse"}, "highlight", report, path)
+        lit = ctx.exposed.state["lit"]
+        for n in names or []:
+            if n in lit:
+                report.error("SS281", f"{path}.args.name", f"{n} 已经高亮了（先 unhighlight）")
+            lit.add(n)
+
+    def unhighlight(args: dict, ctx, report: Report, path: str) -> None:
+        lit = ctx.exposed.state["lit"]
+        unknown_args(args, {"name"}, "unhighlight", report, path)
+        if "name" not in args:
+            lit.clear()
+            return
+        for n in old_names(args, ctx, report, path, True) or []:
+            if n not in lit:
+                report.error("SS281", f"{path}.args.name", f"{n} 没有高亮")
+            lit.discard(n)
+
     def remove(args: dict, ctx, report: Report, path: str) -> None:
         state = ctx.exposed.state
         names = old_names(args, ctx, report, path, False) if "name" in args else list(state["items"])  # 不写 = 全部，钉住的点也收
         unknown_args(args, {"name"}, "remove", report, path)
         for n in names or []:
             state["items"].pop(n, None)
+            state["kinds"].pop(n, None)
             state["fixed"].discard(n)
+            state["lit"].discard(n)
+
+    def check_live_matrix(ctx, report: Report, path: str) -> None:
+        """matrix 的每一项能解析；参数取每组关键值时矩阵不奇异；不和 curves 同时写。"""
+        if ctx.definition.get("curves"):
+            report.error("SS496", path, "这个平面有 curves：曲线不跟着变形，不能再写参数驱动的 matrix")
+        ex = ctx.ex
+        trees = []
+        for i, row in enumerate(ctx.definition["matrix"]):
+            for j, v in enumerate(row):
+                if _num(v):
+                    trees.append(("num", float(v)))
+                    continue
+                if ex is None:
+                    report.error("SS402", f"{path}[{i}][{j}]", f"{v!r}：场景没有声明 params，矩阵元素只能写数")
+                    return
+                tree = ex.parse(v, f"{path}[{i}][{j}]")
+                if tree is None:
+                    return
+                trees.append(tree)
+        for env in (ex.states_for(ctx.obj_id) if ex is not None else [{}]):
+            a, b_, c, d = (expr.evaluate(t, math.nan, env) for t in trees)
+            if not all(math.isfinite(v) for v in (a, b_, c, d)):
+                report.error("SS411", path, f"参数取 {ex.describe(env)} 时矩阵有一项没有定义")
+                return
+            if abs(a * d - b_ * c) < 1e-9:
+                report.error("SS411", path, f"参数取 {ex.describe(env)} 时矩阵的行列式是 0：整个平面压成一条线，画不出网格")
+                return
 
     def validate(ctx, report: Report, path: str) -> None:
         d = ctx.definition
@@ -363,6 +509,8 @@ def register(registry: dict, Widget, Exposed, unknown_args) -> None:  # noqa: N8
         if labels is not None and _labels(labels):
             report.error("SS202", f"{path}.axis_labels", _labels(labels))
         b = box(ctx)
+        if "matrix" in d and _live_matrix(d["matrix"]) is None:
+            check_live_matrix(ctx, report, f"{path}.matrix")
         cs = d.get("curves") if _curves(d.get("curves")) is None else []
         for n, entry in enumerate(cs):
             cpath = f"{path}.curves[{n}]"
@@ -398,9 +546,11 @@ def register(registry: dict, Widget, Exposed, unknown_args) -> None:  # noqa: N8
         "plane",
         params={"x": (True, _range), "y": (True, _range), "grid": (False, _bool), "numbers": (False, _bool),
                 "complex": (False, _bool), "mesh": (False, _bool), "mesh_role": (False, _role),
-                "axis_labels": (False, _labels), "curves": (False, _curves), "points": (False, _points)},
+                "axis_labels": (False, _labels), "curves": (False, _curves), "points": (False, _points),
+                "matrix": (False, _live_matrix)},
         expose=expose,
-        actions={"vector": vector, "slide": slide, "point": point, "shape": shape, "rotate": rotate, "scale": scale,
-                 "warp": warp, "reset": reset, "relabel": relabel, "remove": remove},
+        actions={"vector": vector, "slide": slide, "point": point, "shape": shape, "segment": segment, "line": line,
+                 "rotate": rotate, "scale": scale, "warp": warp, "reset": reset, "relabel": relabel,
+                 "highlight": highlight, "unhighlight": unhighlight, "remove": remove},
         validate=validate,
     )
