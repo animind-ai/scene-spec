@@ -358,6 +358,10 @@
           "minimum": 12,
           "maximum": 96
         },
+        "layout": {
+          "description": "区域怎么分：adaptive（默认）每个对象按它可见期间 top / side / footer 有没有被占用定主讲区大小；stable 整个场景只算一次，场景里用到过的区域一直预留，主讲区在 beat 之间不跳、不缩。adaptive (default): stage size per object; stable: every region the scene ever uses stays reserved, so the stage never jumps between beats",
+          "enum": ["adaptive", "stable"]
+        },
         "lang": {
           "description": "旁白和画面文字的语言：zh（默认）| en。一般不手写，由 localize(doc, \"en\") 设上",
           "enum": [
