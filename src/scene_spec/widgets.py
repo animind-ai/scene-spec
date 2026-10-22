@@ -206,6 +206,20 @@ def _cells_fill(args: dict, ctx: WidgetContext, report: Report, path: str) -> No
 
 # ---------- 步骤胶囊、总结卡 ----------
 
+def _chips_reveal(args: dict, ctx: WidgetContext, report: Report, path: str) -> None:
+    """reveal {index?}：露出若干胶囊（只在 reveal: true 的胶囊上有意义；默认全部）。"""
+    if not ctx.definition.get("reveal"):
+        report.warning("SS235", f"{path}", "chips 没有写 reveal: true，胶囊本来就都在，reveal 动作没有效果")
+    if "index" not in args:
+        return
+    rng = selectors.parse_slice(args.get("index"))
+    n = ctx.exposed.items or 0
+    if rng is None:
+        report.error("SS233", f"{path}.args.index", "index 应为非负整数或 \"i:j\"")
+    elif rng[1] > n:
+        report.error("SS234", f"{path}.args.index", f"只有 {n} 个胶囊，下标越界")
+
+
 def _expose_items(key: str) -> Callable[[dict, dict], Exposed]:
     def expose(definition: dict, data: dict) -> Exposed:
         value = definition.get(key)
@@ -223,6 +237,94 @@ def _summary_rows(value: object) -> str | None:
         if "role" in row and row["role"] not in ROLES:
             return f"role 应为 {'/'.join(sorted(ROLES))} 之一"
     return None
+
+
+# ---------- 数例表 seq_table：几行带行头的格子，一列列露（kit 的 mx/table.py） ----------
+
+def _table_rows(value: object) -> str | None:
+    if not isinstance(value, list) or not value:
+        return "应为非空列表"
+    for row in value:
+        if not (isinstance(row, dict) and isinstance(row.get("label"), str) and isinstance(row.get("values"), list)):
+            return "每行应为 {label, values, role?}"
+        if _list_of_literals(row["values"]):
+            return "values 应为非空列表，每项是数或 LaTeX 字符串"
+        if "role" in row and row["role"] not in ROLES:
+            return f"role 应为 {'/'.join(sorted(ROLES))} 之一"
+    return None
+
+
+def _expose_table(definition: dict, data: dict) -> Exposed:
+    rows = definition.get("rows")
+    if not isinstance(rows, list):
+        return Exposed()
+    n = max((len(r.get("values", [])) for r in rows if isinstance(r, dict)), default=0)
+    return Exposed(parts={"row": len(rows), "head": len(rows)}, items=n)
+
+
+def _validate_table(ctx: WidgetContext, report: Report, path: str) -> None:
+    rows = ctx.definition.get("rows")
+    if not isinstance(rows, list):
+        return
+    lengths = {len(r["values"]) for r in rows if isinstance(r, dict) and isinstance(r.get("values"), list)}
+    if len(lengths) > 1:
+        report.error("SS250", f"{path}.rows", f"各行的 values 长度不一样（{sorted(lengths)}）")
+    known = ctx.definition.get("known")
+    if isinstance(known, int) and lengths and known > max(lengths):
+        report.error("SS250", f"{path}.known", f"known={known} 超过了列数 {max(lengths)}")
+
+
+def _table_shade(args: dict, ctx: WidgetContext, report: Report, path: str) -> None:
+    rows, cols = ctx.exposed.parts.get("row", 0), ctx.exposed.items or 0
+    for key, n in (("row", rows), ("col", cols)):
+        v = args.get(key)
+        if not isinstance(v, int) or isinstance(v, bool) or v < 0:
+            report.error("SS233", f"{path}.args.{key}", f"{key} 应为非负整数")
+        elif v >= n:
+            report.error("SS234", f"{path}.args.{key}", f"{key}={v} 越界（只有 {n} 个）")
+    if "role" in args and args["role"] not in ROLES:
+        report.error("SS233", f"{path}.args.role", f"role 应为 {'/'.join(sorted(ROLES))} 之一")
+
+
+# ---------- 折线图 line_chart：几个量随项数的升降（kit 的 mx/chart.py） ----------
+
+def _chart_series(value: object) -> str | None:
+    if not isinstance(value, list) or not value:
+        return "应为非空列表"
+    for s in value:
+        if not (isinstance(s, dict) and isinstance(s.get("values"), list)):
+            return "每条线应为 {name?, values, role?}"
+        if _list_of_literals(s["values"]):
+            return "values 应为非空列表，每项是数"
+        if "role" in s and s["role"] not in ROLES:
+            return f"role 应为 {'/'.join(sorted(ROLES))} 之一"
+    return None
+
+
+def _expose_chart(definition: dict, data: dict) -> Exposed:
+    series = definition.get("series")
+    return Exposed(parts={"axes": 1, "series": len(series) if isinstance(series, list) else 0})
+
+
+def _validate_chart(ctx: WidgetContext, report: Report, path: str) -> None:
+    x, series = ctx.definition.get("x"), ctx.definition.get("series")
+    if not (isinstance(x, list) and isinstance(series, list)):
+        return
+    for k, s in enumerate(series):
+        if isinstance(s, dict) and isinstance(s.get("values"), list) and len(s["values"]) != len(x):
+            report.error("SS250", f"{path}.series[{k}]", f"values 有 {len(s['values'])} 项，x 有 {len(x)} 项")
+
+
+def _chart_ring(args: dict, ctx: WidgetContext, report: Report, path: str) -> None:
+    n_series = ctx.exposed.parts.get("series", 0)
+    x = ctx.definition.get("x")
+    n_x = len(x) if isinstance(x, list) else 0
+    for key, n in (("series", n_series), ("index", n_x)):
+        v = args.get(key)
+        if not isinstance(v, int) or isinstance(v, bool) or v < 0:
+            report.error("SS233", f"{path}.args.{key}", f"{key} 应为非负整数")
+        elif v >= n:
+            report.error("SS234", f"{path}.args.{key}", f"{key}={v} 越界（只有 {n} 个）")
 
 
 # ---------- 差分表 ----------
@@ -421,13 +523,30 @@ REGISTRY: dict[str, Widget] = {
     ),
     "chips": Widget(
         "chips",
-        params={"items": (True, _str_list)},
+        params={"items": (True, _str_list), "reveal": (False, _bool)},
         expose=_expose_items("items"),
+        actions={"reveal": _chips_reveal},
     ),
     "summary": Widget(
         "summary",
         params={"rows": (True, _summary_rows)},
         expose=_expose_items("rows"),
+    ),
+    "seq_table": Widget(
+        "seq_table",
+        params={"rows": (True, _table_rows), "known": (False, _nonneg_int), "size": (False, _positive_number)},
+        expose=_expose_table,
+        actions={"shade": _table_shade, "unshade": _table_shade},
+        validate=_validate_table,
+    ),
+    "line_chart": Widget(
+        "line_chart",
+        params={"x": (True, _list_of_literals), "series": (True, _chart_series), "ymax": (False, _positive_number),
+                "yticks": (False, _list_of_literals), "x_label": (False, _str), "y_label": (False, _str),
+                "width": (False, _positive_number), "height": (False, _positive_number)},
+        expose=_expose_chart,
+        actions={"ring": _chart_ring},
+        validate=_validate_chart,
     ),
     "diff_table": Widget(
         "diff_table",

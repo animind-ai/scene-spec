@@ -140,7 +140,7 @@ objects:
 | 层 | 例子 | 定义在哪 |
 |---|---|---|
 | 基本类型 | `text`（文字与公式混排）、`math`、`shape`（圆、多边形、线、箭头）、`axes`、`numberline`、`grid`、`group` | 规范本身 |
-| 组件 `widget` | `problem_card` 题卡、`chips` 步骤胶囊、`think_box` 想一想框、`summary` 总结卡 | `kit`，每个组件带自己的参数 Schema |
+| 组件 `widget` | `problem_card` 题卡、`chips` 步骤胶囊、`think_box` 想一想框、`summary` 总结卡、`seq_table` 数例表、`line_chart` 折线图 | `kit`，每个组件带自己的参数 Schema |
 | 变形原语对象 | `diff_table` 差分表、`area_model` 面积模型、`fraction_bar` 分数条 | `primitives`，同上 |
 
 §6.7 现有的 `card_box`、`plan_chips`、`think_box`、`summary_rows` 都会变成 `kit` 里的组件，`Table` 类变成 `primitives` 里的 `diff_table`。
@@ -625,6 +625,12 @@ beats:
 - 播放器根据 `pause` 生成章节点；`style.segmented: true` 时每个 beat 末尾自动成为分段点。
 - `pause` 本身也是 beat，可以有旁白。
 - `pause.hold` 和句与句之间的静音不是同一个数。句间静音看句末标点（§7.8），`pause.hold` 是停下来给学生看的时长，predict / think 要在 0.5–8 秒，segment 要在 0–10 秒。
+- 成片里 `think` / `predict` 的留白不是干等：旁白说完后底部的胶囊让开，kit 画一条「想一想 · 可以按暂停」+ 倒计时进度条，
+  `hold` 秒缩完再换回来。固定几秒永远不合每个人的思考速度（2026-10-21 学生访谈），留白只是提示，真要想的学生自己按暂停；
+  所以 `hold` 取 3 秒左右就够，读题后的「先自己试」可以给 5 秒。
+- 竞赛讲解（`line: contest`）的写法：每一段开头的问题单独一个 `pause: {type: think}` beat（画面上只有问题和钉着的题卡），
+  下一个 beat 再讲；步骤胶囊写 `reveal: true`，讲到哪一段才露哪一个，回放完整证明时用 `reveal` 动作全部亮出，
+  免得一开始就把整条解题路线摆给学生看。
 
 ### 7.4 教学标注
 
