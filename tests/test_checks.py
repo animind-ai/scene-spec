@@ -194,6 +194,17 @@ def test_empty_plane_warns(example):
     assert "SS384" in codes(example)
 
 
+def test_plane_axes_can_be_turned_off(example):
+    example["objects"]["venn"] = {
+        "widget": "plane", "x": [-2, 2], "y": [-2, 2], "grid": False, "axes": False,
+    }
+    beat(example, "Opening")["do"].append(
+        {"at": 0, "act": "shape", "target": "venn", "args": {"name": "A", "points": [[0, 0], [1, 0], [1, 1]]}}
+    )
+    assert check(example).ok
+    assert not [c for c in codes(example) if c.startswith("SS2")]
+
+
 def test_empty_plane_can_be_explicit_background(example):
     example["objects"]["empty_plane"] = {
         "widget": "plane", "x": [-2, 2], "y": [-2, 2], "allow_empty": True,
