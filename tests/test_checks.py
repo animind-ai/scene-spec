@@ -184,6 +184,26 @@ def test_widget_unknown_param(example):
     assert codes(example) == ["SS203"]
 
 
+def test_empty_plane_warns(example):
+    example["objects"]["empty_plane"] = {
+        "widget": "plane", "x": [-2, 2], "y": [-2, 2],
+    }
+    beat(example, "Opening")["do"].append(
+        {"at": 0, "act": "show", "target": "empty_plane"}
+    )
+    assert "SS384" in codes(example)
+
+
+def test_empty_plane_can_be_explicit_background(example):
+    example["objects"]["empty_plane"] = {
+        "widget": "plane", "x": [-2, 2], "y": [-2, 2], "allow_empty": True,
+    }
+    beat(example, "Opening")["do"].append(
+        {"at": 0, "act": "show", "target": "empty_plane"}
+    )
+    assert "SS384" not in codes(example)
+
+
 def test_unregistered_widget_is_only_a_warning(example):
     example["objects"]["plan"]["widget"] = "fancy_chips"
     report = check(example)

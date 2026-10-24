@@ -547,7 +547,7 @@ def register(registry: dict, Widget, Exposed, unknown_args) -> None:  # noqa: N8
         params={"x": (True, _range), "y": (True, _range), "grid": (False, _bool), "numbers": (False, _bool),
                 "complex": (False, _bool), "mesh": (False, _bool), "mesh_role": (False, _role),
                 "axis_labels": (False, _labels), "curves": (False, _curves), "points": (False, _points),
-                "matrix": (False, _live_matrix)},
+                "matrix": (False, _live_matrix), "allow_empty": (False, _bool)},
         expose=expose,
         actions={"vector": vector, "slide": slide, "point": point, "shape": shape, "segment": segment, "line": line,
                  "rotate": rotate, "scale": scale, "warp": warp, "reset": reset, "relabel": relabel,

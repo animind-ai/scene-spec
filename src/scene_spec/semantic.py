@@ -69,6 +69,10 @@ class _Checker:
         self.beats: list[dict] = doc["beats"]
         self.exposed: dict[str, widgets.Exposed] = {}
         self.referenced: set[str] = set()
+        # All actions addressed to a widget, used for semantic checks that
+        # cannot be inferred from the widget definition alone (for example an
+        # empty plane that only shows the renderer's default axes/grid).
+        self.widget_actions: dict[str, list[str]] = {}
         self.ex = P.ExprChecker(doc, report)
         self.stats = {
             "beats": len(self.beats),
@@ -351,6 +355,8 @@ class _Checker:
     def check_action(self, action: dict, path: str) -> None:
         act = action["act"]
         target = self.resolve(action["target"], f"{path}.target") if "target" in action else None
+        if target is not None:
+            self.widget_actions.setdefault(target.obj, []).append(act)
         for key in ("from", "to"):
             if key in action:
                 self.resolve(action[key], f"{path}.{key}")
@@ -491,6 +497,20 @@ class _Checker:
         for obj_id in self.objects:
             if obj_id not in self.referenced:
                 self.r.warning("SS381", f"objects.{obj_id}", "这个对象没有被任何动作或布局引用，也没有钉住")
+        content_actions = {"vector", "slide", "point", "shape", "segment", "line", "rotate", "scale", "warp", "reset",
+                           "relabel", "highlight", "unhighlight", "remove"}
+        for obj_id, definition in self.objects.items():
+            if definition.get("widget") != "plane" or definition.get("allow_empty") is True:
+                continue
+            if definition.get("curves") or definition.get("points") or definition.get("matrix") is not None:
+                continue
+            actions = self.widget_actions.get(obj_id, [])
+            if not any(act in content_actions for act in actions):
+                self.r.warning(
+                    "SS384",
+                    f"objects.{obj_id}",
+                    "plane 只有显示/隐藏动作，没有点、向量、图形或变形；会渲染成空坐标轴/网格。补真实内容，或明确写 allow_empty: true",
+                )
 
     def run(self) -> None:
         P.check_declarations(self.doc, self.r)
