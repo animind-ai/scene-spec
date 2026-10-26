@@ -355,3 +355,16 @@ def test_area_grid_actions(example):
     assert not [c for c in codes(example) if c.startswith("SS28")]
     do.append({"after": "prev", "act": "shade", "target": "sq", "args": {"rows": 5}})
     assert "SS281" in codes(example)
+
+
+def test_style_layout_is_adaptive_or_stable():
+    import copy
+    from pathlib import Path
+
+    from scene_spec.loader import load_file
+
+    doc = copy.deepcopy(load_file(Path(__file__).resolve().parents[1] / "examples" / "s67-p01.scene.yaml"))
+    doc.setdefault("style", {})["layout"] = "stable"
+    assert check(doc).ok
+    doc["style"]["layout"] = "fixed"
+    assert not check(doc).ok

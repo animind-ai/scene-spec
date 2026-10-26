@@ -114,6 +114,7 @@ style:
   step_hold: 1.0            # 分段时每个子步（step）结束定格几秒，见 §7.6
   subtitles: burned         # burned 烧进画面（默认，2026-10-17 定）| soft 只封装可关的软字幕轨 | none；都导出 .vtt/.srt
   min_font: 28              # 字号下限（1080p 下的像素）：布局求解不缩到它以下，kit inspect 报低于它的字；不写时 16
+  layout: adaptive          # adaptive（默认）主讲区按每个对象可见期间别的区域有没有人用来定大小；stable 整个场景只算一次（用到过的 top / side / footer 一直预留），主讲区在 beat 之间不跳不缩
 ```
 
 ---
