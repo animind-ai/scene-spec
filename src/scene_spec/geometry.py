@@ -22,7 +22,7 @@ from dataclasses import dataclass, field
 TOL = 1e-6  # 断言的容许误差
 EPS = 1e-9  # 判退化（平行、相切）的阈值
 POINT_DIRS = ("u", "d", "l", "r", "ul", "ur", "dl", "dr")
-POINT_OPTS = {"label", "dir", "dot", "hidden", "role", "aux"}
+POINT_OPTS = {"label", "dir", "dot", "hidden", "role", "aux", "draw"}
 CIRCLE_OPTS = {"hidden", "role", "aux", "dashed", "draw", "width"}
 ELEMENT_KINDS = ("segment", "line", "ray", "polygon", "arc", "angle", "tick")
 ELEMENT_OPTS = {"name", "role", "aux", "dashed", "hidden", "width", "fill", "radius", "arcs", "right", "count", "ccw",
@@ -485,6 +485,8 @@ def elements(definition: dict) -> list[Element]:
         out.append(Element(name, kind, d[kind], d, path))
     for name, d in (definition.get("points") or {}).items():
         opts = d if isinstance(d, dict) else {}
+        if opts.get("draw", True) is False:  # 只用来构造的点：不画、不算进图框（同圆的 draw: false）
+            continue
         out.append(Element(name, "point", name, opts, f"points.{name}"))
     seen: dict[str, str] = {}
     for e in out:

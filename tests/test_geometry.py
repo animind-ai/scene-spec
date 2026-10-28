@@ -199,3 +199,16 @@ def test_trace_keeps_asserts_true_along_the_way(example):
     assert add(example, d, ("trace", {"point": "A", "to": 60})) == []
     # 滑过 B 到劣弧上，圆周角变成补角：断言途中失效
     assert "SS273" in add(example, d, ("trace", {"point": "A", "to": 270}))
+
+
+def test_construction_only_points_are_not_drawn_and_ignore_the_box(example):
+    """draw: false 的点只参与构造：不画、不算进图框，伸出 box 也不报 SS275；断言照样能用它。"""
+    pts = {**TRI["points"], "F": {"at": [9, 9], "draw": False},
+           "G": {"mid": ["F", "O"], "draw": False}, "H": {"mid": ["G", "O"]}}
+    d = {**TRI, "points": pts, "box": [-2.5, -2.5, 3.0, 3.0],
+         "assert": [*TRI["assert"], {"collinear": ["O", "H", "F"]}]}
+    assert add(example, d) == []
+    names = {e.name for e in elements(d)}
+    assert "H" in names and not {"F", "G"} & names
+    # 不写 draw: false 时，伸出图框照样报错
+    assert "SS275" in add(example, {**d, "points": {**pts, "F": [9, 9]}})
