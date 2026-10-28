@@ -11,6 +11,7 @@
 - **JSON Schema**：`schema/scene-spec-0.1.schema.json`
 - **检查器**：受限 YAML 读取、结构检查、语义检查（引用、时间点、组件参数、教学信息）
 - **示例**：`examples/s67-p01.scene.yaml`（高阶等差数列）和 `examples/s67-p02.scene.yaml`（d-等差比数列），两支完整的例题讲解视频
+- **综合几何图** `geometry`（`src/scene_spec/geometry.py`）：点由构造算出（求交、中点、垂足、对称、外心内心、切点……），检查器解出整张图，报构造退化（SS272）、`assert` 里的共圆 / 共线 / 等长 / 等角等结论数值上不成立（误差 > 1e-6，SS273）、出了图框（SS275）；kit 画图用同一个求解器。写法见 kit 的 `mx/geometry.py`，示例 `examples/geometry.scene.yaml`（圆周角定理）
 
 格式的设计说明见 [docs/design.md](docs/design.md)。渲染不在本仓库，由 [kit](https://github.com/animind-ai/kit) 负责：渲染引擎默认是 [墨线 moxian](https://github.com/animind-ai/moxian)，也可以用 `--backend manim` 切换到 Manim。
 

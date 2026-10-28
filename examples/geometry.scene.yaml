@@ -1,0 +1,204 @@
+# 综合几何图 geometry 的示例：圆周角定理（教科书的标准证明）。
+# 点全部由构造算出（圆上按方向角取点、直线与圆的第二个交点），关键结论写进 assert，检查器和 kit 都按 1e-6 验算。
+# 证明图在整支视频里不动：新添的直径用暗红（aux），用到的角涂色；最后一场是另一张图，用 trace 让 A 沿圆滑动。
+spec: "0.1"
+
+meta:
+  id: geometry-inscribed-angle
+  title: 圆周角定理
+  line: worked
+  grade: 初三
+  author: Boxi Yu
+  license: CC-BY-4.0
+  sources:
+    - kind: text
+      cite: 圆周角定理（初中教科书通用定理）
+      note: 证明是标准证法；图、讲解与旁白为原创
+
+pedagogy:
+  insight: 过圆心作直径，把圆周角拆成两个等腰三角形的底角；外角等于不相邻两内角之和，于是圆心角是圆周角的两倍
+  status: method
+
+style:
+  theme: paper
+  canvas: "16:9"
+  voice:
+    persona: teacher-hs
+    speed: 1.0
+  subtitles: soft
+
+objects:
+  title:
+    type: text
+    text: 圆周角定理
+    role: A
+    level: display
+    in: stage
+
+  card:
+    widget: problem_card
+    pin: top
+    lines:
+      - '[圆周角定理]{.bold} 同一条弧所对的圆周角，等于它所对的[圆心角的一半]{#half .HL}：$\angle BAC=\tfrac12\angle BOC$．'
+
+  fig:
+    widget: geometry
+    in: stage
+    points:
+      O: [0, 0]
+      A: {on: c, angle: 105, dir: u}
+      B: {on: c, angle: 215}
+      C: {on: c, angle: 328}
+      D: {meet: [[A, O], c], not: A, hidden: true}
+    circles:
+      c: {center: O, radius: 2.4}
+    draw:
+      - segment: [A, B]
+      - segment: [A, C]
+      - {segment: [O, B], hidden: true}
+      - {segment: [O, C], hidden: true}
+      - {segment: [A, D], aux: true, hidden: true}
+      - {angle: [B, A, C], radius: 0.7}
+      - {angle: [B, O, C], role: A, radius: 0.45, hidden: true}
+      - {angle: [O, A, B], arcs: 1, radius: 0.55, hidden: true}
+      - {angle: [A, B, O], arcs: 1, radius: 0.55, hidden: true}
+      - {angle: [O, A, C], arcs: 2, radius: 0.55, role: B, hidden: true}
+      - {angle: [O, C, A], arcs: 2, radius: 0.55, role: B, hidden: true}
+      - {angle: [B, O, D], radius: 0.38, hidden: true}
+      - {angle: [D, O, C], radius: 0.38, role: B, hidden: true}
+      - {tick: [O, A], hidden: true}
+      - {tick: [O, B], hidden: true}
+      - {tick: [O, C], hidden: true}
+    assert:
+      - collinear: [A, O, D]
+      - equal: [[O, A], [O, B], [O, C]]
+      - equal_angle: [[O, A, B], [A, B, O]]
+      - equal_angle: [[O, A, C], [O, C, A]]
+
+  st_aux:
+    type: text
+    text: '连 $AO$ 并延长，交圆于 [$D$]{.NO}'
+    in: side
+  st_iso:
+    type: text
+    text: '等腰：[$\angle OAB=\angle OBA$]{.HL}'
+    below: st_aux
+    gap: lg
+  st_ext:
+    type: text
+    text: '外角：$\angle BOD=2\angle OAB$'
+    below: st_iso
+    gap: sm
+  st_iso2:
+    type: text
+    text: '同理 [$\angle DOC=2\angle OAC$]{.B}'
+    below: st_ext
+    gap: lg
+  st_sum:
+    type: text
+    text: '相加：[$\angle BOC=2\angle BAC$]{.A}'
+    below: st_iso2
+    gap: lg
+
+  # 另一张图：A 在优弧上滑动，参照点 P 不动
+  move:
+    widget: geometry
+    in: stage
+    points:
+      O: {at: [0, 0], dot: false, label: ""}
+      A: {on: c, angle: 100}
+      P: {on: c, angle: 150, role: DIM}
+      B: {on: c, angle: 215, dir: dl}
+      C: {on: c, angle: 328, dir: dr}
+    circles:
+      c: {center: O, radius: 2.4}
+    draw:
+      - segment: [A, B]
+      - segment: [A, C]
+      - {segment: [P, B], role: DIM}
+      - {segment: [P, C], role: DIM}
+      - {angle: [B, A, C], radius: 0.6, fill: true}
+      - {angle: [B, P, C], radius: 0.5, role: DIM}
+    assert:
+      - equal_angle: [[B, A, C], [B, P, C]]
+  mv_note:
+    type: text
+    text: '$A$ 在优弧上移动，[$\angle BAC$ 不变]{.HL}'
+    in: side
+
+beats:
+  - id: Intro
+    say:
+      - {id: s1, pace: normal, text: "{@t}这一节证明圆周角定理。"}
+    do:
+      - {at: s1@t, act: show, target: title}
+
+  - id: Statement
+    say:
+      - {id: s1, pace: normal, text: "{@c}同一条弧所对的圆周角，{@h}等于它所对的圆心角的一半。"}
+      - {id: s2, pace: normal, text: "{@f}看图：角 B A C 是圆周角，{@o}角 B O C 是圆心角。"}
+    do:
+      - {at: s1, act: hide, target: title}
+      - {at: s1@c, act: show, target: card}
+      - {at: s1@h, act: underline, target: "card#half"}
+      - {at: s2@f, act: show, target: fig}
+      - {with: prev, act: shade, target: fig, args: {name: ang_BAC}}
+      - {at: s2@o, act: draw, target: fig, args: {name: [OB, OC]}}
+      - {after: prev, act: shade, target: fig, args: {name: ang_BOC}}
+
+  - id: Diameter
+    say:
+      - {id: s1, pace: normal, text: "{@d}关键一步：连 A O 并延长，交圆于 D。"}
+      - {id: s2, pace: normal, text: "{@s}这条直径把圆周角拆成两半。"}
+    do:
+      - {at: s1, act: unshade, target: fig, args: {name: [ang_BAC, ang_BOC]}}
+      - {with: prev, act: remove, target: fig, args: {name: [ang_BAC, ang_BOC]}}
+      - {at: s1@d, act: draw, target: fig, args: {name: [AD, D]}}
+      - {with: prev, act: show, target: st_aux}
+      - {at: s2@s, act: ring, target: fig, args: {name: AD, role: NO}}
+
+  - id: Isosceles
+    say:
+      - {id: s1, pace: normal, text: "{@r}O A 和 O B 都是半径，{@a}所以三角形 O A B 是等腰三角形，两个底角相等。"}
+      - {id: s2, pace: normal, text: "{@e}角 B O D 是它的外角，{@x}等于两个底角的和，也就是角 O A B 的两倍。"}
+    do:
+      - {at: s1, act: unring, target: fig, args: {name: AD}}
+      - {at: s1@r, act: show, target: fig.tick_OA}
+      - {with: prev, act: show, target: fig.tick_OB}
+      - {at: s1@a, act: shade, target: fig, args: {name: [ang_OAB, ang_ABO]}}
+      - {with: prev, act: show, target: st_iso}
+      - {at: s2@e, act: shade, target: fig, args: {name: ang_BOD}}
+      - {at: s2@x, act: show, target: st_ext}
+
+  - id: Other
+    say:
+      - {id: s1, pace: normal, text: "{@c}右边一样：O A 等于 O C，{@a}角 O A C 等于角 O C A，{@d}角 D O C 是它的两倍。"}
+    do:
+      - {at: s1@c, act: show, target: fig.tick_OC}
+      - {at: s1@a, act: shade, target: fig, args: {name: [ang_OAC, ang_OCA]}}
+      - {at: s1@d, act: shade, target: fig, args: {name: ang_DOC}}
+      - {with: prev, act: show, target: st_iso2}
+
+  - id: Sum
+    say:
+      - {id: s1, pace: normal, text: "{@s}两式相加，{@b}角 B O C 等于角 B A C 的两倍。证完。"}
+    do:
+      - {at: s1@s, act: dim, target: fig, args: {except: [AB, AC, OB, OC, c, A, B, C, O, ang_OAB, ang_OAC, ang_BOD, ang_DOC]}}
+      - {at: s1@b, act: show, target: st_sum}
+      - {with: prev, act: focus, target: fig.ang_BOD}
+      - {after: prev, act: unfocus, target: fig}
+
+  - id: Move
+    say:
+      - {id: s1, pace: normal, text: "{@m}换一张图：让 A 在优弧上移动，{@g}圆周角始终和角 B P C 一样大。"}
+    do:
+      - {at: s1, act: hide, target: fig}
+      - {with: prev, act: hide, target: st_aux}
+      - {with: prev, act: hide, target: st_iso}
+      - {with: prev, act: hide, target: st_ext}
+      - {with: prev, act: hide, target: st_iso2}
+      - {with: prev, act: hide, target: st_sum}
+      - {at: s1@m, act: show, target: move}
+      - {with: prev, act: show, target: mv_note}
+      - {at: s1@g, act: trace, target: move, args: {point: A, to: 60}, dur: 2.0}
+      - {after: prev, act: trace, target: move, args: {point: A, to: 125}, dur: 2.0}

@@ -1843,6 +1843,13 @@ from .cs import register as _register_cs  # noqa: E402
 _register_cs(REGISTRY)
 
 
+# ---------- 综合几何图（geometry）：点由构造算出、断言数值验算；求解器和检查在 geometry.py ----------
+
+from .geometry import register as _register_geometry  # noqa: E402
+
+_register_geometry(REGISTRY, Widget, Exposed, _unknown_args)
+
+
 def lookup(name: str) -> Widget | None:
     """按名字找组件，忽略 @版本。"""
     return REGISTRY.get(name.split("@", 1)[0])
