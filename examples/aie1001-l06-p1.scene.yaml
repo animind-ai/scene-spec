@@ -317,7 +317,7 @@ beats:
       - {with: prev, act: show, target: pc}
 
   - id: Predict
-    pause: {type: predict, prompt: "What does fact(3) return, and how many calls are made?", hold: 0}
+    pause: {type: predict, prompt: "What does fact(3) return, and how many calls are made?", hold: 0.5}
     say:
       - {id: s0, pace: ask, text: "Before we go on, pause the video and predict. What does fact of three return? And how many times is fact called in total?"}
       - {id: s1, pace: normal, text: "Fact of three returns six. {@f}And fact is called four times: with three, two, one, and zero."}

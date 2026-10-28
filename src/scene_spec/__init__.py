@@ -19,7 +19,7 @@ __all__ = [
     "check", "check_file", "check_text", "check_timing", "localize", "silence_after",
     "Issue", "LocalizeError", "Report", "SPEC_VERSION",
 ]
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 SPEC_VERSION = "0.1"
 
 

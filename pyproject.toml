@@ -1,6 +1,6 @@
 [project]
 name = "scene-spec"
-version = "0.1.0"
+version = "0.2.0"
 description = "数学讲解视频的场景描述格式：JSON Schema 与检查器"
 readme = "README.md"
 license = "MIT"
