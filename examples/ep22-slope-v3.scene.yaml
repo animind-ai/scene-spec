@@ -25,7 +25,7 @@ pedagogy:
 
 style:
   side: column  # v2 改版：侧栏内容放回主讲区右边一栏，顶栏只留一行问题句
-  layout: v2  # 培玉视觉规范 v2；v3 试点加 §10：一个镜头一个重点、一种强调色、动效取舍
+  layout: v2  # 视觉规范 v2；v3 试点加 §10：一个镜头一个重点、一种强调色、动效取舍
   theme: paper
   canvas: "16:9"
   voice:

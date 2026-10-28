@@ -24,7 +24,7 @@ pedagogy:
   landing: Landing
 
 style:
-  layout: v2  # 培玉视觉规范 v2（style-v2 批量重渲，2026-10-20）
+  layout: v2  # 视觉规范 v2（style-v2 批量重渲，2026-10-20）
   theme: paper
   canvas: "16:9"
   voice:

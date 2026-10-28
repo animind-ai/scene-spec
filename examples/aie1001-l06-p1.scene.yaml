@@ -1,5 +1,5 @@
 # AIE1001 第 6 讲（递归）第 1 部分：函数怎么调用自己。编程课用 scene-spec 写的第一支（docs/cs-lecture.md）。
-# 照着课程仓库里手写的 Manim 版（aie1001/videos/L06/p1/scenes.py）一个 beat 一个 beat 改写；旁白和那一版逐字相同，
+# 照着同一讲手写的 Manim 版一个 beat 一个 beat 改写；旁白和那一版逐字相同，
 # 所以可以直接用那一版已经合成好的音频（每个 beat 的句数一样）。句子 id 是 s0、s1……，对应 Manim 版 cue.at() 的下标。
 # 墨线的对象跨 beat 常驻：每个 beat 开头先收掉上一个 beat 的对象；页眉 head 只有一个，每个 beat 用 retitle 换标题。
 spec: "0.1"
