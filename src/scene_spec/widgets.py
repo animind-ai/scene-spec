@@ -1836,6 +1836,13 @@ from .space import register as _register_space  # noqa: E402
 _register_space(REGISTRY, Widget, Exposed, _unknown_args)
 
 
+# ---------- 编程课组件（代码面板、终端、调用栈……）：检查在 cs.py，设计见 docs/cs-lecture.md ----------
+
+from .cs import register as _register_cs  # noqa: E402
+
+_register_cs(REGISTRY)
+
+
 def lookup(name: str) -> Widget | None:
     """按名字找组件，忽略 @版本。"""
     return REGISTRY.get(name.split("@", 1)[0])

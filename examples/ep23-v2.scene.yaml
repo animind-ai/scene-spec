@@ -1,0 +1,252 @@
+# v2 版式副本：与 ep23.scene.yaml 相同，只加 style.layout: v2（无右侧栏、顶栏 1.0、满宽 stage；字幕仍是双语两行烧录带）。
+# 洞察系列 #23 配方：把矩形补成正方形（九年级）。squares 系列第三集（最后一集），接 #18。
+# 按脚本 insight/ep23-completing-square/script.yaml（第 1 轮）写。
+# 开场就是 #18 的片尾画面（正方形 x² 加一条长条 bx、a² − b² = (a + b)(a − b)）；钩子问 x² + 4x = 45 的 x、停三秒、说出"只能背公式"；
+# 先按错误想法在角上补 b²：边长 x + b 的正方形还缺一整条 bx；预测暂停后长条对半分、一半转到上面，只缺一个 (b/2)² 的角，补上成 (x + 2)²；
+# 非例：角上叠一块 b²，大了四倍、戳出去；落到 x² + 4x + 4 = (x + 2)²，两边加 4、开方得 x = 5（−9 也是解，图上画不出来）。
+# 图里 x = 5、b = 4，正好是方程的正根。
+spec: "0.1"
+
+meta:
+  id: ep23
+  title: 配方：把矩形补成正方形
+  line: insight
+  units: [J8]
+  episode: 23
+  grade: 九年级
+  author: Boxi Yu
+  license: CC-BY-4.0
+
+pedagogy:
+  insight: x²+bx 的面积图把长条对半分、一半挪到上面，只差一个边长 b/2 的角；补上就是正方形，开方解出 x，求根公式就是这样推出来的
+  misconception: 求根公式只能死记硬背；补的角块是 b²
+  non_example: 角上补 b²：b² 是 4×4，角上只空着 2×2，大了四倍、戳出大正方形；长条不分开、补 b² 也还缺一条 bx
+  status: proof
+  landing: Landing
+
+style:
+  side: column  # v2 改版：侧栏内容放回主讲区右边一栏，顶栏只留一行问题句
+  layout: v2  # 培玉视觉规范 v2（style-v2 批量重渲，2026-10-20）
+  theme: paper
+  canvas: "16:9"
+  voice:
+    persona: teacher-hs
+    speed: 1.0
+  segmented: true
+  step_hold: 1.0
+
+objects:
+  # 开场：#18 的片尾（同样的定义）
+  law0:
+    type: text
+    text: '[$a^2-b^2$]{#l} [$=$]{#e} [$(a+b)$]{#p .HL} [$(a-b)$]{#m .HL}'
+    level: display
+    in: side
+  xsq0:
+    widget: dissect
+    role: A
+    in: stage
+    shapes:
+      X: {rect: [5, 5], label: '$x^2$'}
+      Bx: {rect: [4, 5], at: [5, 0], role: B, label: '$bx$'}
+    guides:
+      tx: {from: [0, 5], to: [5, 5], label: '$x$', role: A, side: above, solid: true}
+      tb: {from: [5, 5], to: [9, 5], label: '$b$', role: B, side: above, solid: true}
+      lx: {from: [0, 5], to: [0, 0], label: '$x$', role: A, side: left, solid: true}
+  # 本集干活用的图：视野留出上面挪过去的半条、戳出去的 b²
+  cs:
+    widget: dissect
+    role: A
+    in: stage
+    view: [[-1.0, -1.0], [9.8, 9.9]]
+    shapes:
+      X: {rect: [5, 5], label: '$x^2$'}
+      Bx: {rect: [4, 5], at: [5, 0], role: B, label: '$bx$'}
+      C: {rect: [2, 2], at: [5, 5], role: HL, label: '$(\tfrac{b}{2})^2$', hidden: true}
+      BB: {rect: [4, 4], at: [5, 5], role: NO, hidden: true, edges: [{at: [[5, 9], [9, 9]], text: '$b^2$'}]}
+    cuts:
+      half: {piece: Bx, line: [[7, 0], [7, 5]], into: [H1, H2]}
+    pieces:
+      H1: {role: B, label: '$\tfrac{b}{2}x$'}
+      H2: {role: B, label: '$\tfrac{b}{2}x$'}
+    guides:
+      tx: {from: [0, 5], to: [5, 5], label: '$x$', role: A, side: above, solid: true}
+      tb: {from: [5, 5], to: [9, 5], label: '$b=4$', role: B, side: above, solid: true}
+      lx: {from: [0, 5], to: [0, 0], label: '$x$', role: A, side: left, solid: true}
+      m1: {from: [0, 5], to: [0, 9], role: NO}
+      m2: {from: [0, 9], to: [5, 9], label: '缺 $bx$', role: NO, side: above}
+      m3: {from: [5, 9], to: [5, 5], role: NO}
+      side: {from: [0, 0], to: [7, 0], label: '$x+2$', role: HL, side: below, solid: true}
+    merges:
+      Sq: {pieces: [X, H1, H2, C], role: HL}
+  eq:
+    type: math
+    tex: 'x^2+4x=45'
+    level: display
+    in: side
+  myth:
+    type: text
+    text: '[只能背公式？]{#m}'
+    role: "NO"
+    level: title
+    below: eq
+    gap: md
+  law:
+    type: text
+    text: '[$x^2+4x$]{#l} [$+4$]{#c .HL} [$=$]{#e} [$(x+2)^2$]{#r .HL}'
+    level: display
+    below: myth
+    gap: lg
+  num1:
+    type: math
+    tex: '(x+2)^2=45+4=49'
+    level: title
+    below: law
+    gap: md
+  sol:
+    type: text
+    text: '[$x+2=7$，$x=5$]{#p}[，或 $-9$]{#n}'
+    level: title
+    below: num1
+    gap: md
+  practice:
+    type: text
+    text: '[练一练]{.HL}　$x^2+6x=16$，角上补多大？'
+    level: title
+    in: footer
+
+i18n:
+  en:
+    meta: {title: "Completing the Square, Literally"}
+    objects:
+      cs: {guides: {m2: {label: 'Missing $bx$'}}}
+      myth: {text: '[Formula only?]{#m}'}
+      sol: {text: '[$x+2=7$, $x=5$]{#p}[, or $-9$]{#n}'}
+      practice: {text: '[Try it]{.HL}  $x^2+6x=16$: corner size?'}
+    beats:
+      Hook: {pause: {prompt: "x² + 4x = 45, no quadratic formula. Where would you start?"}}
+      Predict: {pause: {prompt: "Cut the strip in half and move one half to the top. How big is the missing corner?"}}
+
+beats:
+  - id: Hook
+    pause: {type: predict, prompt: x² + 4x = 45，没有求根公式，你会从哪下手？, hold: 3, app_item: ep23-before-1}
+    say:
+      - {id: s1, pace: normal, text: "一千多年前，花拉子米的书里就有这样一道题。", en: "Over a thousand years ago, al-Khwarizmi's book already had a problem like this."}
+      - {id: s2, pace: ask, text: "{@q}x 方加四 x 等于四十五，要是没有公式，你从哪下手？", en: "{@q}x squared plus four x equals forty-five. With no formula, where would you start?"}
+    do:
+      # 开场：一下子摆出 #18 的片尾画面
+      - {at: s1, act: show, target: xsq0, dur: 0.01}
+      - {with: prev, act: show, target: "xsq0#tx", dur: 0.01}
+      - {with: prev, act: show, target: "xsq0#tb", dur: 0.01}
+      - {with: prev, act: show, target: "xsq0#lx", dur: 0.01}
+      - {with: prev, act: show, target: law0, dur: 0.01}
+      - {at: s2@q, act: hide, target: law0}
+      - {after: prev, act: show, target: eq}
+
+  - id: Myth
+    shows: misconception
+    say:
+      - {id: s1, pace: normal, text: "同桌直摇头：{@m}这得背求根公式，套进去才算得出。", en: "Your deskmate shakes their head: {@m}you need the quadratic formula, memorised and plugged in."}
+    do:
+      - {at: s1@m, act: show, target: myth}
+
+  - id: Setup
+    say:
+      - {id: s1, pace: normal, text: "我们一起看图。{@x}这块 x 方是边长 x 的正方形，{@b}四 x 是宽四的长条。", en: "Let's look together. {@x}x squared is a square with side x, and {@b}four x is a strip four wide."}
+      - {id: s2, pace: normal, text: "要是能把整块补成正方形，开个方就解出来了。", en: "If we could make the whole thing into a square, one square root would solve it."}
+    do:
+      - {at: s1, act: hide, target: xsq0}
+      - {with: prev, act: show, target: "cs#X"}
+      - {with: prev, act: show, target: "cs#Bx"}
+      - {with: prev, act: show, target: "cs#tx"}
+      - {with: prev, act: show, target: "cs#tb"}
+      - {with: prev, act: show, target: "cs#lx"}
+      - {at: s1@x, act: mark, target: "cs#tx"}
+      - {at: s1@b, act: unmark, target: "cs#tx"}
+      - {with: prev, act: mark, target: "cs#tb"}
+      - {at: s2, act: unmark, target: "cs#tb"}
+
+  - id: Wrong
+    shows: non_example
+    say:
+      - {id: s1, pace: normal, text: "先试试{@c}在角上补一个 b 方，看能不能补成正方形。", en: "First try {@c}adding b squared in the corner and see if it makes a square."}
+      - {id: s2, pace: normal, text: "可是边长 x 加 b 的正方形，{@m}左上角还空着一大块。", en: "But a square with side x plus b still has {@m}a big empty piece at the top left."}
+      - {id: s3, pace: normal, text: "完全平方公式说过，它里面有两条长条，{@o}这里只有一条。", en: "The square-of-a-sum formula told us it has two strips in it, and {@o}here there's only one."}
+    do:
+      - {at: s1@c, act: hide, target: "cs#tx"}
+      - {with: prev, act: hide, target: "cs#tb"}
+      - {with: prev, act: show, target: "cs#BB"}
+      - {at: s2@m, act: show, target: "cs#m1"}
+      - {with: prev, act: show, target: "cs#m2"}
+      - {with: prev, act: show, target: "cs#m3"}
+      - {at: s3@o, act: mark, target: "cs#Bx"}
+
+  - id: Predict
+    pause: {type: predict, prompt: 把长条切成两半，一半挪到上面，缺的角有多大？, hold: 3}
+    say:
+      - {id: s1, pace: ask, text: "{@h}把长条切成两半，一半挪到上面，缺的角有多大？", en: "{@h}Cut the strip into two halves and move one half to the top. How big is the missing corner?"}
+    do:
+      - {at: s1, act: unmark, target: "cs#Bx"}
+      - {with: prev, act: hide, target: "cs#BB"}
+      - {with: prev, act: hide, target: "cs#m1"}
+      - {with: prev, act: hide, target: "cs#m2"}
+      - {with: prev, act: hide, target: "cs#m3"}
+      - {after: prev, act: show, target: "cs#tx"}
+      - {with: prev, act: show, target: "cs#tb"}
+      - {at: s1@h, act: mark, target: "cs#Bx"}
+
+  - id: Fill
+    say:
+      - {id: s1, pace: normal, text: "{@c}长条对半切开，每条宽二分之 b，这里是二。", en: "{@c}Cut the strip in half. Each piece is b over two wide, which here is two."}
+      - {id: s2, pace: normal, text: "{@r}右边一条转过来贴到上面，三块拼成一个缺角的正方形。", en: "{@r}Turn the right-hand piece round and put it on top: three pieces make a square with a corner missing."}
+      - {id: s3, pace: slow, text: "{@k}缺的角边长是二，面积是二分之 b 的平方，就是四。", en: "{@k}The missing corner has side two, so its area is b over two, squared: four."}
+      - {id: s4, pace: normal, text: "{@f}补上它，就是边长 x 加二的大正方形。", en: "{@f}Fill it in, and we have a big square with side x plus two."}
+    do:
+      - {at: s1@c, act: unmark, target: "cs#Bx"}
+      - {with: prev, act: cut, target: cs, args: {cut: half}, dur: 1.0}
+      - {at: s2@r, act: hide, target: "cs#tx"}
+      - {with: prev, act: hide, target: "cs#tb"}
+      - {with: prev, act: snap, target: cs, args: {piece: H2, edge: [[7, 0], [7, 5]], to: X, to_edge: [[5, 5], [0, 5]]}, dur: fit}
+      - {at: s3@k, act: show, target: "cs#C"}
+      - {after: prev, act: mark, target: "cs#C"}
+      - {at: s4@f, act: unmark, target: "cs#C"}
+      - {with: prev, act: merge, target: cs, args: {name: Sq}}
+      - {with: prev, act: hide, target: "cs#lx"}
+      - {with: prev, act: show, target: "cs#side"}
+
+  - id: NonExample
+    shows: non_example
+    say:
+      - {id: s1, pace: ask, text: "那角上{@b}补一个 b 方行不行？", en: "So could we put {@b}b squared in the corner instead?"}
+      - {id: s2, pace: normal, text: "b 方是四乘四，角上只空着二乘二，{@n}大了四倍，塞不进去。", en: "b squared is four by four, but the gap is only two by two: {@n}four times too big. It doesn't fit."}
+    do:
+      - {at: s1@b, act: show, target: "cs#BB"}
+      - {at: s2@n, act: mark, target: "cs#BB"}
+
+  - id: Landing
+    shows: landing
+    say:
+      - {id: s1, pace: slow, text: "{@l}所以 x 方加四 x 加四，等于 x 加二的平方。", en: "{@l}So x squared plus four x plus four equals x plus two, squared."}
+      - {id: s2, pace: normal, text: "方程两边都加四，{@n}x 加二的平方就是四十九。", en: "Add four to both sides of the equation, and {@n}x plus two, squared, is forty-nine."}
+      - {id: s3, pace: normal, text: "开个方，{@s}x 加二等于七，所以 x 等于五。", en: "Take the square root: {@s}x plus two is seven, so x is five."}
+      - {id: s4, pace: normal, text: "{@n}x 加二也可以是负七，负九也是解，只是图上画不出来。", en: "{@n}x plus two could also be minus seven, so minus nine is a solution too; the picture just can't show it."}
+      - {id: s5, pace: normal, text: "四换成任意的 b，{@k}补的都是二分之 b 的平方，求根公式就是这么推出来的。", en: "Swap four for any b and {@k}you always add b over two, squared. That's how the quadratic formula is derived."}
+    do:
+      - {at: s1, act: unmark, target: "cs#BB"}
+      - {with: prev, act: hide, target: "cs#BB"}
+      - {at: s1@l, act: show, target: law}
+      - {at: s2@n, act: show, target: num1}
+      - {at: s3@s, act: show, target: "sol#p"}
+      - {at: s4@n, act: show, target: "sol#n"}
+      - {at: s5@k, act: mark, target: "cs#C"}
+      - {with: prev, act: mark, target: "law#c"}
+
+  - id: Close
+    say:
+      - {id: s1, pace: normal, text: "还记得切一刀吗？{@x}配方也只是切开、挪一挪、补一块。", en: "Remember cutting once? {@x}Completing the square is just cutting, moving, and filling one piece."}
+      - {id: s2, pace: ask, text: "{@p}x 方加六 x 等于十六，你会在角上补多大一块？", en: "{@p}x squared plus six x equals sixteen. How big a corner would you add?"}
+    do:
+      - {at: s1, act: unmark, target: "cs#C"}
+      - {with: prev, act: unmark, target: "law#c"}
+      - {at: s1@x, act: cross, target: "myth#m"}
+      - {at: s2@p, act: show, target: practice}

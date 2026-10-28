@@ -1,0 +1,228 @@
+# v2 版式副本：与 ep07.scene.yaml 相同，只加 style.layout: v2（无右侧栏、顶栏 1.0、满宽 stage；字幕仍是双语两行烧录带）。
+# 洞察系列 #7 通分：为什么要找公分母？（分数小系列第二集，三到五年级）。
+# 开场就是 #6 的片尾画面（四等份数轴、1/2 上的点、两小跳、涂色、轴下六格分数条、顶部等式、底部规则），收掉只剩数轴和 1/2；
+# 钩子问 1/2 + 1/3 = 2/5 吗、停三秒，再说出"分子加分子、分母加分母"；数轴上先走 1/2、再接着走 1/3；
+# 按错误想法把 2/5 也点上：它在 1/2 左边，加了一段反而往回走，打叉（位置矛盾本身就是非例）；
+# 两段单位不同（二等分、三等分各看一眼），预测暂停后切成六份：1/2 是三小跳、1/3 是两小跳，一共五格 = 5/6；
+# 落到算式 1/2 + 1/3 = 3/6 + 2/6 = 5/6，轴下分数条涂三格再涂两格；结尾只留四等份数轴，顶部写 2/3 × 3/4 = ?（#8 的开头画面）。
+# 英文一句对一句写在每句的 en 里（双语字幕的第二行）。
+spec: "0.1"
+
+meta:
+  id: ep07
+  title: 通分：为什么要找公分母？
+  line: insight
+  units: [P5]
+  episode: 7
+  grade: 三到五年级
+  author: Boxi Yu
+  license: CC-BY-4.0
+
+pedagogy:
+  insight: 两段长度要用同一种小格来量才能直接数；六分之一能把二分之一和三分之一都正好量完，所以先换成六分之几再加
+  misconception: 二分之一加三分之一等于五分之二（分子加分子、分母加分母）
+  non_example: 五分之二比二分之一还小，加了一段反而往回走，这不可能
+  status: proof
+  landing: Landing
+
+style:
+  side: column  # v2 改版：侧栏内容放回主讲区右边一栏，顶栏只留一行问题句
+  layout: v2  # 培玉视觉规范 v2（style-v2 批量重渲，2026-10-20）
+  theme: paper
+  canvas: "16:9"
+  voice:
+    persona: friend-ps
+    speed: 1.0
+  segmented: true
+  step_hold: 1.0
+
+objects:
+  # 上一集的片尾：只在开场亮一下，和 #6 的末帧一致
+  prev_eq:
+    type: text
+    text: '[$\dfrac{1}{2}$]{#a} [$=\dfrac{2}{4}$]{#b} [$=\dfrac{3}{6}$]{#c}'
+    role: HL
+    level: title
+    in: top
+  prev_rule:
+    type: text
+    text: '[分母 $2\to 4$：每份切两份，$\times 2$]{#den}[　·　分子 $1\to 2$：拿的也切两份，$\times 2$]{#num}[　·　切三份：都 $\times 3$]{#x3}'
+    in: footer
+  line:
+    widget: number_line
+    range: [0, 1]
+    parts: 1
+    fractions: true
+    measures: ["1/4", "1/2", "1/3", "1/6"]
+    unit: 9
+    bars: true
+    role: A
+    in: stage
+  q:
+    type: text
+    text: '[$\dfrac{1}{2}+\dfrac{1}{3}$]{#lhs} [$=$]{#e} [$\dfrac{2}{5}\ ?$]{#bad .NO}'
+    level: title
+    in: top
+  eq:
+    in: side
+    type: text
+    text: '[$\dfrac{1}{2}+\dfrac{1}{3}$]{#lhs} [$=\dfrac{3}{6}+\dfrac{2}{6}$]{#mid} [$=\dfrac{5}{6}$]{#ans .HL}'
+    level: title
+  next:
+    type: text
+    text: '$\dfrac{2}{3}\times\dfrac{3}{4}=\ ?$'
+    level: title
+    in: top
+
+i18n:
+  en:
+    meta: {title: "Why Do Fractions Need a Common Denominator?"}
+    objects:
+      prev_rule: {text: '[Bottom $2\to 4$: cut each piece in two, $\times 2$]{#den}[  ·  Top $1\to 2$: take two, $\times 2$]{#num}[  ·  Cut in three: $\times 3$]{#x3}'}
+    beats:
+      Hook: {pause: {prompt: "Half a book on Saturday, a third on Sunday. Is that two fifths in all?"}}
+      Predict: {pause: {prompt: "Is there a small step that measures both stretches exactly?"}}
+
+beats:
+  - id: Hook
+    pause: {type: predict, prompt: 周六读了二分之一，周日读了三分之一，一共是五分之二吗？, hold: 3, app_item: ep07-before-1}
+    say:
+      - {id: s1, pace: ask, text: "一本书，周六读了二分之一，周日读了三分之一，{@q}一共是五分之二吗？", en: "A book: half of it read on Saturday, a third on Sunday. {@q}Is that two fifths in all?"}
+      - {id: s2, pace: normal, text: "换成你，会写几？想好了再往下看。", en: "What would you write? Decide before you watch on."}
+    do:
+      # 开场：一下子摆出 #6 的片尾画面
+      - {at: s1, act: show, target: prev_eq, dur: 0.01}
+      - {with: prev, act: mark, target: "prev_eq#a", dur: 0.01}
+      - {with: prev, act: mark, target: "prev_eq#b", dur: 0.01}
+      - {with: prev, act: mark, target: "prev_eq#c", dur: 0.01}
+      - {with: prev, act: show, target: prev_rule, dur: 0.01}
+      - {with: prev, act: show, target: line, dur: 0.01}
+      - {after: prev, act: subdivide, target: line, args: {parts: 4}, dur: 0.01}
+      - {with: prev, act: mark_point, target: line, args: {at: "1/2"}, dur: 0.01}
+      - {with: prev, act: jump, target: line, args: {length: "1/4", count: 2}, dur: 0.01}
+      - {with: prev, act: highlight, target: line, args: {to: "1/2"}, dur: 0.01}
+      - {with: prev, act: bar, target: line, args: {parts: 6}, dur: 0.01}
+      - {after: prev, act: fill, target: line, args: {cells: "0:3", role: A}, dur: 0.01}
+      - {after: prev, act: hold, dur: 0.6}
+      # 收掉，只剩数轴和 1/2
+      - {after: prev, act: unmark, target: "prev_eq#a"}
+      - {with: prev, act: unmark, target: "prev_eq#b"}
+      - {with: prev, act: unmark, target: "prev_eq#c"}
+      - {with: prev, act: hide, target: prev_eq}
+      - {with: prev, act: hide, target: prev_rule}
+      - {with: prev, act: hide, target: "line.jump[0]"}
+      - {with: prev, act: hide, target: "line.jump[1]"}
+      - {with: prev, act: hide, target: "line.count[0]"}
+      - {with: prev, act: hide, target: "line.count[1]"}
+      - {with: prev, act: hide, target: "line.span[0]"}
+      - {with: prev, act: hide, target: "line.strip[0]"}
+      - {after: prev, act: subdivide, target: line, args: {parts: 2}, dur: 0.8}
+      - {at: s1@q, act: show, target: q}
+
+  - id: Myth
+    shows: misconception
+    say:
+      - {id: s1, pace: normal, text: "表弟算得飞快：{@top}分子加分子，分母加分母，{@sum}一加一，二加三。", en: "A younger cousin is quick to answer: {@top}tops together, bottoms together. {@sum}One plus one, two plus three."}
+    do:
+      - {at: s1@top, act: mark, target: "q#lhs"}
+      - {at: s1@sum, act: mark, target: "q#bad"}
+
+  - id: Walk
+    say:
+      - {id: s1, pace: normal, text: "还是上一集那条数轴。{@a}从零出发，先走二分之一。", en: "Same number line as last time. {@a}Start at zero and go one half."}
+      - {id: s2, pace: normal, text: "接着，{@b}再往前走三分之一，看看停在哪里。", en: "Then {@b}go another third, and see where we stop."}
+    do:
+      - {at: s1, act: unmark, target: "q#lhs"}
+      - {with: prev, act: unmark, target: "q#bad"}
+      - {at: s1@a, act: jump, target: line, args: {length: "1/2", count: 1, numbers: false}, dur: 1.2}
+      - {at: s2@b, act: jump, target: line, args: {length: "1/3", count: 1, from: "1/2", keep: true, role: B, numbers: false}, dur: 1.2}
+      - {after: prev, act: hold, dur: 0.5}
+
+  - id: WrongIdea
+    shows: non_example
+    say:
+      - {id: s1, pace: normal, text: "如果答案是五分之二，我们把五分之二也放上来。", en: "If the answer were two fifths, let's put two fifths on the line too."}
+      - {id: s2, pace: normal, text: "{@cut}把零到一切成五份，{@two}取两份。", en: "{@cut}Cut zero to one into five parts and {@two}take two."}
+      - {id: s3, pace: slow, text: "{@w}咦？五分之二比二分之一还小。", en: "{@w}Wait. Two fifths is smaller than one half."}
+      - {id: s4, pace: normal, text: "多加了一段，反而往回走了，{@x}这不可能。", en: "We added a whole stretch and ended up further back. {@x}That can't happen."}
+    do:
+      - {at: s2@cut, act: subdivide, target: line, args: {parts: 5}, dur: 1.2}
+      - {at: s2@two, act: highlight, target: line, args: {to: "2/5", role: "NO"}}
+      - {after: prev, act: mark_point, target: line, args: {at: "2/5", role: "NO"}}
+      - {at: s3@w, act: focus, target: "line.point[1]"}
+      - {after: prev, act: hold, dur: 1}
+      - {at: s4@x, act: unfocus, target: line}
+      - {with: prev, act: cross, target: "q#bad"}
+      - {after: prev, act: hide, target: "line.point[1]"}
+      - {with: prev, act: hide, target: "line.span[0]"}
+
+  - id: SameUnit
+    say:
+      - {id: s1, pace: normal, text: "问题出在，两段用的单位不一样，{@h}一个是二分之一，{@t}一个是三分之一。", en: "The trouble is that the two stretches use different units: {@h}one is in halves, {@t}the other in thirds."}
+    do:
+      - {at: s1@h, act: subdivide, target: line, args: {parts: 2}, dur: 1.0}
+      - {at: s1@t, act: subdivide, target: line, args: {parts: 3}, dur: 1.0}
+      - {after: prev, act: hold, dur: 0.5}
+
+  - id: Predict
+    pause: {type: predict, prompt: 有没有一种小格子，能把两段都正好量完？, hold: 3, app_item: ep07-predict-1}
+    say:
+      - {id: s1, pace: ask, text: "有没有一种小格子，{@q}能把两段都正好量完？", en: "Is there one small step {@q}that measures both stretches exactly?"}
+
+  - id: Sixths
+    say:
+      - {id: s1, pace: normal, text: "试试把零到一，{@six}平均切成六份。", en: "Try cutting zero to one {@six}into six equal parts."}
+      - {id: s2, pace: normal, text: "{@a}二分之一，正好是三个六分之一。", en: "{@a}One half is exactly three sixths."}
+      - {id: s3, pace: normal, text: "{@b}三分之一，正好是两个六分之一。", en: "{@b}One third is exactly two sixths."}
+      - {id: s4, pace: brisk, text: "现在用同一种小格来数，{@c}三格，再两格。", en: "Now count with the same step: {@c}three, then two more."}
+    do:
+      - {at: s1@six, act: subdivide, target: line, args: {parts: 6}, dur: 1.2}
+      - {at: s2, act: step}        # 子步：六等分刻度出来，先看一眼
+      - {at: s2@a, act: jump, target: line, args: {length: "1/6", count: 3}, dur: fit}
+      - {at: s3@b, act: jump, target: line, args: {length: "1/6", count: 2, from: "1/2", keep: true, role: B}, dur: fit}
+      - {at: s4@c, act: highlight, target: line, args: {to: "1/2", role: A}, dur: 0.8}
+      - {after: prev, act: highlight, target: line, args: {from: "1/2", to: "5/6", role: B, keep: true}, dur: 0.6}
+
+  - id: Reveal
+    say:
+      - {id: s1, pace: slow, text: "{@ans}一共五格，就是六分之五。", en: "{@ans}Five steps in all: five sixths."}
+      - {id: s2, pace: normal, text: "{@w}六分之五在二分之一的右边，{@fwd}加了一段，就往前走了一段。", en: "{@w}Five sixths is to the right of one half. {@fwd}Add a stretch, move forward a stretch."}
+    do:
+      - {at: s1@ans, act: mark_point, target: line, args: {at: "5/6"}}
+      - {at: s2, act: step}        # 子步：一共五格 = 5/6
+      - {at: s2@w, act: mark_point, target: line, args: {at: "2/5", role: "NO"}}
+      - {at: s2@fwd, act: hide, target: "line.point[3]"}
+
+  - id: Landing
+    shows: landing
+    say:
+      - {id: s1, pace: normal, text: "为什么是六？{@why}因为二和三，都能整切进六份里。", en: "Why six? {@why}Because both two and three fit evenly into six parts."}
+      - {id: s2, pace: normal, text: "{@r}二分之一换成六分之三，三分之一换成六分之二，这就是上一集的换名字。", en: "{@r}One half gets renamed three sixths, one third becomes two sixths. That's last episode's renaming trick."}
+      - {id: s3, pace: normal, text: "单位一样了，{@add}分子才能直接相加。", en: "Once the units match, {@add}we can simply add the tops."}
+    do:
+      - {at: s1, act: hide, target: "eq#mid"}
+      - {with: prev, act: hide, target: "eq#ans"}
+      - {at: s1@why, act: set, target: eq, args: {opacity: 1}}
+      - {at: s2@r, act: show, target: "eq#mid"}
+      - {with: prev, act: bar, target: line, args: {parts: 6}}
+      - {after: prev, act: fill, target: line, args: {cells: "0:3", role: A}}
+      - {after: prev, act: fill, target: line, args: {cells: "3:5", role: B}}
+      - {at: s3@add, act: show, target: "eq#ans"}
+      - {after: prev, act: hold, dur: 1}
+
+  - id: Close
+    say:
+      - {id: s1, pace: slow, text: "所以二分之一加三分之一，{@not}不是五分之二，{@is}是六分之五。", en: "So one half plus one third {@not}isn't two fifths. {@is}It's five sixths."}
+      - {id: s2, pace: ask, text: "加法要先换成同一个单位。{@next}那乘法呢？三分之二乘四分之三，是什么意思？", en: "Adding means switching to the same unit first. {@next}But what about multiplying? What does two thirds times three fourths even mean?"}
+    do:
+      - {at: s1@not, act: mark, target: "q#bad"}
+      - {at: s1@is, act: unmark, target: "q#bad"}
+      - {with: prev, act: mark, target: "eq#ans"}
+      - {after: prev, act: hold, dur: 1}
+      # 收成 #8 的开头画面：只留四等份数轴，顶部写 2/3 × 3/4 = ?
+      - {at: s2@next, act: unmark, target: "eq#ans"}
+      - {with: prev, act: hide, target: q}
+      - {with: prev, act: hide, target: eq}
+      - {with: prev, act: erase, target: line}
+      - {after: prev, act: subdivide, target: line, args: {parts: 4}, dur: 1.0}
+      - {after: prev, act: show, target: next}

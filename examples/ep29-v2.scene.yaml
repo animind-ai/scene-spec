@@ -1,0 +1,266 @@
+# v2 版式副本：与 ep29.scene.yaml 相同，只加 style.layout: v2（无右侧栏、顶栏 1.0、满宽 stage；字幕仍是双语两行烧录带）。
+# 洞察系列 #29 等差数列求和（高一 / 高二）。sums 系列第一集，接 #30。第 2 版：削峰填谷（2026-10-18 用户定）。
+# 按脚本 insight/ep29-arithmetic-sum/script.yaml（第 2 版）写。
+# 一个洞察：和摞成积木台阶，像 #35 削峰填谷那样把高的那头匀给矮的那头，摊成平墙，高度 = (首项 + 末项) ÷ 2；
+# 钩子用情境（孩子张口说出 5050）、停三秒、同桌说"只对从 1 开始管用"；1..5 摊成 3，5 × 3 = 15；1..100 摊成 50.5；
+# 迷思：3..11 照样摊成 7；非例 1、2、4、8：首尾平均 4.5，真摊平只有 3.75；落到 S = n(a₁ + aₙ) ÷ 2，
+# 再用一句话接回"倒过来拼成长方形"。片尾画面（长方形、底部公式、右侧下一集的问题）和第 1 版完全一样，#30 接它。
+spec: "0.1"
+
+meta:
+  id: ep29
+  title: 等差数列求和：倒过来再加一遍
+  line: insight
+  units: [S6]
+  episode: 29
+  grade: 高一
+  author: Boxi Yu
+  license: CC-BY-4.0
+
+pedagogy:
+  insight: 把等差数列摞成积木台阶，像削峰填谷那样把高的那头匀给矮的那头，台阶摊成一面平墙，高度正好是首项加末项的一半；所以和等于项数乘这个平均高度
+  misconception: 首尾配对这招只对从一开始的数列管用，比如一加到一百
+  non_example: 一、二、四、八每级多得不一样：首尾平均是四点五，可摊平只有三点七五
+  status: proof
+  landing: Landing
+
+style:
+  side: column  # v2 改版：侧栏内容放回主讲区右边一栏，顶栏只留一行问题句
+  layout: v2  # 培玉视觉规范 v2（style-v2 批量重渲，2026-10-20）
+  theme: paper
+  canvas: "16:9"
+  voice:
+    persona: teacher-hs
+    speed: 1.0
+  segmented: true
+  step_hold: 1.0
+
+objects:
+  q1:
+    type: text
+    text: '$1+2+3+\cdots+100$'
+    level: title
+    in: side
+  q2:
+    type: text
+    text: '[$=5050$]{#r} [$?$]{#q .NO}'
+    level: title
+    below: q1
+    gap: sm
+  myth:
+    type: text
+    text: '[只对从 1 开始管用？]{#m}'
+    role: "NO"
+    below: q2
+    gap: md
+  nq:
+    type: text
+    text: '曲线每一点涨得多快？'
+    role: HL
+    level: title
+    in: side
+  law:
+    type: text
+    text: '[$S=$]{#s} [$n(a_1+a_n)$]{#nw .HL} [$\div 2$]{#h}'
+    level: display
+    in: footer
+  odd:
+    widget: dissect
+    role: A
+    in: stage
+    view: [[-1.6, -0.8], [14.4, 10.0]]
+    shapes:
+      D:
+        dots: {rows: [3, 5, 7, 9, 11]}
+    copies:
+      E: D
+    pieces:
+      E: {role: B}
+    guides:
+      rows: {from: [-0.7, 0], to: [-0.7, 4], label: '5 排', role: HL, side: left}
+      cols: {from: [0, 4.7], to: [13, 4.7], label: '每排 $3+11=14$ 个', role: HL, side: above}
+      n: {from: [-0.7, 0], to: [-0.7, 4], label: '$n$ 排', role: HL, side: left}
+      w: {from: [0, 4.7], to: [13, 4.7], label: '每排 $a_1+a_n$ 个', role: HL, side: above}
+  q3:
+    type: text
+    text: '[$=100\times 50.5$]{#m} [$=5050$]{#r .HL}'
+    below: q1
+    gap: sm
+  a5:
+    type: text
+    text: '$1+2+3+4+5$'
+    below: myth
+    gap: lg
+  s5:
+    type: text
+    text: '[$=5\times 3$]{#m} [$=15$]{#r .HL}'
+    below: a5
+    gap: sm
+  a35:
+    type: text
+    text: '$3+5+7+9+11$'
+    below: myth
+    gap: lg
+  s35:
+    type: text
+    text: '[$=5\times 7$]{#m} [$=35$]{#r .HL}'
+    below: a35
+    gap: sm
+  ag:
+    type: text
+    text: '$1+2+4+8$'
+    below: myth
+    gap: lg
+  sg:
+    type: text
+    text: '[$15\div 4=3.75$]{#r}'
+    below: ag
+    gap: sm
+  bars5:
+    widget: block_bars
+    role: A
+    in: stage
+    heights: [1, 2, 3, 4, 5]
+    room: 5
+    numbers: true
+  bars35:
+    widget: block_bars
+    role: A
+    in: stage
+    heights: [3, 5, 7, 9, 11]
+    room: 11
+    numbers: true
+  bars8:
+    widget: block_bars
+    role: A
+    in: stage
+    heights: [1, 2, 4, 8]
+    room: 8
+
+i18n:
+  en:
+    meta: {title: "Summing an Arithmetic Series: Flip It and Add"}
+    objects:
+      myth: {text: '[Only works from 1?]{#m}'}
+      nq: {text: "How fast is it rising?"}
+      odd:
+        guides:
+          rows: {label: '5 rows'}
+          cols: {label: '$3+11=14$ per row'}
+          n: {label: '$n$ rows'}
+          w: {label: '$a_1+a_n$ per row'}
+    beats:
+      Hook: {pause: {prompt: "How did he get five thousand and fifty so fast?"}}
+      Predict: {pause: {prompt: "Pour the tall end into the short end until it is flat. How high will it be?"}}
+
+beats:
+  - id: Hook
+    pause: {type: predict, prompt: 他怎么一下子算出五千零五十的？, hold: 3, app_item: ep29-before-1}
+    say:
+      - {id: s1, pace: normal, text: "{@q}老师让全班从一加到一百，{@r}一个孩子很快就报出五千零五十。", en: "{@q}A teacher told the class to add up every number from one to a hundred. {@r}One boy called out five thousand and fifty almost at once."}
+      - {id: s2, pace: ask, text: "你先琢磨一下：他怎么算得这么快？", en: "Turn it over in your head first: how did he do it so fast?"}
+    do:
+      - {at: s1@q, act: show, target: q1}
+      - {at: s1@r, act: show, target: q2}
+
+  - id: Myth
+    shows: misconception
+    say:
+      - {id: s1, pace: normal, text: "同桌不服气：{@m}首尾配对这招，只对从一开始的数管用。", en: "His deskmate wasn't impressed: {@m}pairing first with last only works when you start at one."}
+    do:
+      - {at: s1@m, act: show, target: myth}
+
+  - id: Setup
+    say:
+      - {id: s1, pace: normal, text: "先看小的：{@a}一加到五，{@b}每个数摞成一列积木，像一级级台阶。", en: "Start small: {@a}one to five, {@b}each number stacked as a column of blocks, like a staircase."}
+      - {id: s2, pace: normal, text: "还记得削峰填谷吗？高的削下来填到矮的上，摊平的高度就是平均数。", en: "Remember levelling peaks into valleys? Shave the tall ones, fill the short ones, and the flat height is the mean."}
+    do:
+      - {at: s1@a, act: show, target: a5}
+      - {at: s1@b, act: show, target: bars5}
+
+  - id: Predict
+    pause: {type: predict, prompt: 把高的那头往矮的那头匀，最后摊平，会有多高？, hold: 3, app_item: ep29-why-1}
+    say:
+      - {id: s1, pace: ask, text: "把高的那头往矮的那头匀，最后摊平，会有多高？", en: "Pour the tall end into the short end until it's flat. How high will it be?"}
+
+  - id: Level
+    say:
+      - {id: s1, pace: normal, text: "{@a}最高的五分两块给最矮的一，{@b}四再分一块给二。", en: "{@a}The tallest, five, gives two blocks to the shortest, one. {@b}Four gives one block to two."}
+      - {id: s2, pace: slow, text: "{@l}台阶变成了一面平墙，每列都是三块。", en: "{@l}The staircase becomes a flat wall, three blocks in every column."}
+      - {id: s3, pace: normal, text: "三正好是一和五的平均：高出来的，正好填上缺的。", en: "Three is exactly the average of one and five: what sticks out exactly fills what's missing."}
+      - {id: s4, pace: normal, text: "所以和就是列数乘平均高度，{@r}五乘三，十五。", en: "So the sum is the number of columns times the average height: {@r}five times three, fifteen."}
+      - {id: s5, pace: normal, text: "一加到一百也一样：一百列，摊平后高五十点五。", en: "One to a hundred works the same way: a hundred columns, levelled to fifty and a half."}
+      - {id: s6, pace: slow, text: "{@h}一百乘五十点五，正好五千零五十。", en: "{@h}A hundred times fifty and a half: exactly five thousand and fifty."}
+    do:
+      - {at: s1@a, act: transfer, target: bars5, args: {from: 4, to: 0, count: 2}, dur: fit}
+      - {at: s1@b, act: transfer, target: bars5, args: {from: 3, to: 1}, dur: fit}
+      - {at: s2@l, act: level, target: bars5, args: {at: 3, label: '$(1+5)\div 2=3$', role: HL}}
+      - {at: s4@r, act: show, target: s5}
+      - {after: prev, act: mark, target: "s5#r"}
+      - {at: s6@h, act: hide, target: q2}
+      - {with: prev, act: show, target: q3}
+      - {after: prev, act: mark, target: "q3#r"}
+
+  - id: Try
+    say:
+      - {id: s1, pace: normal, text: "那不从一开始呢？{@a}试试三、五、七、九、十一。", en: "What if we don't start at one? {@a}Try three, five, seven, nine, eleven."}
+      - {id: s2, pace: normal, text: "{@a}十一匀四块给三，{@b}九匀两块给五，{@l}全都摊成七。", en: "{@a}Eleven passes four blocks to three, {@b}nine passes two to five, and {@l}everything levels at seven."}
+      - {id: s3, pace: normal, text: "七还是首尾的平均，{@r}和是五乘七，三十五。", en: "Seven is still the average of first and last, and {@r}the sum is five times seven, thirty-five."}
+    do:
+      - {at: s1, act: unmark, target: "q3#r"}
+      - {with: prev, act: unmark, target: "s5#r"}
+      - {with: prev, act: hide, target: bars5}
+      - {with: prev, act: hide, target: a5}
+      - {with: prev, act: hide, target: s5}
+      - {at: s1@a, act: show, target: a35}
+      - {with: prev, act: show, target: bars35}
+      - {at: s2@a, act: transfer, target: bars35, args: {from: 4, to: 0, count: 4}, dur: fit}
+      - {at: s2@b, act: transfer, target: bars35, args: {from: 3, to: 1, count: 2}, dur: fit}
+      - {at: s2@l, act: level, target: bars35, args: {at: 7, label: '$(3+11)\div 2=7$', role: HL}}
+      - {at: s3@r, act: show, target: s35}
+      - {after: prev, act: mark, target: "s35#r"}
+      - {with: prev, act: cross, target: "myth#m"}
+
+  - id: NonExample
+    shows: non_example
+    say:
+      - {id: s1, pace: normal, text: "可要是{@a}一、二、四、八，每级多得不一样呢？", en: "But what about {@a}one, two, four, eight, where the steps grow by different amounts?"}
+      - {id: s2, pace: normal, text: "{@x}首尾平均是四点五，{@t}可一共十五块，{@l}摊平只有三点七五。", en: "{@x}The first-and-last average is four and a half, but {@t}there are fifteen blocks, so {@l}the level is only three and three quarters."}
+    do:
+      - {at: s1, act: unmark, target: "s35#r"}
+      - {with: prev, act: hide, target: bars35}
+      - {with: prev, act: hide, target: a35}
+      - {with: prev, act: hide, target: s35}
+      - {at: s1@a, act: show, target: ag}
+      - {with: prev, act: show, target: bars8}
+      - {at: s2@x, act: level, target: bars8, args: {at: 4.5, label: '$(1+8)\div 2=4.5$?', role: "NO"}}
+      - {at: s2@t, act: show, target: sg}
+      - {at: s2@l, act: level, target: bars8, args: {at: 3.75, label: '$3.75$', role: HL}}
+
+  - id: Landing
+    shows: landing
+    say:
+      - {id: s1, pace: slow, text: "{@law}所以等差数列的和，是项数乘首项加末项，再除以二。", en: "{@law}So an arithmetic series adds up to the number of terms times first plus last, divided by two."}
+      - {id: s2, pace: normal, text: "{@d}两份台阶倒过来一拼，每排都是首项加末项，{@f}也是这个道理。", en: "{@d}Flip a second staircase onto the first and every row is first plus last: {@f}the same idea."}
+    do:
+      - {at: s1@law, act: show, target: law}
+      - {at: s2@d, act: hide, target: bars8}
+      - {with: prev, act: hide, target: ag}
+      - {with: prev, act: hide, target: sg}
+      - {after: prev, act: show, target: odd}
+      - {after: prev, act: copy, target: odd, args: {piece: E, by: [0, 5.5]}}
+      - {after: prev, act: rotate, target: odd, args: {piece: E, angle: 180}, dur: 0.8}
+      - {after: prev, act: shift, target: odd, args: {piece: E, to: [9.428571, 1.428571]}, dur: 0.8}
+      - {at: s2@f, act: show, target: "odd#n"}
+      - {with: prev, act: show, target: "odd#w"}
+
+  - id: Close
+    say:
+      - {id: s1, pace: normal, text: "这种一级一级的台阶，讲差分的时候还会再见到。", en: "We'll meet this staircase again when we get to finite differences."}
+      - {id: s2, pace: ask, text: "{@q}一条曲线在每一点涨得有多快，又该怎么看出来？", en: "{@q}Next: how can we see how fast a curve is rising at each point?"}
+    do:
+      # 片尾画面：长方形、底部公式和右侧一句下一集的问题，不留叠加层，#30 开场好还原
+      - {at: s1, act: hide, target: q1}
+      - {with: prev, act: hide, target: q3}
+      - {with: prev, act: hide, target: myth}
+      - {at: s2@q, act: show, target: nq}

@@ -1,0 +1,232 @@
+# v2 版式副本：与 ep04.scene.yaml 相同，只加 style.layout: v2（无右侧栏、顶栏 1.0、满宽 stage；字幕仍是双语两行烧录带）。
+# 洞察系列 #4 分配律就是切一刀（数的世界入门系列第四集，三到四年级）。
+# 开场就是 #3 的片尾画面（四排十个点、最右一列拿掉、9 × 4 = 10 × 4 − 4）；钩子问 (5 + 3) × 4、停三秒、说出"得十七"；
+# 每个点放进一个小方格，点阵变成长方形，再换成四排八格（8 = 5 + 3）；先在格子上看 17 是哪几块（右块 12 + 五个散格）；
+# 预测暂停后沿 5 和 3 之间切开：20 + 12 = 32；非例 5 × 3 + 4 的散格子拼不成长方形；
+# 落到 (5 + 3) × 4 = 5 × 4 + 3 × 4，回扣 #3 的切掉一条。结尾：切成两块的长方形和算式（#5 的开头画面）。
+# 脚本：insight/ep04-distributive-cut/script.yaml（第 1 轮）。
+spec: "0.1"
+
+meta:
+  id: ep04
+  title: 分配律就是切一刀
+  line: insight
+  units: [M2]
+  episode: 4
+  grade: 三到四年级
+  author: Boxi Yu
+  license: CC-BY-4.0
+
+pedagogy:
+  insight: 四排八格的长方形沿五和三中间切一刀，两块加起来还是整块，所以五加三的和乘四，等于五乘四加三乘四
+  misconception: 五加三再乘四，就是五加上三乘四，得十七（只乘了一项）
+  non_example: 五乘三加四不能拆成五加四再乘三：五乘三是一块，四个格子是散的，拼不成一块长方形
+  status: proof
+  landing: Equation
+
+style:
+  layout: v2  # 培玉视觉规范 v2（style-v2 批量重渲，2026-10-20）
+  theme: paper
+  canvas: "16:9"
+  voice:
+    persona: friend-ps
+    speed: 1.0
+  segmented: true
+  step_hold: 1.0
+
+objects:
+  # 开场：#3 的片尾（同样的定义）
+  array:
+    widget: dot_array
+    rows: 4
+    cols: 10
+    room: [4, 10]
+    in: stage
+  end_eq3:
+    type: text
+    text: '$9\times4=10\times4-4$'
+    level: title
+    in: top
+  q:
+    type: text
+    text: '$(5+3)\times4=\ ?$'
+    level: title
+    in: top
+  myth:
+    type: text
+    text: '[$5+3\times4=17$]{#m}？'
+    role: "NO"
+    level: title
+    in: footer
+  rect:
+    widget: area_grid
+    cols: 8
+    rows: 4
+    rect: true
+    in: stage
+  total:
+    type: text
+    text: '$20+12=32$'
+    level: title
+    in: footer
+  block:
+    widget: area_grid
+    cols: 5
+    rows: 3
+    rect: true
+    in: stage
+  loose:
+    widget: area_grid
+    cols: 4
+    rows: 1
+    rect: true
+    right_of: block
+    gap: lg
+  nonex:
+    type: text
+    text: '$5\times3+4$ 不能写成 [$(5+4)\times3$]{#x}'
+    level: title
+    in: footer
+  eq:
+    type: text
+    text: '[$(5+3)\times4$]{#l} [$=$]{#e} [$5\times4$]{#a .A} [$+$]{#p} [$3\times4$]{#b .B} [$=32$]{#r .HL}'
+    level: title
+    in: top
+  letters:
+    type: text
+    text: '$(a+b)\times c=a\times c+b\times c$'
+    in: footer
+  back:
+    type: text
+    text: '上一集：$9\times4=10\times4-1\times4$，切掉一条'
+    in: footer
+  end_eq:
+    type: text
+    text: '$(5+3)\times4=5\times4+3\times4$'
+    level: title
+    in: top
+
+i18n:
+  en:
+    meta: {title: "The Distributive Law Is Just One Cut"}
+    objects:
+      myth: {text: '[$5+3\times4=17$]{#m}?'}
+      nonex: {text: '$5\times3+4$ is not [$(5+4)\times3$]{#x}'}
+      back: {text: 'Last time: $9\times4=10\times4-1\times4$, one strip cut off'}
+    beats:
+      Hook: {pause: {prompt: "Each box has five pencils and three crayons. How many in four boxes?"}}
+      Predict: {pause: {prompt: "Cut between the five and the three. Do the two pieces still add up the same?"}}
+
+beats:
+  - id: Hook
+    pause: {type: predict, prompt: 每盒五支加三支，四盒一共几支？, hold: 3, app_item: ep04-before-1}
+    say:
+      - {id: s1, pace: ask, text: "每盒五支铅笔三支彩笔，{@q}四盒一共几支？", en: "Each box has five pencils and three crayons. {@q}How many in four boxes?"}
+      - {id: s2, pace: normal, text: "你先算一算，把得数记在心里。", en: "Work it out first and keep your answer in your head."}
+    do:
+      # 开场：#3 的片尾画面
+      - {at: s1, act: show, target: array, dur: 0.01}
+      - {with: prev, act: fade_col, target: array, args: {role: A}, dur: 0.01}
+      - {with: prev, act: show, target: end_eq3, dur: 0.01}
+      - {at: s1@q, act: hide, target: end_eq3}
+      - {after: prev, act: show, target: q}
+
+  - id: Myth
+    shows: misconception
+    say:
+      - {id: s1, pace: normal, text: "{@m}哥哥列成五加三乘四，算出十七。", en: "{@m}Big brother writes five plus three times four, and gets seventeen."}
+    do:
+      - {at: s1@m, act: show, target: myth}
+
+  - id: Setup
+    say:
+      - {id: s1, pace: normal, text: "我们一起看。{@s}把每个点放进一个小方格。", en: "Let's look together. {@s}Put every dot into its own little square."}
+      - {id: s2, pace: normal, text: "{@r}点阵就变成一块长方形，一格一个。", en: "{@r}The dot array turns into a rectangle, one dot per square."}
+      - {id: s3, pace: normal, text: "换成四排，每排八格，{@e}八就是五加三。", en: "Now make it four rows of eight squares. {@e}Eight is five plus three."}
+    do:
+      - {at: s1@s, act: squares, target: array, args: {fill: A, dots: false}, dur: 1.2}
+      - {at: s2@r, act: hide, target: array}
+      - {with: prev, act: show, target: rect}
+      - {at: s3@e, act: split, target: rect, args: {cols: [5, 3]}, dur: 1.0}
+
+  - id: Wrong
+    shows: misconception
+    say:
+      - {id: s1, pace: normal, text: "{@w}来找十七：右边三乘四，是十二格。", en: "Where's the seventeen? {@w}The right part, three times four, is twelve squares."}
+      - {id: s2, pace: normal, text: "{@f}再加五个单独的格子，左边一大片没算。", en: "{@f}Plus five loose squares. The big part on the left got left out."}
+      - {id: s3, pace: normal, text: "{@x}十七太少了，这个长方形明明有好多格。", en: "{@x}Seventeen is far too few. This rectangle clearly has lots of squares."}
+    do:
+      - {at: s1@w, act: fill, target: rect, args: {col: 1, role: B, label: true}}
+      - {at: s2@f, act: fill, target: rect, args: {cells: "0:5", role: "NO"}}
+      - {at: s3@x, act: cross, target: "myth#m"}
+      - {after: prev, act: unfill, target: rect}
+
+  - id: Predict
+    pause: {type: predict, prompt: 沿五和三中间切一刀，两块加起来会变吗？, hold: 2.5, app_item: ep04-predict-1}
+    say:
+      - {id: s1, pace: ask, text: "沿五和三中间切一刀，{@q}两块加起来会变吗？", en: "Cut it between the five and the three. {@q}Will the two pieces add up to something different?"}
+    do:
+      - {at: s1@q, act: mark, target: "rect.cut[0]"}
+
+  - id: Cut
+    say:
+      - {id: s1, pace: slow, text: "{@c}切开分一分，左边是五乘四，有二十格。", en: "{@c}Cut and pull apart: the left is five times four, twenty squares."}
+      - {id: s2, pace: normal, text: "{@r}右边三乘四，是十二格，{@j}合起来三十二格。", en: "{@r}The right is three times four, twelve. {@j}Together, thirty-two."}
+    do:
+      - {at: s1, act: unmark, target: "rect.cut[0]"}
+      - {at: s1@c, act: apart, target: rect, args: {gap: 0.5}}
+      - {after: prev, act: fill, target: rect, args: {col: 0, role: A, label: true}}
+      - {at: s2@r, act: fill, target: rect, args: {col: 1, role: B, label: true}}
+      - {at: s2@j, act: join, target: rect}
+      - {with: prev, act: hide, target: myth}
+      - {after: prev, act: show, target: total}
+
+  - id: Reveal
+    shows: non_example
+    say:
+      - {id: s1, pace: slow, text: "{@a}先加再乘，和分开乘再加，换什么数都一样。", en: "{@a}Add then multiply, or multiply each part then add: the same, whatever the numbers."}
+      - {id: s2, pace: normal, text: "{@n}五乘三加四呢？能拆成五加四再乘三吗？", en: "{@n}What about five times three plus four? Can it become five plus four, times three?"}
+      - {id: s3, pace: normal, text: "{@l}五乘三是一块，旁边四个格子是散的。", en: "{@l}Five times three is one block, and the four squares beside it are loose."}
+      - {id: s4, pace: normal, text: "{@x}拼不成一块长方形，切一刀就用不上。", en: "{@x}They don't make one rectangle, so cutting doesn't help."}
+    do:
+      - {at: s1@a, act: mark, target: total}
+      - {at: s2, act: step}
+      - {at: s2@n, act: unmark, target: total}
+      - {with: prev, act: hide, target: rect}
+      - {with: prev, act: hide, target: total}
+      - {with: prev, act: show, target: block}
+      - {with: prev, act: show, target: loose}
+      - {with: prev, act: show, target: nonex}
+      - {at: s3@l, act: fill, target: block, args: {role: A, label: true}}
+      - {after: prev, act: fill, target: loose, args: {role: "NO"}}
+      - {at: s4@x, act: cross, target: "nonex#x"}
+
+  - id: Equation
+    shows: landing
+    say:
+      - {id: s1, pace: normal, text: "{@e}写成算式，左块是五乘四，{@b}右块是三乘四。", en: "{@e}As a number sentence, the left block is five times four and {@b}the right block is three times four."}
+      - {id: s2, pace: normal, text: "{@k}上一集的九乘四，就是从十乘四切掉一条。", en: "{@k}Last time's nine times four was just ten times four with one strip cut off."}
+    do:
+      - {at: s1, act: hide, target: block}
+      - {with: prev, act: hide, target: loose}
+      - {with: prev, act: hide, target: nonex}
+      - {with: prev, act: hide, target: q}
+      - {after: prev, act: show, target: rect}
+      - {with: prev, act: show, target: eq}
+      - {at: s1@e, act: mark, target: "eq#a"}
+      - {at: s1@b, act: mark, target: "eq#b"}
+      - {after: prev, act: show, target: letters}
+      - {at: s2@k, act: unmark, target: "eq#a"}
+      - {with: prev, act: unmark, target: "eq#b"}
+      - {with: prev, act: hide, target: letters}
+      - {after: prev, act: show, target: back}
+
+  - id: LookBack
+    say:
+      - {id: s1, pace: normal, text: "看完和大人一起，在方格纸上画一画、剪一剪。", en: "After watching, draw and cut a rectangle on squared paper with a grown-up."}
+      - {id: s2, pace: ask, text: "{@n}为什么二十三乘十四的竖式，要错一位？", en: "{@n}Twenty-three times fourteen: why does long multiplication shift the second row over?"}
+    do:
+      # 收成 #5 的开头画面：切成两块的长方形，上方 (5 + 3) × 4 = 5 × 4 + 3 × 4
+      - {at: s2@n, act: hide, target: back}
+      - {with: prev, act: hide, target: eq}
+      - {after: prev, act: show, target: end_eq}

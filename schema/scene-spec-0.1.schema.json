@@ -167,11 +167,12 @@
           "minLength": 1
         },
         "line": {
-          "description": "产品线：insight 洞察短视频 | worked 例题讲解 | contest 竞赛拔高",
+          "description": "产品线：insight 洞察短视频 | worked 例题讲解 | contest 竞赛拔高 | lecture 大学课程讲座",
           "enum": [
             "insight",
             "worked",
-            "contest"
+            "contest",
+            "lecture"
           ]
         },
         "units": {
@@ -352,6 +353,21 @@
             "soft",
             "none"
           ]
+        },
+        "layout": {
+          "description": "分区模板：default（默认，题卡在上）| lecture（讲座：顶上一条窄带放页眉，side 是右半边），见 docs/cs-lecture.md | v2（培玉规范 v2：无右侧栏，side 并入顶栏，stage 占满宽度；字幕沿用默认的中英双语两行烧录带，占成片底部 12%）",
+          "enum": ["default", "lecture", "v2"]
+        },
+        "side": {
+          "description": "v2 版式里 side 放哪：band（默认，并进 1.0 的顶栏，只适合一行字）| column（主讲区右边一栏，宽 4.2，公式竖排、迷思、多行文字放这里；顶栏只留一行问题句）",
+          "enum": ["band", "column"]
+        },
+        "fonts": {
+          "description": "西文正文和代码的字体（字体族名）；系统里没有时 kit 退回默认字体",
+          "type": "object",
+          "additionalProperties": false,
+          "minProperties": 1,
+          "properties": {"text": {"type": "string", "minLength": 1}, "code": {"type": "string", "minLength": 1}}
         },
         "min_font": {
           "type": "integer",

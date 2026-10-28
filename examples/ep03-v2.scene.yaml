@@ -1,0 +1,217 @@
+# v2 版式副本：与 ep03.scene.yaml 相同，只加 style.layout: v2（无右侧栏、顶栏 1.0、满宽 stage；字幕仍是双语两行烧录带）。
+# 洞察系列 #3 乘法口诀里藏着的"斜线"（数的世界入门系列第三集，二到三年级）。
+# 开场就是 #2 的片尾画面（四排三个的点阵、3 × 4 = 4 × 3）；钩子问九的口诀有什么规律、停三秒、说出"只能死记"；
+# 每排补满到十个（一排一个十），再每排拿掉最后一个：九乘一、九乘二、九乘三一排排亮起来；预测暂停问九乘四；
+# 四个十拿掉四个要拆开一个十，剩三个十和六个；非例：八的口诀个位每次少二，到八乘六断掉；
+# 落到 9 × 4 = 10 × 4 − 4 = 36。结尾：四排十个、最右一列拿掉，9 × 4 = 10 × 4 − 4（#4 的开头画面）。
+# 规律那一列放在上方横排（不放侧栏：侧栏会让点阵变小，接不上 #2 的片尾）。
+# 脚本：insight/ep03-nines-pattern/script.yaml（第 1 轮）。
+spec: "0.1"
+
+meta:
+  id: ep03
+  title: 乘法口诀里藏着的"斜线"
+  line: insight
+  units: [P3]
+  episode: 3
+  grade: 二到三年级
+  author: Boxi Yu
+  license: CC-BY-4.0
+
+pedagogy:
+  insight: 九就是十少一：每多一排，多一个十、也多拿掉一个点，所以十位加一、个位减一
+  misconception: 口诀没什么道理，只能死记硬背
+  non_example: 八比十少二，个位每次少二，到八乘六就不够减了，规律断掉；十位加一、个位减一是九才有的
+  status: proof
+  landing: Equation
+
+style:
+  layout: v2  # 培玉视觉规范 v2（style-v2 批量重渲，2026-10-20）
+  theme: paper
+  canvas: "16:9"
+  voice:
+    persona: friend-ps
+    speed: 1.0
+  segmented: true
+  step_hold: 1.0
+
+objects:
+  # 开场：#2 的片尾（同样的定义）
+  array:
+    widget: dot_array
+    rows: 4
+    cols: 3
+    room: [4, 10]
+    in: stage
+  end_eq2:
+    type: text
+    text: '$3\times4=4\times3$'
+    level: title
+    in: top
+  table:
+    type: text
+    text: '[$9$]{#n1} · [$18$]{#n2} · [$27$]{#n3} · [$36$]{#n4} · [$45$]{#n5} · [$54$]{#n6} · [$63$]{#n7} · [$72$]{#n8} · [$81$]{#n9}'
+    level: title
+    in: top
+  myth:
+    type: text
+    text: 口诀只能死记？
+    role: "NO"
+    in: footer
+  rule:
+    type: text
+    text: '每多一排：[十位 $+1$]{#t .A}，[个位 $-1$]{#o .B}'
+    level: title
+    in: footer
+  arr8:
+    widget: dot_array
+    rows: 4
+    cols: 10
+    room: [4, 10]
+    in: stage
+  table8:
+    type: text
+    text: '[$8$]{#m1} · [$16$]{#m2} · [$24$]{#m3} · [$32$]{#m4} · [$40$]{#m5} · [$48$]{#m6}'
+    level: title
+    in: top
+  rule8:
+    type: text
+    text: '八：个位每次 $-2$，到 [$48$]{#x} 十位没变'
+    level: title
+    in: footer
+  eq:
+    type: text
+    text: '[$9\times4$]{#a} [$=10\times4$]{#b .A} [$-4$]{#c .NO} [$=40-4=36$]{#d .HL}'
+    level: title
+    in: top
+  end_eq:
+    type: text
+    text: '$9\times4=10\times4-4$'
+    level: title
+    in: top
+
+i18n:
+  en:
+    meta: {title: "The Hidden Diagonal in the Nines Table"}
+    objects:
+      myth: {text: "Just memorize the table?"}
+      rule: {text: 'Each extra row: [tens $+1$]{#t .A}, [ones $-1$]{#o .B}'}
+      rule8: {text: 'Eights: ones $-2$ each time; at [$48$]{#x} the tens stay'}
+    beats:
+      Hook: {pause: {prompt: "What pattern is in this column of the nines table?"}}
+      Predict: {pause: {prompt: "Nine times four: what are the tens and the ones?"}}
+
+beats:
+  - id: Hook
+    pause: {type: predict, prompt: 九的口诀这一列数，有什么规律？, hold: 3, app_item: ep03-before-1}
+    say:
+      - {id: s1, pace: ask, text: "{@q}姐姐背到九的口诀，卡住了：这列数有规律吗？", en: "{@q}Big sister got stuck on her nines table. Is there a pattern in this column?"}
+      - {id: s2, pace: normal, text: "你盯着这列数，先找一找。", en: "Look hard at the column and hunt for it first."}
+    do:
+      # 开场：#2 的片尾画面
+      - {at: s1, act: show, target: array, dur: 0.01}
+      - {with: prev, act: show, target: end_eq2, dur: 0.01}
+      - {at: s1@q, act: hide, target: end_eq2}
+      - {after: prev, act: show, target: table}
+
+  - id: Myth
+    shows: misconception
+    say:
+      - {id: s1, pace: normal, text: "{@m}姐姐叹气：口诀没道理，只能死记硬背。", en: "{@m}She sighs: times tables make no sense, you just learn them by heart."}
+    do:
+      - {at: s1@m, act: show, target: myth}
+
+  - id: Setup
+    say:
+      - {id: s1, pace: normal, text: "{@t}看这些数，十位一直加一，个位一直减一。", en: "{@t}Look at these numbers: the tens go up by one, and the ones go down by one."}
+      - {id: s2, pace: normal, text: "{@d}我们用圆点排一排，看看它为什么会这样。", en: "{@d}Let's line up some dots and see why that happens."}
+      - {id: s3, pace: normal, text: "{@e}每一排都补满十个，一排就是一个十。", en: "{@e}Fill every row up to ten. Each row is one ten."}
+    do:
+      - {at: s1@t, act: hide, target: myth}
+      - {with: prev, act: show, target: rule}
+      - {at: s2@d, act: hide, target: rule}
+      - {at: s3@e, act: extend, target: array, args: {cols: 10}, dur: 1.4}
+
+  - id: Nines
+    say:
+      - {id: s1, pace: normal, text: "{@f}再把每排最后一个拿掉，一排就剩九个。", en: "{@f}Now take the last dot off every row. Each row has nine left."}
+      - {id: s2, pace: normal, text: "九乘一，{@o}一排，一个十少一个，是九。", en: "Nine times one: {@o}one row, one ten minus one. That's nine."}
+      - {id: s3, pace: normal, text: "九乘二，{@t}两排，两个十少两个，是十八。", en: "Nine times two: {@t}two rows, two tens minus two. That's eighteen."}
+      - {id: s4, pace: normal, text: "{@m}每多一排，就多一个十，也多拿掉一个点。", en: "{@m}Each extra row adds one more ten, and takes away one more dot."}
+    do:
+      - {at: s1@f, act: fade_col, target: array}
+      - {at: s2@o, act: recolor, target: array, args: {row: 0, role: HL}}
+      - {with: prev, act: mark, target: "table#n1"}
+      - {at: s3@t, act: recolor, target: array, args: {row: 1, role: HL}}
+      - {with: prev, act: mark, target: "table#n2"}
+      - {at: s4@m, act: recolor, target: array, args: {row: 2, role: HL}}
+      - {with: prev, act: mark, target: "table#n3"}
+
+  - id: Predict
+    pause: {type: predict, prompt: 九乘四，十位是几、个位是几？, hold: 2.5, app_item: ep03-predict-1}
+    say:
+      - {id: s1, pace: ask, text: "九乘四呢？{@q}四排，你猜十位是几，个位是几？", en: "Nine times four? {@q}Four rows. Can you guess the tens and the ones?"}
+    do:
+      - {at: s1@q, act: recolor, target: array, args: {row: 3, role: HL}}
+      - {with: prev, act: hide, target: "table#n4"}
+
+  - id: Break
+    say:
+      - {id: s1, pace: normal, text: "{@b}四个十里拿掉四个，就要拆开一个十。", en: "{@b}Taking four from four tens means breaking open one ten."}
+      - {id: s2, pace: slow, text: "{@r}剩下三个十，还有六个，就是三十六。", en: "{@r}That leaves three tens and six more: thirty-six."}
+    do:
+      - {at: s1, act: unmark, target: "table#n1"}
+      - {with: prev, act: unmark, target: "table#n2"}
+      - {with: prev, act: unmark, target: "table#n3"}
+      - {with: prev, act: recolor, target: array, args: {role: A}}
+      - {at: s1@b, act: recolor, target: array, args: {row: 3, role: B}}
+      - {at: s2@r, act: show, target: "table#n4"}
+      - {after: prev, act: mark, target: "table#n4"}
+
+  - id: Reveal
+    shows: non_example
+    say:
+      - {id: s1, pace: normal, text: "{@g}十位比排数少一，个位和排数合起来是十。", en: "{@g}The tens are one less than the rows, and the ones plus the rows make ten."}
+      - {id: s2, pace: normal, text: "{@e}八的口诀呢？八比十少二，每排拿掉两个。", en: "{@e}What about the eights? Eight is two less than ten, so each row loses two."}
+      - {id: s3, pace: normal, text: "{@o}个位每次少二，到八乘六，{@x}就不够减了。", en: "{@o}The ones drop by two each time, and at eight times six {@x}they run out."}
+      - {id: s4, pace: normal, text: "{@n}所以加一减一，是九才有的，因为九比十少一。", en: "{@n}So up one, down one belongs to nine, because nine is one less than ten."}
+    do:
+      - {at: s1, act: step}
+      - {at: s1, act: unmark, target: "table#n4"}
+      - {at: s1@g, act: show, target: rule}
+      - {at: s2@e, act: hide, target: array}
+      - {with: prev, act: hide, target: table}
+      - {with: prev, act: hide, target: rule}
+      - {after: prev, act: show, target: arr8}
+      - {with: prev, act: fade_col, target: arr8, dur: 0.6}
+      - {with: prev, act: show, target: table8}
+      - {after: prev, act: fade_col, target: arr8, args: {col: -2}, dur: 0.6}
+      - {at: s3@o, act: show, target: rule8}
+      - {at: s3@x, act: cross, target: "table8#m6"}
+      - {at: s4@n, act: hide, target: arr8}
+      - {with: prev, act: hide, target: table8}
+      - {with: prev, act: hide, target: rule8}
+      - {after: prev, act: show, target: array}
+      - {with: prev, act: show, target: table}
+
+  - id: Equation
+    shows: landing
+    say:
+      - {id: s1, pace: normal, text: "{@e}写成算式，九乘四，{@t}就等于十乘四减去四。", en: "{@e}As a number sentence, nine times four is {@t}ten times four take away four."}
+    do:
+      - {at: s1@e, act: hide, target: table}
+      - {after: prev, act: show, target: eq}
+      - {at: s1@t, act: mark, target: "eq#b"}
+      - {after: prev, act: mark, target: "eq#c"}
+
+  - id: LookBack
+    say:
+      - {id: s1, pace: normal, text: "看完和大人一起，张开十根手指，弯一弯试试。", en: "After watching, hold up ten fingers with a grown-up and try bending one down."}
+      - {id: s2, pace: ask, text: "{@n}为什么九乘四拆成十乘四减四，不会算错？", en: "{@n}Why can nine times four be split into ten times four take away four without going wrong?"}
+    do:
+      - {at: s1, act: unmark, target: "eq#b"}
+      - {with: prev, act: unmark, target: "eq#c"}
+      # 收成 #4 的开头画面：四排十个、最右一列拿掉，上方 9 × 4 = 10 × 4 − 4
+      - {at: s2@n, act: hide, target: eq}
+      - {with: prev, act: recolor, target: array, args: {role: A}}
+      - {after: prev, act: show, target: end_eq}

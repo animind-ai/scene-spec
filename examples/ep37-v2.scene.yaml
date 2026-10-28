@@ -1,0 +1,188 @@
+# v2 版式副本：与 ep37.scene.yaml 相同，只加 style.layout: v2（无右侧栏、顶栏 1.0、满宽 stage；字幕仍是双语两行烧录带）。
+# 洞察系列 #37 条件概率：把样本空间缩小（高二）。单集。按脚本 insight/ep37-conditional-probability/script.yaml（第 1 轮）写。
+# 一个洞察：已知条件 = 划掉不可能的格子，在剩下的样本空间里重新数（组件 outcomes：2×2 方格，行老大、列老二）。
+# 钩子问已知有男孩、两个都是男孩的概率，停三秒，说出"二分之一"；四格一样可能，男男本来 1/4；
+# 至少一个男孩 → 划掉女女、描出剩下三格；预测暂停"剩下三格里占几格"；1/3，说 1/2 的人把男女、女男当成一种；
+# 非例：老大是男孩 → 划掉下面一行，剩两格，才是 1/2；落到"先划掉不可能的，再在剩下的里面数"；结尾问反过来的条件概率。
+spec: "0.1"
+
+meta:
+  id: ep37
+  title: 条件概率：把样本空间缩小
+  line: insight
+  units: [S13, S12]
+  episode: 37
+  grade: 高二
+  author: Boxi Yu
+  license: CC-BY-4.0
+
+pedagogy:
+  insight: 条件概率就是把已知不可能的情况划掉，在剩下的样本空间里重新数；已知至少一个男孩，划掉女女，剩下三格里两个男孩只占一格，是三分之一
+  misconception: 条件概率等于原来的概率，或者凭感觉说另一个不是男就是女，所以是二分之一
+  non_example: 如果知道的是老大是男孩，划掉的是下面一整行，剩下两格，这时才是二分之一
+  status: proof
+  landing: Landing
+
+style:
+  side: column  # v2 改版：侧栏内容放回主讲区右边一栏，顶栏只留一行问题句
+  layout: v2  # 培玉视觉规范 v2（style-v2 批量重渲，2026-10-20）
+  theme: paper
+  canvas: "16:9"
+  voice:
+    persona: teacher-hs
+    speed: 1.0
+  segmented: true
+  step_hold: 1.0
+
+objects:
+  q:
+    type: text
+    text: '已知有男孩，两个都是男孩的概率？'
+    level: title
+    in: top
+  myth:
+    in: side
+    type: text
+    text: '[二分之一？]{#m}'
+    role: "NO"
+    level: title
+  grid:
+    widget: outcomes
+    rows: 2
+    cols: 2
+    labels: [男男, 男女, 女男, 女女]
+    row_labels: [老大男, 老大女]
+    col_labels: [老二男, 老二女]
+    allow: {cross: [grid]}  # strike 的叉故意划过被排除的那一格
+    in: stage
+  p0:
+    type: text
+    text: '$P$(都是男孩) $=\tfrac{1}{4}$'
+    level: title
+    in: side
+  p1:
+    type: text
+    text: '[$P$(都是男孩 | 有男孩)]{#l} [$=\tfrac{1}{3}$]{#r .HL}'
+    level: title
+    in: side
+  p2:
+    type: text
+    text: '[$P$(都是男孩 | 老大是男孩)]{#l}'
+    level: title
+    in: side
+  p2b:
+    type: text
+    text: '[$=\tfrac{1}{2}$]{#r}'
+    level: title
+    below: p2
+    gap: sm
+
+i18n:
+  en:
+    meta: {title: "Conditional Probability: Shrinking the Sample Space"}
+    objects:
+      q: {text: "Given at least one boy, how likely are two boys?"}
+      myth: {text: "[One half?]{#m}"}
+      grid: {labels: [BB, BG, GB, GG], row_labels: [Older B, Older G], col_labels: [Younger B, Younger G]}
+      p0: {text: '$P$(two boys) $=\tfrac{1}{4}$'}
+      p1: {text: '[$P$(two boys | a boy)]{#l} [$=\tfrac{1}{3}$]{#r .HL}'}
+      p2: {text: '[$P$(two boys | older boy)]{#l}'}
+    beats:
+      Hook: {pause: {prompt: "At least one boy: how likely is it that both are boys?"}}
+      Predict: {pause: {prompt: "Of the three cells left, how many are two boys?"}}
+
+beats:
+  - id: Hook
+    pause: {type: predict, prompt: 至少一个男孩，两个都是男孩的可能有多大？, hold: 3, app_item: ep37-before-1}
+    say:
+      - {id: s1, pace: normal, text: "新搬来的邻居家有两个孩子，{@q}你只知道，其中至少有一个男孩。", en: "The new neighbours have two children. {@q}All you know is that at least one of them is a boy."}
+      - {id: s2, pace: ask, text: "不用算，凭感觉说：两个都是男孩的可能有多大？", en: "Don't calculate, just go with your gut: how likely is it that both are boys?"}
+    do:
+      - {at: s1@q, act: show, target: q}
+
+  - id: Myth
+    shows: misconception
+    say:
+      - {id: s1, pace: normal, text: "朋友脱口而出：{@m}二分之一，另一个不是男孩就是女孩嘛。", en: "A friend blurts out: {@m}one half, the other one is either a boy or a girl."}
+    do:
+      - {at: s1@m, act: show, target: myth}
+
+  - id: Setup
+    say:
+      - {id: s1, pace: normal, text: "我们一起看。{@g}按老大、老二排，一共四种情况。", en: "Let's look together. {@g}Listing older then younger, there are four cases."}
+      - {id: s2, pace: normal, text: "{@a}男男、{@b}男女、{@c}女男、{@d}女女，每一种都一样可能。", en: "{@a}Boy-boy, {@b}boy-girl, {@c}girl-boy, {@d}girl-girl: each equally likely."}
+      - {id: s3, pace: normal, text: "比如{@b}男女，是老大男孩、老二女孩；{@c}女男正好反过来。", en: "{@b}Boy-girl, for example, means older boy, younger girl; {@c}girl-boy is the other way round."}
+      - {id: s4, pace: normal, text: "{@s}两个都是男孩只占一格，{@p}本来是四分之一。", en: "{@s}Two boys is just one cell: {@p}one quarter, to begin with."}
+    do:
+      - {at: s1@g, act: show, target: grid}
+      - {at: s2@a, act: focus, target: "grid.cell[0]"}
+      - {at: s2@b, act: focus, target: "grid.cell[1]"}
+      - {at: s2@c, act: focus, target: "grid.cell[2]"}
+      - {at: s2@d, act: focus, target: "grid.cell[3]"}
+      - {at: s3@b, act: focus, target: "grid.cell[1]"}
+      - {at: s3@c, act: focus, target: "grid.cell[2]"}
+      - {at: s4@s, act: unfocus, target: grid}
+      - {with: prev, act: shade, target: grid, args: {cells: [0], role: HL}}
+      - {at: s4@p, act: show, target: p0}
+
+  - id: Shrink
+    say:
+      - {id: s1, pace: normal, text: "现在多知道了一件事：至少有一个是男孩。", en: "Now we know: at least one is a boy."}
+      - {id: s2, pace: normal, text: "那么女女这种情况就不可能了，{@x}我们把它划掉。", en: "So girl-girl is impossible. {@x}Cross it out."}
+      - {id: s3, pace: slow, text: "{@f}样本空间缩小成剩下的三格。", en: "{@f}The sample space shrinks to the three cells left."}
+    do:
+      - {at: s2@x, act: strike, target: grid, args: {cells: [3]}}
+      - {at: s3@f, act: frame, target: grid, args: {cells: [0, 1, 2]}}
+
+  - id: Predict
+    pause: {type: predict, prompt: 剩下三格里，两个都是男孩的占几格？, hold: 3, app_item: ep37-why-1}
+    say:
+      - {id: s1, pace: ask, text: "剩下三格里，两个都是男孩的占几格？", en: "Of the three cells left, how many are two boys?"}
+
+  - id: Answer
+    say:
+      - {id: s1, pace: normal, text: "只有一格，{@p}所以概率是三分之一，不是二分之一。", en: "Just one, {@p}so the probability is one third, not one half."}
+      - {id: s2, pace: normal, text: "剩下的三格机会相同，{@s}阴影占一格，就是一除以三。", en: "The three remaining cells are still equally likely, and {@s}the shaded one is one of them: one divided by three."}
+      - {id: s3, pace: normal, text: "说二分之一的人，{@t}其实是把男女和女男当成了同一种情况。", en: "Saying one half {@t}treats boy-girl and girl-boy as a single case."}
+    do:
+      - {at: s1@p, act: hide, target: p0}
+      - {with: prev, act: show, target: p1}
+      - {at: s2@s, act: mark, target: "p1#r"}
+      - {at: s3@t, act: unmark, target: "p1#r"}
+      - {with: prev, act: shade, target: grid, args: {cells: [1, 2], role: C}}
+      - {after: prev, act: cross, target: "myth#m"}
+
+  - id: NonExample
+    shows: non_example
+    say:
+      - {id: s1, pace: normal, text: "{@c}换一个条件：这回知道的是，老大是男孩。", en: "{@c}Change the condition: what we know is that the older one is a boy."}
+      - {id: s2, pace: normal, text: "{@x}这次划掉的是下面一整行，{@f}剩下男男、男女两格。", en: "{@x}This time the whole bottom row is crossed out, {@f}leaving boy-boy and boy-girl."}
+      - {id: s3, pace: normal, text: "{@p}这时才是二分之一。条件一变，剩下的样本空间就变了。", en: "{@p}Only now is it one half. Change the condition, and what's left changes."}
+    do:
+      - {at: s1@c, act: unshade, target: grid, args: {cells: [1, 2]}}
+      - {with: prev, act: restore, target: grid}
+      - {with: prev, act: unframe, target: grid}
+      - {at: s2@x, act: strike, target: grid, args: {cells: [2, 3]}}
+      - {at: s2@f, act: frame, target: grid, args: {cells: [0, 1]}}
+      - {at: s3@p, act: hide, target: p1}
+      - {with: prev, act: show, target: p2}
+      - {with: prev, act: show, target: p2b}
+
+  - id: Landing
+    shows: landing
+    say:
+      - {id: s1, pace: slow, text: "{@c}所以条件概率，就是{@x}先划掉不可能的，{@f}再在剩下的里面数。", en: "{@c}So conditional probability means {@x}crossing out what's impossible, then {@f}counting in what's left."}
+      - {id: s2, pace: normal, text: "{@d}分母不再是全部四格，而是划完以后剩下的三格。", en: "{@d}The denominator is no longer all four cells, just the three that remain."}
+    do:
+      - {at: s1@c, act: restore, target: grid}
+      - {with: prev, act: unframe, target: grid}
+      - {with: prev, act: hide, target: p2}
+      - {with: prev, act: hide, target: p2b}
+      - {with: prev, act: show, target: p1}
+      - {at: s1@x, act: strike, target: grid, args: {cells: [3]}}
+      - {at: s1@f, act: frame, target: grid, args: {cells: [0, 1, 2]}}
+      - {at: s2@d, act: mark, target: "p1#r"}
+
+  - id: Close
+    say:
+      - {id: s1, pace: ask, text: "已知两个都是男孩，至少一个男孩的概率又是多少？", en: "Given both are boys, what's the chance of at least one boy?"}

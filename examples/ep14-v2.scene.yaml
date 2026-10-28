@@ -1,0 +1,265 @@
+# v2 版式副本：与 ep14.scene.yaml 相同，只加 style.layout: v2（无右侧栏、顶栏 1.0、满宽 stage；字幕仍是双语两行烧录带）。
+# 洞察系列 #14 圆锥为什么是圆柱的 1/3（六年级）。面积系列（area）第四集，接 #13。演示，不是证明。
+# 按脚本 insight/ep14-cone-volume/script.yaml（第 1 轮）写。组件 solid（立体：轴测图、剖成三块、截面比大小）。
+# 开场就是 #13 的片尾画面（64 块拼成的近似长方形、右侧三个公式、底部 πr²）；钩子问为什么是三分之一、停三秒、说出"一半"；
+# 正方体剖成三个全等的四棱锥，每块 1/3；非例：要是一半，两块就够；预测暂停后四棱锥和圆锥同底面积同高，
+# 截平面上下扫，截面一直一样大（祖暅原理，旁白说明是演示）；落到 V 锥 = 1/3 × 底面积 × 高。
+spec: "0.1"
+
+meta:
+  id: ep14
+  title: 圆锥为什么是圆柱的 1/3
+  line: insight
+  units: [P6]
+  episode: 14
+  grade: 六年级
+  author: Boxi Yu
+  license: CC-BY-4.0
+
+pedagogy:
+  insight: 一个正方体正好切成三个一样的四棱锥，所以四棱锥是同底同高柱体的三分之一；圆锥和这个四棱锥每一层的截面都一样大，体积也就一样，所以圆锥也是圆柱的三分之一
+  misconception: 圆锥是圆柱的一半；倒沙子倒三次正好满，就算证明了
+  non_example: 要是锥体是柱体的一半，两块就该拼成正方体，可正方体要切成三块四棱锥才拼得满
+  status: demo
+  landing: Landing
+
+style:
+  side: column  # v2 改版：侧栏内容放回主讲区右边一栏，顶栏只留一行问题句
+  layout: v2  # 培玉视觉规范 v2（style-v2 批量重渲，2026-10-20）
+  theme: paper
+  canvas: "16:9"
+  voice:
+    persona: friend-ps
+    speed: 1.0
+  segmented: true
+  step_hold: 1.0
+
+objects:
+  # 开场：#13 的片尾（同样的定义；myth 只为占住 law2 的位置，不显示）
+  law:
+    type: text
+    text: '[$S$]{#s} [$=$]{#e} [$a$]{#a .HL} [$\times$]{#x} [$h$]{#h .HL}'
+    level: display
+    in: side
+  myth:
+    type: text
+    text: '[规定的？]{#m}'
+    role: "NO"
+    level: title
+    below: law
+    gap: md
+  law2:
+    type: text
+    text: '[$S=a\times h$]{#ah} [$\div 2$]{#half .HL}'
+    level: display
+    below: myth
+    gap: md
+  myth13:
+    type: text
+    text: '[弯的，没法算？]{#m}'
+    role: "NO"
+    level: title
+    below: law2
+    gap: md
+  c64:
+    widget: dissect
+    role: A
+    in: stage
+    view: [[-2.6, -2.6], [10, 2.6]]
+    shapes:
+      C:
+        circle: 2
+    cuts:
+      k: {piece: C, sectors: 64, into: e}
+    guides:
+      hgt: {from: [2.85, -1], to: [2.85, 1], label: '高 $r$', role: HL, side: left}
+      len: {from: [3.16, -1.3], to: [9.44, -1.3], label: '长 $\pi r$', role: HL, side: below}
+  law3:
+    type: text
+    text: '[$S=\pi r\times r$]{#pr} [$=\pi r^2$]{#r2 .HL}'
+    level: title
+    in: footer
+  # 本集
+  myth14:
+    type: text
+    text: '[一半？]{#m}'
+    role: "NO"
+    level: title
+    in: side
+  cup:
+    # 开场情境：盖在 myth13 的位置上（over 不算进侧栏叠放高度；挂 below 会把 #13 的那一叠顶高，开头对不上 #13 的末帧）
+    type: text
+    text: '[冰淇淋杯装多少？]{#g}'
+    level: title
+    over: myth13
+  four:
+    widget: solid
+    in: stage
+    bodies:
+      C: {cube: 2, label: 正方体}
+      P: {pyramid: {base: 2, h: 2}, role: B, label: 四棱锥}
+      Y: {cylinder: {r: 1, h: 2}, role: C, label: 圆柱}
+      K: {cone: {r: 1, h: 2}, role: HL, label: 圆锥}
+  cube:
+    widget: solid
+    in: stage
+    bodies:
+      C: {cube: 2, role: DIM}
+    splits:
+      s: {body: C, into: [P1, P2, P3], gap: 2}
+  third:
+    type: text
+    text: '每个四棱锥 [$=\dfrac{1}{3}$]{#t .HL} 正方体'
+    level: title
+    in: top
+  zu:
+    widget: solid
+    in: stage
+    bodies:
+      P: {pyramid: {base: 2, h: 2}, role: B}
+      K: {cone: {r: 1.128, h: 2}, role: A}
+    plane: {bodies: [P, K], z: 0.5, compare: right, labels: ['$S_1$', '$S_2$']}
+  same:
+    type: text
+    text: '$S_1=S_2$'
+    level: title
+    in: top
+  law4:
+    type: text
+    text: '[圆锥体积]{#v} [$=\dfrac{1}{3}\times$]{#t .HL} [底面积 $\times$ 高]{#r}'
+    level: title
+    in: footer
+
+i18n:
+  en:
+    meta: {title: "Why Is a Cone One Third of a Cylinder?"}
+    objects:
+      myth: {text: '[Just a rule?]{#m}'}
+      myth13: {text: '[Too curved to compute?]{#m}'}
+      c64:
+        guides:
+          hgt: {label: 'height $r$'}
+          len: {label: 'length $\pi r$'}
+      myth14: {text: '[Half?]{#m}'}
+      cup: {text: '[How much fits?]{#g}'}
+      four:
+        bodies:
+          C: {label: Cube}
+          P: {label: Pyramid}
+          Y: {label: Cylinder}
+          K: {label: Cone}
+      third: {text: 'Each pyramid [$=\dfrac{1}{3}$]{#t .HL} of the cube'}
+      law4: {text: '[Cone volume]{#v} [$=\dfrac{1}{3}\times$]{#t .HL} [base area $\times$ height]{#r}'}
+    beats:
+      Hook: {pause: {prompt: "A cone cup with the same base and height as a cylinder cup: how much of the cylinder does it hold?"}}
+      Predict: {pause: {prompt: "A cone can't be cut into three. Is it one third too?"}}
+
+beats:
+  - id: Hook
+    pause: {type: predict, prompt: 同底同高的圆锥杯，能装圆柱杯的多少？, hold: 3, app_item: ep14-before-1}
+    say:
+      - {id: s1, pace: ask, text: "冰淇淋店的圆锥杯和圆柱杯{@g}一样高、口一样大，圆锥杯能装多少？", en: "At the ice-cream shop, a cone cup and a cylinder cup are {@g}just as tall and just as wide at the top. How much does the cone cup hold?"}
+      - {id: s2, pace: normal, text: "动手算之前，先凭感觉说个数。", en: "Before working anything out, name a number on gut feeling."}
+    do:
+      # 开场：一下子摆出 #13 的片尾画面
+      - {at: s1, act: show, target: law, dur: 0.01}
+      - {with: prev, act: show, target: law2, dur: 0.01}
+      - {with: prev, act: show, target: myth13, dur: 0.01}
+      - {with: prev, act: show, target: law3, dur: 0.01}
+      - {with: prev, act: show, target: c64, dur: 0.01}
+      - {after: prev, act: cut, target: c64, args: {cut: k}, dur: 0.01}
+      - {after: prev, act: arrange, target: c64, args: {cut: k, layout: alternate, at: [6.3, 0]}, dur: 0.01}
+      - {after: prev, act: show, target: "c64#hgt", dur: 0.01}
+      - {with: prev, act: show, target: "c64#len", dur: 0.01}
+      - {with: prev, act: cross, target: "myth13#m", dur: 0.01}
+      - {at: s1@g, act: hide, target: myth13}
+      - {with: prev, act: show, target: cup}
+
+  - id: Myth
+    shows: misconception
+    say:
+      - {id: s1, pace: normal, text: "{@m}尖尖的圆锥看上去少了一半，好像就该装一半。", en: "{@m}The pointed cone looks like it's missing half, so it seems it should hold half."}
+    do:
+      - {at: s1, act: hide, target: law}
+      - {with: prev, act: hide, target: law2}
+      - {with: prev, act: hide, target: cup}
+      - {at: s1@m, act: show, target: myth14}
+
+  - id: Setup
+    say:
+      - {id: s1, pace: normal, text: "我们一起看。{@s}圆的东西不好切，先看方的。", en: "Let's look together. Round things are hard to cut, {@s}so start with square ones."}
+      - {id: s2, pace: normal, text: "尖尖的四棱锥和圆锥叫锥体，{@m}正方体和圆柱叫柱体。", en: "The pyramid and the cone come to a point; {@m}the cube and the cylinder go straight up."}
+    do:
+      - {at: s1@s, act: hide, target: c64}
+      - {with: prev, act: hide, target: law3}
+      - {after: prev, act: show, target: four}
+      - {at: s2, act: mark, target: "four#P"}
+      - {with: prev, act: mark, target: "four#K"}
+      - {at: s2@m, act: unmark, target: "four#P"}
+      - {with: prev, act: unmark, target: "four#K"}
+
+  - id: Split
+    say:
+      - {id: s1, pace: normal, text: "一个正方体，{@c}可以切成三块，{@a}我们把它们分开看看。", en: "A cube {@c}can be cut into three pieces. {@a}Let's pull them apart."}
+      - {id: s2, pace: normal, text: "{@f}每一块都是四棱锥，底面是正方体的一个面，高是棱长。", en: "{@f}Each piece is a square pyramid: its base is one face of the cube, its height is one edge."}
+      - {id: s3, pace: slow, text: "{@j}三块一模一样，合起来正好是正方体，{@t}每块是三分之一。", en: "{@j}The three are identical and fit back into the cube exactly, so {@t}each is one third."}
+    do:
+      - {at: s1, act: hide, target: four}
+      - {after: prev, act: show, target: cube}
+      - {at: s1@c, act: split, target: cube, args: {split: s}}
+      - {at: s1@a, act: apart, target: cube, args: {split: s}}
+      - {at: s2@f, act: set, target: "cube#P1", args: {role: HL}}
+      - {at: s3@j, act: join, target: cube, args: {split: s}}
+      - {with: prev, act: set, target: "cube#P1", args: {role: A}}
+      - {at: s3@t, act: show, target: third}
+
+  - id: NonExample
+    shows: non_example
+    say:
+      - {id: s1, pace: normal, text: "要是锥体是一半，两块就该拼满，{@x}可明明要三块才行。", en: "If a pyramid were half, two would fill it, but {@x}it clearly takes three."}
+    do:
+      - {at: s1, act: step}
+      - {at: s1@x, act: focus, target: "myth14#m"}
+      - {after: prev, act: unfocus, target: myth14}
+
+  - id: Predict
+    pause: {type: predict, prompt: 圆锥没法切成三块，它也是三分之一吗？, hold: 3, app_item: ep14-why-2}
+    say:
+      - {id: s1, pace: ask, text: "{@q}圆锥没法这样切成三块，它也是三分之一吗？", en: "{@q}A cone can't be cut into three like that. Is it one third too?"}
+
+  - id: Sweep
+    say:
+      - {id: s1, pace: normal, text: "{@p}拿一个四棱锥和一个圆锥，底面一样大，高也一样。", en: "{@p}Take a square pyramid and a cone with the same base area and the same height."}
+      - {id: s2, pace: normal, text: "{@z}用一个平面横着切，{@c}把两个截面拿出来比一比。", en: "{@z}Slice them with a flat plane and {@c}take the two cross-sections out to compare."}
+      - {id: s3, pace: normal, text: "{@u}平面往上走，{@d}再往下走，两个截面一直一样大。", en: "{@u}Move the plane up, {@d}then down: the two sections stay the same size."}
+      - {id: s4, pace: slow, text: "每一层都一样大，{@s}一层层叠起来，体积也就一样。", en: "Every layer is the same size, so {@s}stacked up, the volumes are the same."}
+      - {id: s5, pace: normal, text: "圆柱和正方体也一样，底面一样大，每一层都一样大。", en: "The same goes for the cylinder and the prism: same base, same size at every layer."}
+    do:
+      - {at: s1@p, act: hide, target: cube}
+      - {with: prev, act: hide, target: third}
+      - {after: prev, act: show, target: zu}
+      - {at: s2@z, act: sweep, target: zu, args: {z: 0.5}}
+      - {at: s2@c, act: compare, target: zu}
+      - {at: s3@u, act: sweep, target: zu, args: {z: 1.5}, dur: fit}
+      - {at: s3@d, act: sweep, target: zu, args: {z: 0.3}, dur: fit}
+      - {at: s4@s, act: show, target: same}
+      - {with: prev, act: mark, target: "zu.flat[0]"}
+      - {with: prev, act: mark, target: "zu.flat[1]"}
+
+  - id: Landing
+    shows: landing
+    say:
+      - {id: s1, pace: slow, text: "{@law}所以圆锥也是同底同高的圆柱的三分之一。", en: "{@law}So a cone is also one third of the cylinder with the same base and height."}
+      - {id: s2, pace: normal, text: "这是演示，不是证明：每层一样大体积就一样，叫祖暅原理，我们先用着。", en: "This is a demonstration, not a proof: equal layers mean equal volume. That's Zu Geng's principle, and we're borrowing it here."}
+      - {id: s3, pace: normal, text: "倒沙子倒三次正好满，也只是演示，切成三块才看得出为什么。", en: "Pouring sand three times to fill it is only a demonstration too; cutting into three shows why."}
+    do:
+      - {at: s1, act: unmark, target: "zu.flat[0]"}
+      - {with: prev, act: unmark, target: "zu.flat[1]"}
+      - {at: s1@law, act: show, target: law4}
+
+  - id: Close
+    say:
+      - {id: s1, pace: normal, text: "锥体不是柱体的一半，{@x}要三个才能装满一个柱体。", en: "A cone isn't half a cylinder. {@x}It takes three to fill one."}
+      - {id: s2, pace: ask, text: "{@q}负二乘负三，为什么会是正六？", en: "{@q}Next: negative two times negative three, why is it positive six?"}
+    do:
+      - {at: s1@x, act: cross, target: "myth14#m"}

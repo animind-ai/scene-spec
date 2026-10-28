@@ -17,7 +17,7 @@ import re
 from dataclasses import dataclass, field
 
 ROLES = {"FG", "A", "B", "C", "HL", "NO", "DIM"}
-STYLE_CLASSES = {"bold", "italic"}
+STYLE_CLASSES = {"bold", "italic", "code"}  # code：等宽字体（编程课里的行内代码）
 _ID = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
 
 

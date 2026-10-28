@@ -1,0 +1,284 @@
+# v2 版式副本：与 ep18-difference-of-squares.scene.yaml 相同，只加 style.layout: v2（无右侧栏、顶栏 1.0、满宽 stage；字幕仍是双语两行烧录带）。
+# 洞察系列 #18 平方差：剪下来补上去（七至八年级）。squares 系列第二集，接 #17、#23。
+# 按脚本 insight/ep18-difference-of-squares/script.yaml（第 1 轮）写；早先的样片 ep18.scene.yaml 留给截图回归。
+# 开场就是 #17 的片尾画面（挖掉一角的正方形、(a+b)² = a² + 2ab + b²）；钩子问 a² − b² 能写成谁乘谁、停三秒、说出 (a − b)²；
+# L 形里画出 (a − b)²，旁边多出两条长条，代数 5、2：21 对 9；预测暂停后剪一刀、上面一条转过来补到右边，拼成 (a + b) × (a − b) 的长方形；
+# 非例：a² + b² 是两个分开的正方形，没有缺口可补；落到 a² − b² = (a + b)(a − b)，回访 #5（21 × 19）、#4（切一刀面积不变）。
+# 结尾留一个正方形加一条长条（#23 的开头画面）。
+spec: "0.1"
+
+meta:
+  id: ep18
+  title: 平方差：剪下来补上去
+  line: insight
+  units: [J2]
+  episode: 18
+  grade: 七至八年级
+  author: Boxi Yu
+  license: CC-BY-4.0
+
+pedagogy:
+  insight: 边长 a 的正方形挖掉边长 b 的一角，剩下的 L 形剪一刀、把一条转过来补到旁边，拼成长 a+b、宽 a−b 的长方形，所以 a²−b²=(a+b)(a−b)
+  misconception: 减法也照搬，a²−b² 就是 (a−b)²
+  non_example: (a−b)² 只是 L 形左下角那个正方形，旁边还多出两条长条；a²+b² 是两个分开的正方形，没有缺口可补
+  status: proof
+  landing: Landing
+
+style:
+  side: column  # v2 改版：侧栏内容放回主讲区右边一栏，顶栏只留一行问题句
+  layout: v2  # 培玉视觉规范 v2（style-v2 批量重渲，2026-10-20）
+  theme: paper
+  canvas: "16:9"
+  voice:
+    persona: teacher-hs
+    speed: 1.0
+  segmented: true
+  step_hold: 1.0
+
+objects:
+  # 开场：#17 的片尾（同样的定义）
+  law0:
+    type: text
+    text: '[$(a+b)^2$]{#l} [$=$]{#e} [$a^2$]{#a2 .B} [$+$]{#p1} [$2ab$]{#ab .HL} [$+$]{#p2} [$b^2$]{#b2 .C}'
+    level: display
+    in: side
+  dsq:
+    widget: dissect
+    role: A
+    in: stage
+    view: [[-0.6, -0.9], [7.6, 5.6]]
+    shapes:
+      S: {rect: [5, 5]}
+      W: {rect: [3, 3], role: NO, label: '$(a-b)^2$', hidden: true, edges: [{at: [[0, 0], [0, 3]], text: '$a-b$'}]}
+      U1: {rect: [3, 2], at: [0, 3], role: HL, hidden: true}
+      U2: {rect: [2, 3], at: [3, 0], role: HL, hidden: true}
+    cuts:
+      hole: {piece: S, path: [[5, 3], [3, 3], [3, 5]], into: [L, B2]}
+      c2: {piece: L, line: [[0, 3], [3, 3]], into: [Top, Bottom]}
+    pieces:
+      B2: {role: NO, label: '$b^2$'}
+      L: {label: '$a^2-b^2$'}
+      Top: {role: B}
+    guides:
+      ba: {from: [0, 0], to: [5, 0], label: '$a$', role: A, side: below, solid: true}
+      hb: {from: [3, 5], to: [5, 5], label: '$b$', role: NO, side: above}
+      long: {from: [0, 0], to: [7, 0], label: '$a+b$', role: HL, side: below, solid: true}
+      short: {from: [7, 0], to: [7, 3], label: '$a-b$', role: HL, side: right, solid: true}
+    merges:
+      R: {pieces: [Bottom, Top], label: '$(a+b)(a-b)$', role: HL}
+  # 后半段（Landing 起）用的同一张图：底栏这时有人用，主讲区和开场不一样大，所以分成两个对象
+  dsq2:
+    widget: dissect
+    role: A
+    in: stage
+    view: [[-0.6, -0.9], [7.6, 5.6]]
+    shapes:
+      S: {rect: [5, 5]}
+      W: {rect: [3, 3], role: NO, label: '$(a-b)^2$', hidden: true, edges: [{at: [[0, 0], [0, 3]], text: '$a-b$'}]}
+      U1: {rect: [3, 2], at: [0, 3], role: HL, hidden: true}
+      U2: {rect: [2, 3], at: [3, 0], role: HL, hidden: true}
+    cuts:
+      hole: {piece: S, path: [[5, 3], [3, 3], [3, 5]], into: [L, B2]}
+      c2: {piece: L, line: [[0, 3], [3, 3]], into: [Top, Bottom]}
+    pieces:
+      B2: {role: NO, label: '$b^2$'}
+      L: {label: '$a^2-b^2$'}
+      Top: {role: B}
+    guides:
+      ba: {from: [0, 0], to: [5, 0], label: '$a$', role: A, side: below, solid: true}
+      hb: {from: [3, 5], to: [5, 5], label: '$b$', role: NO, side: above}
+      long: {from: [0, 0], to: [7, 0], label: '$a+b$', role: HL, side: below, solid: true}
+      short: {from: [7, 0], to: [7, 3], label: '$a-b$', role: HL, side: right, solid: true}
+    merges:
+      R: {pieces: [Bottom, Top], label: '$(a+b)(a-b)$', role: HL}
+  wrong:
+    type: text
+    text: '[$a^2-b^2=(a-b)^2$ ？]{#w}'
+    role: "NO"
+    level: display
+    in: side
+  num1:
+    type: math
+    tex: '5\times 5-2\times 2=21'
+    level: title
+    below: wrong
+    gap: lg
+  num2:
+    type: math
+    tex: '3\times 3=9'
+    level: title
+    below: num1
+    gap: md
+  two:
+    widget: dissect
+    role: A
+    in: stage
+    view: [[-0.6, -0.9], [7.6, 5.6]]
+    shapes:
+      P: {rect: [5, 5], label: '$a^2$'}
+      Q: {rect: [2, 2], at: [5.6, 0], role: C, label: '$b^2$'}
+  law:
+    type: text
+    text: '[$a^2-b^2$]{#l} [$=$]{#e} [$(a+b)$]{#p .HL} [$(a-b)$]{#m .HL}'
+    level: display
+    in: side
+  num3:
+    type: math
+    tex: '21\times 19=20\times 20-1\times 1=399'
+    level: title
+    below: dsq2
+    gap: lg
+  # 结尾：#23 的开头（同样的定义写在 ep23 里）
+  xsq:
+    widget: dissect
+    role: A
+    in: stage
+    shapes:
+      X: {rect: [5, 5], label: '$x^2$'}
+      Bx: {rect: [4, 5], at: [5, 0], role: B, label: '$bx$'}
+    guides:
+      tx: {from: [0, 5], to: [5, 5], label: '$x$', role: A, side: above, solid: true}
+      tb: {from: [5, 5], to: [9, 5], label: '$b$', role: B, side: above, solid: true}
+      lx: {from: [0, 5], to: [0, 0], label: '$x$', role: A, side: left, solid: true}
+
+i18n:
+  en:
+    meta: {title: "Difference of Squares: Cut and Paste"}
+    objects:
+      wrong: {text: '[$a^2-b^2=(a-b)^2$ ?]{#w}'}
+    beats:
+      Hook: {pause: {prompt: "A square room with a square pillar in one corner: what times what is the floor area a² − b²?"}}
+      Predict: {pause: {prompt: "Cut the L-shape once into a rectangle: how long and how wide is it?"}}
+
+beats:
+  - id: Hook
+    pause: {type: predict, prompt: 角落立着方柱的正方形房间，地板 a² − b² 能写成谁乘谁？, hold: 3, app_item: ep18-before-1}
+    say:
+      - {id: s1, pace: normal, text: "边长 a 的正方形房间，角落里立着边长 b 的方柱。", en: "A square room with side a has a square pillar with side b standing in one corner."}
+      - {id: s2, pace: ask, text: "{@q}要铺的地板是 a 方减 b 方，凭直觉猜，能写成谁乘谁？", en: "{@q}The floor to cover is a squared minus b squared. Go with your gut: what times what is it?"}
+    do:
+      # 开场：一下子摆出 #17 的片尾画面（挖掉的角就是方柱）
+      - {at: s1, act: show, target: "dsq#S", dur: 0.01}
+      - {with: prev, act: show, target: "dsq#ba", dur: 0.01}
+      - {with: prev, act: show, target: law0, dur: 0.01}
+      - {after: prev, act: cut, target: dsq, args: {cut: hole}, dur: 0.01}
+      - {after: prev, act: hide, target: "dsq#B2", dur: 0.01}
+      - {with: prev, act: labels, target: dsq, args: {piece: L, show: false}, dur: 0.01}
+      - {with: prev, act: show, target: "dsq#hb", dur: 0.01}
+      - {at: s2@q, act: hide, target: law0}
+      - {with: prev, act: labels, target: dsq, args: {piece: L, show: true}}
+
+  - id: Myth
+    shows: misconception
+    say:
+      - {id: s1, pace: normal, text: "装修师傅随口说：{@w}减法也照搬，就是 a 减 b 的平方。", en: "The builder says offhand: {@w}subtraction works the same, so it's a minus b, squared."}
+    do:
+      - {at: s1@w, act: show, target: wrong}
+
+  - id: Setup
+    say:
+      - {id: s1, pace: normal, text: "上一集是加起来再平方，这一集是平方了再相减。", en: "Last time we added, then squared. This time we square, then subtract."}
+      - {id: s2, pace: normal, text: "我们一起看。{@a}大正方形边长是 a，{@b}挖掉的小正方形边长是 b。", en: "Let's look together. {@a}The big square has side a, and {@b}the small square cut out has side b."}
+    do:
+      - {at: s2@a, act: mark, target: "dsq#ba"}
+      - {at: s2@b, act: unmark, target: "dsq#ba"}
+      - {with: prev, act: mark, target: "dsq#hb"}
+
+  - id: Wrong
+    shows: non_example
+    say:
+      - {id: s1, pace: normal, text: "要是它等于 a 减 b 的平方，{@w}L 形就该是这个正方形。", en: "If it equalled a minus b squared, {@w}the L-shape would be just this square."}
+      - {id: s2, pace: normal, text: "{@s}正方形旁边还剩两条长条，一条在上，一条在右。", en: "{@s}But above it and to its right there are two strips left over."}
+      - {id: s3, pace: normal, text: "这两条长条，刚才的猜想里一条也没有算。", en: "The guess doesn't count either of those two strips."}
+      - {id: s4, pace: normal, text: "代个数试试，a 是五，b 是二，{@n}二十五减四是二十一。", en: "Try numbers: a is five and b is two, and {@n}twenty-five minus four is twenty-one."}
+      - {id: s5, pace: normal, text: "{@n}三的平方只有九，{@x}差得远了，这个猜法不对。", en: "{@n}Three squared is only nine. {@x}That's way off, so the guess is wrong."}
+    do:
+      - {at: s1, act: unmark, target: "dsq#hb"}
+      - {with: prev, act: labels, target: dsq, args: {piece: L, show: false}}
+      - {at: s1@w, act: show, target: "dsq#W"}
+      - {at: s2@s, act: show, target: "dsq#U1"}
+      - {with: prev, act: show, target: "dsq#U2"}
+      - {at: s4, act: hide, target: "dsq#U1"}
+      - {with: prev, act: hide, target: "dsq#U2"}
+      - {at: s4@n, act: show, target: num1}
+      - {at: s5@n, act: show, target: num2}
+      - {at: s5@x, act: cross, target: "wrong#w"}
+
+  - id: Predict
+    pause: {type: predict, prompt: 把 L 形剪一刀拼成长方形，长和宽各是多少？, hold: 3}
+    say:
+      - {id: s1, pace: ask, text: "{@p}把 L 形剪一刀拼成长方形，长和宽各是多少？", en: "{@p}Cut the L-shape once and make a rectangle. How long and how wide is it?"}
+    do:
+      - {at: s1@p, act: hide, target: "dsq#W"}
+
+  - id: Rearrange
+    say:
+      - {id: s1, pace: normal, text: "{@cut}沿着这条线剪开，{@turn}上面这一条，转过来补到右边。", en: "{@cut}Cut along this line, then {@turn}turn the top strip round and fit it on the right."}
+      - {id: s2, pace: slow, text: "{@rect}拼成了一个长方形，面积一点也没变。", en: "{@rect}It's a rectangle now, and the area hasn't changed at all."}
+      - {id: s3, pace: normal, text: "{@l}长是 a 接上补过来的 b，就是 a 加 b。", en: "{@l}Its length is a plus the b that moved over: a plus b."}
+      - {id: s4, pace: normal, text: "{@s}宽是 a 去掉挖掉的 b，就是 a 减 b。", en: "{@s}Its width is a with b taken away: a minus b."}
+    do:
+      - {at: s1@cut, act: hide, target: "dsq#hb"}
+      - {with: prev, act: cut, target: dsq, args: {cut: c2}, dur: 1.0}
+      - {at: s1@turn, act: hide, target: "dsq#ba"}
+      - {with: prev, act: snap, target: dsq, args: {piece: Top, edge: [[0, 3], [3, 3]], to: Bottom, to_edge: [[5, 3], [5, 0]]}, dur: fit}
+      - {at: s2@rect, act: merge, target: dsq, args: {name: R}}
+      - {at: s3@l, act: show, target: "dsq#long"}
+      - {at: s4@s, act: show, target: "dsq#short"}
+
+  - id: NonExample
+    shows: non_example
+    say:
+      - {id: s1, pace: ask, text: "那 a 方加 b 方，{@t}也能这样剪了再补吗？", en: "So can a squared plus b squared {@t}be cut and fitted like this too?"}
+      - {id: s2, pace: normal, text: "这两个正方形分开放着，{@g}中间没有缺口可以补上。", en: "The two squares are apart, {@g}with no gap to fill, so this trick doesn't work."}
+    do:
+      - {at: s1@t, act: hide, target: dsq}
+      - {after: prev, act: show, target: two}
+      - {at: s2@g, act: mark, target: "two#Q"}
+
+  - id: Landing
+    shows: landing
+    say:
+      - {id: s1, pace: slow, text: "{@l}所以 a 方减 b 方，等于 a 加 b 乘 a 减 b。", en: "{@l}So a squared minus b squared equals a plus b times a minus b."}
+      - {id: s2, pace: normal, text: "{@l}长方形的长就是 a 加 b，{@w}宽就是 a 减 b。", en: "{@l}The rectangle's length is a plus b, and {@w}its width is a minus b."}
+      - {id: s3, pace: normal, text: "{@m}竖式里的二十一乘十九，就是二十方减一，三百九十九。", en: "{@m}Twenty-one times nineteen in long multiplication is twenty squared minus one: three hundred ninety-nine."}
+    do:
+      - {at: s1, act: unmark, target: "two#Q"}
+      - {with: prev, act: hide, target: two}
+      - {with: prev, act: hide, target: num1}
+      - {with: prev, act: hide, target: num2}
+      - {after: prev, act: show, target: "dsq2#S", dur: 0.01}
+      - {after: prev, act: cut, target: dsq2, args: {cut: hole}, dur: 0.01}
+      - {after: prev, act: hide, target: "dsq2#B2", dur: 0.01}
+      - {with: prev, act: labels, target: dsq2, args: {piece: L, show: false}, dur: 0.01}
+      - {after: prev, act: cut, target: dsq2, args: {cut: c2}, dur: 0.01}
+      - {after: prev, act: snap, target: dsq2, args: {piece: Top, edge: [[0, 3], [3, 3]], to: Bottom, to_edge: [[5, 3], [5, 0]]}, dur: 0.01}
+      - {after: prev, act: merge, target: dsq2, args: {name: R}, dur: 0.01}
+      - {with: prev, act: show, target: "dsq2#long", dur: 0.01}
+      - {with: prev, act: show, target: "dsq2#short", dur: 0.01}
+      - {at: s1@l, act: show, target: law}
+      - {at: s2@l, act: mark, target: "dsq2#long"}
+      - {with: prev, act: mark, target: "law#p"}
+      - {at: s2@w, act: unmark, target: "dsq2#long"}
+      - {with: prev, act: unmark, target: "law#p"}
+      - {with: prev, act: mark, target: "dsq2#short"}
+      - {with: prev, act: mark, target: "law#m"}
+      - {at: s3@m, act: unmark, target: "dsq2#short"}
+      - {with: prev, act: unmark, target: "law#m"}
+      - {with: prev, act: show, target: num3}
+
+  - id: Close
+    say:
+      - {id: s1, pace: normal, text: "{@x}和切一刀一样，剪下来再补上去，面积一点也不会变。", en: "{@x}Just like cutting a rectangle once, cutting and moving never changes the area."}
+      - {id: s2, pace: ask, text: "{@n}要是正方形旁边多贴了一条，能补成正方形吗？", en: "{@n}What if a strip is stuck on the side of a square? Can we make it a square?"}
+    do:
+      - {at: s1@x, act: mark, target: "wrong#w"}
+      # 收成 #23 的开头画面：正方形加一条长条，右侧只留公式
+      - {at: s2@n, act: unmark, target: "wrong#w"}
+      - {with: prev, act: hide, target: dsq2}
+      - {with: prev, act: hide, target: wrong}
+      - {with: prev, act: hide, target: num3}
+      - {after: prev, act: show, target: xsq}
+      - {with: prev, act: show, target: "xsq#tx"}
+      - {with: prev, act: show, target: "xsq#tb"}
+      - {with: prev, act: show, target: "xsq#lx"}
